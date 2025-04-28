@@ -1,5 +1,6 @@
 import 'package:careflow_app/src/data/auth/repositories/auth_repository.dart';
 import 'package:careflow_app/src/data/auth/usecases/auth_usecase.dart';
+import 'package:careflow_app/src/presentation/pages/login_page.dart';
 import 'package:careflow_app/src/presentation/pages/signup_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +33,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CareFlow App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: SignUpPage(),
-      routes: {'/home': (context) => HomePage()},
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginPage(),
+        '/signup': (context) => SignUpPage(),
+        '/home': (context) => HomePage(),
+      },
     );
   }
 }
