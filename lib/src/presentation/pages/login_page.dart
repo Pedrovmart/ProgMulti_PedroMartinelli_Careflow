@@ -6,7 +6,9 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() {
+    return _LoginPageState();
+  }
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -51,7 +53,25 @@ class _LoginPageState extends State<LoginPage> {
 
                       if (context.mounted &&
                           context.read<AuthProvider>().isAuthenticated) {
-                        Navigator.pushReplacementNamed(context, '/home');
+                        final userType = context.read<AuthProvider>().userType;
+
+                        if (userType == 'paciente') {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/homePaciente',
+                          );
+                        } else if (userType == 'profissional') {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/homeProfissional',
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Tipo de usuário desconhecido'),
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(
                           context,

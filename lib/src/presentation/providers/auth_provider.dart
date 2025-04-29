@@ -5,23 +5,34 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthUseCase authUseCase;
+  final AuthUseCase _authUseCase;
 
-  AuthProvider(this.authUseCase);
+  AuthProvider(this._authUseCase);
 
   User? _user;
   User? get user => _user;
 
   bool get isAuthenticated => _user != null;
 
-  String _userType =
-      ''; // Variável para armazenar o tipo de usuário (paciente ou profissional)
+  String _userType = '';
   String get userType => _userType;
 
-  // Método para login
+  Stream<User?> get authStateChanges => _authUseCase.authStateChanges();
+
+  Future<void> setUserType() async {
+    if (_user != null) {
+      _userType = await _authUseCase.getUserType(_user!.uid);
+      notifyListeners();
+    }
+  }
+
   Future<void> login(String email, String password) async {
     try {
-      _user = await authUseCase.signIn(email: email, password: password);
+      _user = await _authUseCase.signIn(email: email, password: password);
+
+      if (_user != null) {
+        await setUserType();
+      }
       notifyListeners();
     } catch (e) {
       _user = null;
@@ -31,7 +42,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Método para cadastro de Paciente ou Profissional
   Future<void> signUp({
     required String email,
     required String password,
@@ -43,13 +53,13 @@ class AuthProvider with ChangeNotifier {
   }) async {
     try {
       if (userType == 'paciente') {
-        _user = await authUseCase.signUpPaciente(
+        _user = await _authUseCase.signUpPaciente(
           email: email,
           password: password,
           name: name,
         );
       } else {
-        _user = await authUseCase.signUpProfissional(
+        _user = await _authUseCase.signUpProfissional(
           email: email,
           password: password,
           name: name,
@@ -58,7 +68,7 @@ class AuthProvider with ChangeNotifier {
         );
       }
 
-      _userType = userType; // Define o tipo de usuário no AuthProvider
+      _userType = userType;
       notifyListeners();
     } catch (e) {
       _user = null;
@@ -68,10 +78,9 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Método para logout
   Future<void> signOut() async {
     try {
-      await authUseCase.signOut();
+      await _authUseCase.signOut();
       _user = null;
       _userType = '';
       notifyListeners();

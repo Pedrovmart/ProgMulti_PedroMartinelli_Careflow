@@ -1,11 +1,13 @@
 import 'package:careflow_app/src/data/auth/repositories/auth_repository.dart';
 import 'package:careflow_app/src/data/auth/usecases/auth_usecase.dart';
 import 'package:careflow_app/src/presentation/pages/login_page.dart';
+import 'package:careflow_app/src/presentation/pages/paciente_main_page.dart';
+import 'package:careflow_app/src/presentation/pages/profissional_main_page.dart';
 import 'package:careflow_app/src/presentation/pages/signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:careflow_app/src/presentation/pages/home_page.dart';
 
 import 'src/presentation/providers/auth_provider.dart';
 
@@ -31,13 +33,32 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CareFlow App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: '/login',
+      debugShowCheckedModeBanner: false,
+      home: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          return StreamBuilder<firebase_auth.User?>(
+            stream: authProvider.authStateChanges,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Espera enquanto o estado é carregado
+              }
+
+              if (snapshot.hasData) {
+                if (authProvider.userType == 'paciente') {
+                  return PacienteMainPage(); // Página do paciente
+                } else if (authProvider.userType == 'profissional') {
+                  return ProfissionalMainPage(); // Página do profissional
+                }
+              }
+
+              return LoginPage();
+            },
+          );
+        },
+      ),
       routes: {
         '/login': (context) => LoginPage(),
         '/signup': (context) => SignUpPage(),
-        '/home': (context) => HomePage(),
       },
     );
   }

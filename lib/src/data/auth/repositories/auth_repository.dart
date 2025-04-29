@@ -4,6 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
 class AuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  Stream<User?> authStateChanges() {
+    return _firebaseAuth.authStateChanges();
+  }
+
   // Método de login
   Future<User?> loginWithEmailAndPassword(String email, String password) async {
     try {
@@ -38,6 +42,7 @@ class AuthRepository {
           .set({
             'nome': name,
             'email': email,
+            'userType': 'paciente',
             'dataNascimento': null,
             'telefone': null,
             'endereco': null,
@@ -66,6 +71,10 @@ class AuthRepository {
 
       await userCredential.user?.updateDisplayName(name);
 
+      if (userCredential.user == null) {
+        throw Exception("Erro ao criar o usuário no FirebaseAuth");
+      }
+
       final userRef = userCredential.user?.uid;
       await FirebaseFirestore.instance
           .collection('usuarios')
@@ -77,12 +86,47 @@ class AuthRepository {
             'email': email,
             'especialidade': especialidade,
             'numRegistro': numRegistro,
+            'userType': 'profissional',
+            'dataNascimento': null,
+            'telefone': null,
             'createdAt': FieldValue.serverTimestamp(),
           });
 
       return userCredential.user;
     } catch (e) {
       throw Exception("Falha ao registrar profissional: ${e.toString()}");
+    }
+  }
+
+  Future<String> getUserType(String uid) async {
+    try {
+      final pacienteDoc =
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc('pacientes')
+              .collection('pacientes')
+              .doc(uid)
+              .get();
+
+      if (pacienteDoc.exists) {
+        return pacienteDoc['userType'];
+      }
+
+      final profissionalDoc =
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc('profissionais')
+              .collection('profissionais')
+              .doc(uid)
+              .get();
+
+      if (profissionalDoc.exists) {
+        return profissionalDoc['userType'];
+      }
+
+      throw Exception('Usuário não encontrado nas coleções.');
+    } catch (e) {
+      throw Exception("Erro ao verificar tipo de usuário: ${e.toString()}");
     }
   }
 

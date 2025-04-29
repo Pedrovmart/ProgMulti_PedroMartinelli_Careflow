@@ -6,7 +6,6 @@ class AuthUseCase {
 
   AuthUseCase(this._authRepository);
 
-  // Caso de uso para login
   Future<User?> signIn({
     required String email,
     required String password,
@@ -18,7 +17,18 @@ class AuthUseCase {
     }
   }
 
-  // Caso de uso para cadastro de Paciente
+  Future<String> getUserType(String uid) async {
+    try {
+      return await _authRepository.getUserType(uid);
+    } catch (e) {
+      throw Exception("Erro ao obter tipo de usuário: ${e.toString()}");
+    }
+  }
+
+  Stream<User?> authStateChanges() {
+    return _authRepository.authStateChanges();
+  }
+
   Future<User?> signUpPaciente({
     required String email,
     required String password,
@@ -31,7 +41,6 @@ class AuthUseCase {
     }
   }
 
-  // Caso de uso para cadastro de Profissional
   Future<User?> signUpProfissional({
     required String email,
     required String password,
@@ -52,7 +61,6 @@ class AuthUseCase {
     }
   }
 
-  // Caso de uso para logout
   Future<void> signOut() async {
     try {
       await _authRepository.signOut();

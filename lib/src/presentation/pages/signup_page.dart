@@ -98,7 +98,7 @@ class SignUpPageState extends State<SignUpPage> {
 
                 if (context.mounted) {
                   if (context.read<AuthProvider>().isAuthenticated) {
-                    Navigator.pushReplacementNamed(context, '/home');
+                    Navigator.pushReplacementNamed(context, '/login');
                   } else {
                     ScaffoldMessenger.of(
                       context,
