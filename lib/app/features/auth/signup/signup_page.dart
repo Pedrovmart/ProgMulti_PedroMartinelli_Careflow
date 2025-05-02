@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:careflow_app/src/presentation/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/auth_provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -78,27 +78,34 @@ class SignUpPageState extends State<SignUpPage> {
             ),
             ElevatedButton(
               onPressed: () async {
+                // Fazendo o cadastro de acordo com o tipo do usuário
                 if (_isProfisssional) {
-                  await context.read<AuthProvider>().signUp(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    name: _nameController.text,
-                    userType: 'profissional',
-                    especialidade: _especialidadeController.text,
-                    numRegistro: _numRegistroController.text,
+                  await context.read<AuthProvider>().registerProfissional(
+                    _emailController.text,
+                    _passwordController.text,
+                    _nameController.text,
+                    _especialidadeController.text,
                   );
                 } else {
-                  await context.read<AuthProvider>().signUp(
-                    email: _emailController.text,
-                    password: _passwordController.text,
-                    name: _nameController.text,
-                    userType: 'paciente',
+                  await context.read<AuthProvider>().registerPaciente(
+                    _emailController.text,
+                    _passwordController.text,
+                    _nameController.text,
                   );
                 }
 
+                // Verificando se o cadastro foi bem-sucedido
                 if (context.mounted) {
                   if (context.read<AuthProvider>().isAuthenticated) {
-                    Navigator.pushReplacementNamed(context, '/login');
+                    // Redireciona diretamente para a página apropriada
+                    if (_isProfisssional) {
+                      Navigator.pushReplacementNamed(
+                        context,
+                        '/homeProfissional',
+                      );
+                    } else {
+                      Navigator.pushReplacementNamed(context, '/homePaciente');
+                    }
                   } else {
                     ScaffoldMessenger.of(
                       context,

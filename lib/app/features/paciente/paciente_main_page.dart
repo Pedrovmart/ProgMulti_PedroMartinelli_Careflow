@@ -67,6 +67,8 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
 
 // Cada uma dessas classes representa apenas o conteúdo da tela
 class HomePacientePage extends StatelessWidget {
+  const HomePacientePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text('Bem-vindo à Home do Paciente'));
@@ -74,6 +76,8 @@ class HomePacientePage extends StatelessWidget {
 }
 
 class BuscarPage extends StatelessWidget {
+  const BuscarPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(child: Text('Página de Busca'));

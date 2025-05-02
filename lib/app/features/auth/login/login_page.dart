@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:careflow_app/src/presentation/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _isLoading = false; // Para mostrar loading enquanto tenta logar
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +46,16 @@ class _LoginPageState extends State<LoginPage> {
                     });
 
                     try {
+                      // Chama a função de login do AuthProvider
                       await context.read<AuthProvider>().login(
                         _emailController.text.trim(),
                         _passwordController.text.trim(),
                       );
 
-                      if (context.mounted &&
-                          context.read<AuthProvider>().isAuthenticated) {
+                      if (context.read<AuthProvider>().isAuthenticated) {
                         final userType = context.read<AuthProvider>().userType;
 
+                        // Verifica o tipo de usuário e navega para a página correspondente
                         if (userType == 'paciente') {
                           Navigator.pushReplacementNamed(
                             context,

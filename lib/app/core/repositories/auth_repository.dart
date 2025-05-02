@@ -1,14 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importar Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  Stream<User?> authStateChanges() {
-    return _firebaseAuth.authStateChanges();
-  }
-
-  // Método de login
+  // Autenticação do usuário
   Future<User?> loginWithEmailAndPassword(String email, String password) async {
     try {
       final UserCredential userCredential = await _firebaseAuth
@@ -28,29 +24,18 @@ class AuthRepository {
     try {
       final UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-
-      // Atualiza o nome do paciente no Firebase Auth
       await userCredential.user?.updateDisplayName(name);
-
-      // Salva o paciente no Firestore
-      final userRef = userCredential.user?.uid;
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc('pacientes')
           .collection('pacientes')
-          .doc(userRef)
+          .doc(userCredential.user!.uid)
           .set({
             'nome': name,
             'email': email,
             'userType': 'paciente',
-            'dataNascimento': null,
-            'telefone': null,
-            'endereco': null,
-            'cpf': null,
-            'sexo': null,
             'createdAt': FieldValue.serverTimestamp(),
           });
-
       return userCredential.user;
     } catch (e) {
       throw Exception("Falha ao registrar paciente: ${e.toString()}");
@@ -63,41 +48,30 @@ class AuthRepository {
     String password,
     String name,
     String especialidade,
-    String numRegistro,
   ) async {
     try {
       final UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
-
       await userCredential.user?.updateDisplayName(name);
-
-      if (userCredential.user == null) {
-        throw Exception("Erro ao criar o usuário no FirebaseAuth");
-      }
-
-      final userRef = userCredential.user?.uid;
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc('profissionais')
           .collection('profissionais')
-          .doc(userRef)
+          .doc(userCredential.user!.uid)
           .set({
             'nome': name,
             'email': email,
             'especialidade': especialidade,
-            'numRegistro': numRegistro,
             'userType': 'profissional',
-            'dataNascimento': null,
-            'telefone': null,
             'createdAt': FieldValue.serverTimestamp(),
           });
-
       return userCredential.user;
     } catch (e) {
       throw Exception("Falha ao registrar profissional: ${e.toString()}");
     }
   }
 
+  // Método para obter o tipo de usuário
   Future<String> getUserType(String uid) async {
     try {
       final pacienteDoc =
@@ -107,10 +81,7 @@ class AuthRepository {
               .collection('pacientes')
               .doc(uid)
               .get();
-
-      if (pacienteDoc.exists) {
-        return pacienteDoc['userType'];
-      }
+      if (pacienteDoc.exists) return 'paciente';
 
       final profissionalDoc =
           await FirebaseFirestore.instance
@@ -119,12 +90,9 @@ class AuthRepository {
               .collection('profissionais')
               .doc(uid)
               .get();
+      if (profissionalDoc.exists) return 'profissional';
 
-      if (profissionalDoc.exists) {
-        return profissionalDoc['userType'];
-      }
-
-      throw Exception('Usuário não encontrado nas coleções.');
+      throw Exception('Usuário não encontrado.');
     } catch (e) {
       throw Exception("Erro ao verificar tipo de usuário: ${e.toString()}");
     }
@@ -138,4 +106,7 @@ class AuthRepository {
       throw Exception("Falha ao sair: ${e.toString()}");
     }
   }
+
+  // Stream de estado de autenticação
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 }
