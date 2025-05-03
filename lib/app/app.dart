@@ -1,7 +1,6 @@
-import 'package:careflow_app/app/routes/routes.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    show User; // Alias para evitar conflito de importação
 import 'package:flutter/material.dart';
+import 'package:careflow_app/app/routes/routes.dart'; // Suas rotas personalizadas
+import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
@@ -18,7 +17,6 @@ class App extends StatelessWidget {
       child: MaterialApp(
         title: 'CareFlow',
         theme: ThemeData(primarySwatch: Colors.blue),
-        initialRoute: Routes.login,
         onGenerateRoute: Routes.generateRoute,
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, _) {
@@ -26,17 +24,19 @@ class App extends StatelessWidget {
               stream: authProvider.authStateChanges,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return CircularProgressIndicator(); // Aguarda a verificação do login
                 }
 
                 if (snapshot.hasData) {
+                  // Se o usuário estiver logado, define para qual página irá
                   if (authProvider.userType == 'paciente') {
-                    return PacienteMainPage();
+                    return PacienteMainPage(); // Direciona para a home do paciente
                   } else if (authProvider.userType == 'profissional') {
-                    return ProfissionalMainPage();
+                    return ProfissionalMainPage(); // Direciona para a home do profissional
                   }
                 }
 
+                // Se o usuário não estiver autenticado, mostra a tela de login
                 return LoginPage();
               },
             );

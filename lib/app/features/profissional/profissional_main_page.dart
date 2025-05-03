@@ -1,4 +1,4 @@
-import 'package:careflow_app/app/presentation/pages/profissional/home/profissional_home_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -38,9 +38,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
         children: [
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.only(
-                bottom: 76,
-              ), // Espaço para a navbar
+              padding: const EdgeInsets.only(bottom: 76),
               child: _getPageContent(),
             ),
           ),

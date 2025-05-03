@@ -22,13 +22,7 @@ class Routes {
       case homeProfissional:
         return MaterialPageRoute(builder: (_) => ProfissionalMainPage());
       default:
-        return MaterialPageRoute(
-          builder:
-              (_) => Scaffold(
-                appBar: AppBar(title: Text('Erro')),
-                body: Center(child: Text('Página não encontrada!')),
-              ),
-        );
+        return MaterialPageRoute(builder: (_) => LoginPage());
     }
   }
 }

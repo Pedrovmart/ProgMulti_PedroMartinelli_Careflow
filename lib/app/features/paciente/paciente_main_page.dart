@@ -1,4 +1,6 @@
+import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 
 class PacienteMainPage extends StatefulWidget {
   const PacienteMainPage({super.key});
@@ -12,86 +14,48 @@ class PacienteMainPage extends StatefulWidget {
 class _PacienteMainPageState extends State<PacienteMainPage> {
   int _selectedIndex = 0;
 
-  // Lista de Widgets que representam o conteúdo principal (body) de cada aba
-  final List<Widget> _pages = [
-    HomePacientePage(),
-    BuscarPage(),
-    AgendamentosPage(),
-    PerfilPage(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
+  Widget _getPageContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return PacienteHomePage();
+      case 1:
+        return Center(child: Text("Consultas"));
+      case 2:
+        return Center(child: Text("Perfil"));
+      default:
+        return Center(child: Text("Página Inicial"));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_getTitleForIndex(_selectedIndex))),
-      body: _pages[_selectedIndex], // Só troca o body
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Agendamentos',
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 76),
+              child: _getPageContent(),
+            ),
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          // Barra de navegação flutuante
+          Positioned(
+            bottom: 15,
+            left: 15,
+            right: 15,
+            child: NavBarWidget(
+              onTap: _onItemTapped,
+              selectedIndex: _selectedIndex,
+            ),
+          ),
         ],
       ),
     );
-  }
-
-  String _getTitleForIndex(int index) {
-    switch (index) {
-      case 0:
-        return 'Início';
-      case 1:
-        return 'Buscar';
-      case 2:
-        return 'Agendamentos';
-      case 3:
-        return 'Perfil';
-      default:
-        return 'Paciente';
-    }
-  }
-}
-
-class HomePacientePage extends StatelessWidget {
-  const HomePacientePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Bem-vindo à Home do Paciente'));
-  }
-}
-
-class BuscarPage extends StatelessWidget {
-  const BuscarPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Página de Busca'));
-  }
-}
-
-class AgendamentosPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Seus Agendamentos'));
-  }
-}
-
-class PerfilPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Seu Perfil'));
   }
 }
