@@ -45,6 +45,19 @@ class PacienteHomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
+                leading: Icon(Icons.map, color: Colors.teal),
+                title: Text('Rota Atual'),
+                subtitle: Text(
+                  'Você está em: ${ModalRoute.of(context)?.settings.name ?? "Desconhecida"}',
+                ),
+              ),
+            ),
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
                 leading: Icon(Icons.history, color: Colors.teal),
                 title: Text('Histórico Médico'),
                 subtitle: Text('Acesse seu histórico de saúde'),

@@ -109,21 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
                           if (context.mounted &&
                               context.read<AuthProvider>().isAuthenticated) {
-                            final userType =
-                                context.read<AuthProvider>().userType;
-
-                            // Verifica o tipo de usuário e navega para a página correspondente
-                            if (userType == 'paciente') {
-                              context.go('/homePaciente');
-                            } else if (userType == 'profissional') {
-                              context.go('/homeProfissional');
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Tipo de usuário desconhecido'),
-                                ),
-                              );
-                            }
+                            context.replace('/');
                           } else {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(

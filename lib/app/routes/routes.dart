@@ -76,9 +76,19 @@ sealed class Routes {
         if (user == null &&
             state.uri.toString() != '/login' &&
             state.uri.toString() != '/signup') {
-          return '/login';
+          return '/';
         }
-        debugPrint('Redirecting to ${state.uri.toString()}');
+
+        if (user != null) {
+          if (authProvider.userType == 'paciente' &&
+              state.uri.toString() == '/login') {
+            return '/paciente/home';
+          } else if (authProvider.userType == 'profissional' &&
+              state.uri.toString() == '/login') {
+            return '/profissional/home';
+          }
+        }
+
         return null;
       },
       errorBuilder: (context, state) => LoginPage(),

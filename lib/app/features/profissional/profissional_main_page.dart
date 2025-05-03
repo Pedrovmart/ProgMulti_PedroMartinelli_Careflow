@@ -1,3 +1,4 @@
+import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,9 +13,17 @@ class ProfissionalMainPage extends StatelessWidget {
   final Widget child;
   final GoRouterState state;
 
+  static const List<NavBarItem> _navItems = [
+    NavBarItem(icon: Icons.home, label: 'Home'),
+    NavBarItem(icon: Icons.calendar_today, label: 'Agenda'),
+    NavBarItem(icon: Icons.map, label: 'Roadmap'),
+    NavBarItem(icon: Icons.person, label: 'Perfil'),
+  ];
+
   static const List<String> _routes = [
     '/profissional/home',
     '/profissional/consultas',
+    '/profissional/roadmap',
     '/profissional/perfil',
   ];
 
@@ -42,6 +51,7 @@ class ProfissionalMainPage extends StatelessWidget {
                 context.go(_routes[index]); // Navegação via GoRouter
               },
               selectedIndex: _routes.indexOf(location),
+              items: _navItems, // Ícones e rótulos dinâmicos
             ),
           ),
         ],

@@ -1,14 +1,17 @@
+import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 class NavBarWidget extends StatelessWidget {
   final Function(int) onTap;
   final int selectedIndex;
+  final List<NavBarItem> items;
 
   const NavBarWidget({
     super.key,
     required this.onTap,
     required this.selectedIndex,
+    required this.items,
   });
 
   @override
@@ -31,52 +34,22 @@ class NavBarWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Ícone Home
-            IconButton(
-              icon: Icon(
-                Icons.home,
-                color: selectedIndex == 0 ? AppColors.accent : AppColors.light,
-              ),
-              onPressed: () => onTap(0),
-            ),
+          children:
+              items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
 
-            // Ícone Calendário
-            IconButton(
-              icon: Icon(
-                Icons.calendar_today,
-                color: selectedIndex == 1 ? AppColors.accent : AppColors.light,
-              ),
-              onPressed: () => onTap(1),
-            ),
-
-            // Ícone Busca
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: selectedIndex == 2 ? AppColors.accent : AppColors.light,
-              ),
-              onPressed: () => onTap(2),
-            ),
-
-            // Ícone Roadmap
-            IconButton(
-              icon: Icon(
-                Icons.map,
-                color: selectedIndex == 3 ? AppColors.accent : AppColors.light,
-              ),
-              onPressed: () => onTap(3),
-            ),
-
-            // Ícone Perfil
-            IconButton(
-              icon: Icon(
-                Icons.person,
-                color: selectedIndex == 4 ? AppColors.accent : AppColors.light,
-              ),
-              onPressed: () => onTap(4),
-            ),
-          ],
+                return IconButton(
+                  icon: Icon(
+                    item.icon,
+                    color:
+                        selectedIndex == index
+                            ? AppColors.accent
+                            : AppColors.light,
+                  ),
+                  onPressed: () => onTap(index),
+                );
+              }).toList(),
         ),
       ),
     );
