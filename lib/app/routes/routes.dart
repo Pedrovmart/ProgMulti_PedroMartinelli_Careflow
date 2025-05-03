@@ -1,7 +1,6 @@
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
