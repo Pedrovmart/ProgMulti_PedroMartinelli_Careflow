@@ -6,19 +6,16 @@ class AuthProvider extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
 
   firebase_auth.User? _user;
-  String _userType =
-      ''; // Isso vai armazenar o tipo de usuário (paciente, profissional)
+  String _userType = '';
 
   firebase_auth.User? get user => _user;
   String get userType => _userType;
 
-  // Getter para verificar se o usuário está autenticado
   bool get isAuthenticated => _user != null;
 
   Stream<firebase_auth.User?> get authStateChanges =>
       _authRepository.authStateChanges;
 
-  // Método para fazer login
   Future<void> login(String email, String password) async {
     try {
       _user = await _authRepository.loginWithEmailAndPassword(email, password);
@@ -29,7 +26,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Método para registrar paciente
   Future<void> registerPaciente(
     String email,
     String password,
@@ -44,7 +40,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Método para registrar profissional
   Future<void> registerProfissional(
     String email,
     String password,
@@ -65,7 +60,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Método para logout
   Future<void> signOut() async {
     await _authRepository.signOut();
     _user = null;

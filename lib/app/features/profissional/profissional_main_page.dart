@@ -36,7 +36,6 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Conteúdo da página
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.only(

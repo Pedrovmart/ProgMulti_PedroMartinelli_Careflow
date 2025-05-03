@@ -48,7 +48,6 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
     );
   }
 
-  // Define o título da AppBar conforme o índice selecionado
   String _getTitleForIndex(int index) {
     switch (index) {
       case 0:
@@ -65,7 +64,6 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   }
 }
 
-// Cada uma dessas classes representa apenas o conteúdo da tela
 class HomePacientePage extends StatelessWidget {
   const HomePacientePage({super.key});
 

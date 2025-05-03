@@ -14,35 +14,30 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AuthProvider(), // Provedor para gerenciar a autenticação
+      create: (_) => AuthProvider(),
       child: MaterialApp(
         title: 'CareFlow',
         theme: ThemeData(primarySwatch: Colors.blue),
-        initialRoute: Routes.login, // Rota inicial
-        onGenerateRoute: Routes.generateRoute, // Usando o gerador de rotas
+        initialRoute: Routes.login,
+        onGenerateRoute: Routes.generateRoute,
         home: Consumer<AuthProvider>(
-          // Consumindo o AuthProvider para a verificação de autenticação
           builder: (context, authProvider, _) {
             return StreamBuilder<User?>(
-              // Escutando as mudanças de estado de autenticação
-              stream:
-                  authProvider
-                      .authStateChanges, // Fluxo que retorna o estado de autenticação do Firebase
+              stream: authProvider.authStateChanges,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // Exibe um carregando enquanto verifica o estado
+                  return CircularProgressIndicator();
                 }
 
                 if (snapshot.hasData) {
-                  // Verifica o tipo de usuário e redireciona para a página apropriada
                   if (authProvider.userType == 'paciente') {
-                    return PacienteMainPage(); // Página do paciente
+                    return PacienteMainPage();
                   } else if (authProvider.userType == 'profissional') {
-                    return ProfissionalMainPage(); // Página do profissional
+                    return ProfissionalMainPage();
                   }
                 }
 
-                return LoginPage(); // Usuário não autenticado, exibe a página de login
+                return LoginPage();
               },
             );
           },

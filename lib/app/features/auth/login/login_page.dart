@@ -19,40 +19,46 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Senha'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            _isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
+    return PopScope(
+      canPop:
+          !context
+              .read<AuthProvider>()
+              .isAuthenticated, // Permite voltar apenas se o usuário não estiver autenticado
+      child: Scaffold(
+        appBar: AppBar(title: Text('Login')),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Senha'),
+                obscureText: true,
+              ),
+              SizedBox(height: 20),
+              if (_isLoading)
+                CircularProgressIndicator()
+              else
+                ElevatedButton(
                   onPressed: () async {
                     setState(() {
                       _isLoading = true;
                     });
 
                     try {
-                      // Chama a função de login do AuthProvider
                       await context.read<AuthProvider>().login(
                         _emailController.text.trim(),
                         _passwordController.text.trim(),
                       );
 
-                      if (context.read<AuthProvider>().isAuthenticated) {
+                      if (context.mounted &&
+                          context.read<AuthProvider>().isAuthenticated) {
                         final userType = context.read<AuthProvider>().userType;
 
                         // Verifica o tipo de usuário e navega para a página correspondente
@@ -74,9 +80,11 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         }
                       } else {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('Login falhou')));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Login falhou')),
+                          );
+                        }
                       }
                     } catch (e) {
                       if (context.mounted) {
@@ -94,14 +102,15 @@ class _LoginPageState extends State<LoginPage> {
                   },
                   child: Text('Login'),
                 ),
-            SizedBox(height: 20),
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signup');
-              },
-              child: Text('Não tem uma conta? Cadastre-se'),
-            ),
-          ],
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/signup');
+                },
+                child: Text('Não tem uma conta? Cadastre-se'),
+              ),
+            ],
+          ),
         ),
       ),
     );

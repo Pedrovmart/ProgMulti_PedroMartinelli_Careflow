@@ -14,8 +14,7 @@ class SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
 
-  bool _isProfisssional =
-      false; // Controla se o tipo é "Profissional" ou "Paciente"
+  bool _isProfisssional = false;
 
   final TextEditingController _especialidadeController =
       TextEditingController();
@@ -78,7 +77,6 @@ class SignUpPageState extends State<SignUpPage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Fazendo o cadastro de acordo com o tipo do usuário
                 if (_isProfisssional) {
                   await context.read<AuthProvider>().registerProfissional(
                     _emailController.text,
@@ -94,10 +92,8 @@ class SignUpPageState extends State<SignUpPage> {
                   );
                 }
 
-                // Verificando se o cadastro foi bem-sucedido
                 if (context.mounted) {
                   if (context.read<AuthProvider>().isAuthenticated) {
-                    // Redireciona diretamente para a página apropriada
                     if (_isProfisssional) {
                       Navigator.pushReplacementNamed(
                         context,
