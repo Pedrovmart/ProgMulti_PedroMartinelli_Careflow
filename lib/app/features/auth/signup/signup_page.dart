@@ -25,7 +25,11 @@ class SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.light,
-      appBar: AppBar(backgroundColor: AppColors.light),
+      appBar: AppBar(
+        backgroundColor: AppColors.light,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.primaryDark),
+      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -51,6 +55,8 @@ class SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // Toggle para selecionar Paciente ou Profissional
                   Center(
                     child: ToggleButtons(
                       isSelected: [_isProfissional == false, _isProfissional],
@@ -72,68 +78,108 @@ class SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Campo de Nome
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: 'Nome',
+                      labelStyle: TextStyle(color: AppColors.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryDark),
                       ),
                       prefixIcon: Icon(Icons.person, color: AppColors.primary),
                     ),
+                    cursorColor: AppColors.primaryDark,
                   ),
                   const SizedBox(height: 16),
 
+                  // Campo de Email
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
+                      labelStyle: TextStyle(color: AppColors.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryDark),
                       ),
                       prefixIcon: Icon(Icons.email, color: AppColors.primary),
                     ),
+                    cursorColor: AppColors.primaryDark,
                   ),
                   const SizedBox(height: 16),
 
+                  // Campos adicionais para Profissional
                   if (_isProfissional) ...[
                     TextField(
                       controller: _especialidadeController,
                       decoration: InputDecoration(
                         labelText: 'Especialidade',
+                        labelStyle: TextStyle(color: AppColors.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: AppColors.primaryDark),
                         ),
                         prefixIcon: Icon(Icons.work, color: AppColors.primary),
                       ),
+                      cursorColor: AppColors.primaryDark,
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: _numRegistroController,
                       decoration: InputDecoration(
                         labelText: 'Número de Registro',
+                        labelStyle: TextStyle(color: AppColors.primary),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: AppColors.primaryDark),
                         ),
                         prefixIcon: Icon(Icons.badge, color: AppColors.primary),
                       ),
+                      cursorColor: AppColors.primaryDark,
                     ),
                     const SizedBox(height: 16),
                   ],
 
+                  // Campo de Senha
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Senha',
+                      labelStyle: TextStyle(color: AppColors.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryDark),
                       ),
                       prefixIcon: Icon(Icons.lock, color: AppColors.primary),
                     ),
+                    cursorColor: AppColors.primaryDark,
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
 
+                  // Botão de Cadastro ou Indicador de Carregamento
                   if (_isLoading)
                     const Center(
                       child: CircularProgressIndicator(
@@ -211,6 +257,7 @@ class SignUpPageState extends State<SignUpPage> {
                     ),
                   const SizedBox(height: 16),
 
+                  // Botão para Voltar ao Login
                   TextButton(
                     onPressed: () {
                       context.pop();
