@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Título
                   Text(
                     'Bem-vindo ao CareFlow',
                     textAlign: TextAlign.center,
@@ -49,29 +48,41 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo de Email
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
+                      labelStyle: TextStyle(color: AppColors.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryDark),
                       ),
                       prefixIcon: Icon(Icons.email, color: AppColors.primary),
                     ),
+                    cursorColor: AppColors.primaryDark,
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo de Senha
                   TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
                       labelText: 'Senha',
+                      labelStyle: TextStyle(color: AppColors.primary),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryDark),
                       ),
                       prefixIcon: Icon(Icons.lock, color: AppColors.primary),
                     ),
+                    cursorColor: AppColors.primaryDark,
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
