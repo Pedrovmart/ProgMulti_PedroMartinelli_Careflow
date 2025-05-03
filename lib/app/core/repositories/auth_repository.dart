@@ -107,6 +107,14 @@ class AuthRepository {
     }
   }
 
+  User? getCurrentUser() {
+    try {
+      return _firebaseAuth.currentUser;
+    } catch (e) {
+      throw Exception("Erro ao obter o usuário atual: ${e.toString()}");
+    }
+  }
+
   // Stream de estado de autenticação
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 }

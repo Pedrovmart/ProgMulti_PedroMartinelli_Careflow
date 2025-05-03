@@ -5,21 +5,24 @@ import 'package:careflow_app/app/core/repositories/auth_repository.dart';
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
 
-  firebase_auth.User? _user;
+  firebase_auth.User? _currentUser;
   String _userType = '';
 
-  firebase_auth.User? get user => _user;
+  firebase_auth.User? get currentUser => _currentUser;
   String get userType => _userType;
 
-  bool get isAuthenticated => _user != null;
+  bool get isAuthenticated => _currentUser != null;
 
   Stream<firebase_auth.User?> get authStateChanges =>
       _authRepository.authStateChanges;
 
   Future<void> login(String email, String password) async {
     try {
-      _user = await _authRepository.loginWithEmailAndPassword(email, password);
-      _userType = await _authRepository.getUserType(_user!.uid);
+      _currentUser = await _authRepository.loginWithEmailAndPassword(
+        email,
+        password,
+      );
+      _userType = await _authRepository.getUserType(_currentUser!.uid);
       notifyListeners();
     } catch (e) {
       throw Exception("Erro ao fazer login: ${e.toString()}");
@@ -32,7 +35,11 @@ class AuthProvider extends ChangeNotifier {
     String name,
   ) async {
     try {
-      _user = await _authRepository.registerPaciente(email, password, name);
+      _currentUser = await _authRepository.registerPaciente(
+        email,
+        password,
+        name,
+      );
       _userType = 'paciente';
       notifyListeners();
     } catch (e) {
@@ -47,7 +54,7 @@ class AuthProvider extends ChangeNotifier {
     String especialidade,
   ) async {
     try {
-      _user = await _authRepository.registerProfissional(
+      _currentUser = await _authRepository.registerProfissional(
         email,
         password,
         name,
@@ -62,7 +69,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _authRepository.signOut();
-    _user = null;
+    _currentUser = null;
     _userType = '';
     notifyListeners();
   }

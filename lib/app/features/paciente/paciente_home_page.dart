@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PacienteHomePage extends StatelessWidget {
+  const PacienteHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
