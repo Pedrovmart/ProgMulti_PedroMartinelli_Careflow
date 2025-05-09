@@ -1,11 +1,11 @@
 import 'package:careflow_app/app/models/user_model.dart';
 
-class ProfissionalModel extends UserModel {
+class Profissional extends UserModel {
   final String especialidade;
   final String numeroRegistro;
   final String idEmpresa;
 
-  ProfissionalModel({
+  Profissional({
     required super.id,
     required super.nome,
     required super.email,
@@ -14,8 +14,8 @@ class ProfissionalModel extends UserModel {
     required this.idEmpresa,
   }) : super(papel: 'profissional');
 
-  factory ProfissionalModel.fromJson(Map<String, dynamic> json) {
-    return ProfissionalModel(
+  factory Profissional.fromJson(Map<String, dynamic> json) {
+    return Profissional(
       id: json['id'],
       nome: json['nome'],
       email: json['email'],
