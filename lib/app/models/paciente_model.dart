@@ -1,12 +1,12 @@
 import 'user_model.dart';
 
-class PacienteModel extends UserModel {
+class Paciente extends UserModel {
   final String cpf;
   final DateTime dataNascimento;
   final String telefone;
   final String endereco;
 
-  PacienteModel({
+  Paciente({
     required super.id,
     required super.nome,
     required super.email,
@@ -16,8 +16,8 @@ class PacienteModel extends UserModel {
     required this.endereco,
   }) : super(papel: 'paciente');
 
-  factory PacienteModel.fromJson(Map<String, dynamic> json) {
-    return PacienteModel(
+  factory Paciente.fromJson(Map<String, dynamic> json) {
+    return Paciente(
       id: json['id'] as String,
       nome: json['nome'] as String,
       email: json['email'] as String,
