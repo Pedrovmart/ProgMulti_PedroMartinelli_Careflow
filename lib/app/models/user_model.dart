@@ -2,13 +2,13 @@ class UserModel {
   final String id;
   final String nome;
   final String email;
-  final String papel; // 'paciente' ou 'profissional'
+  final String userType; // 'paciente' ou 'profissional'
 
   UserModel({
     required this.id,
     required this.nome,
     required this.email,
-    required this.papel,
+    required this.userType,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -16,11 +16,11 @@ class UserModel {
       id: json['id'],
       nome: json['nome'],
       email: json['email'],
-      papel: json['papel'],
+      userType: json['userType'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id': id, 'nome': nome, 'email': email, 'papel': papel};
+    return {'id': id, 'nome': nome, 'email': email, 'userType': userType};
   }
 }

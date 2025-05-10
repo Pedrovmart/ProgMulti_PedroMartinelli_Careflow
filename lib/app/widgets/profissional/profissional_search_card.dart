@@ -27,11 +27,10 @@ class ProfissionalSearchCard extends StatelessWidget {
             // Placeholder for the professional's image
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                'https://via.placeholder.com/80',
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: const Color.fromARGB(90, 0, 0, 0),
+                child: const Icon(Icons.person, size: 40, color: Colors.white),
               ),
             ),
             const SizedBox(width: 16),

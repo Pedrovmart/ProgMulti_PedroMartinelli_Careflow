@@ -11,17 +11,18 @@ class ProfissionalRepository {
       .collection('profissionais');
 
   // Método para buscar todos os profissionais
-  Future<List<Profissional>> getAllProfissionais() async {
+  Future<Map<String, Map<String, dynamic>>> getAllProfissionais() async {
     try {
       final querySnapshot = await _profissionaisCollection.get();
-      return querySnapshot.docs
-          .map(
-            (doc) => Profissional.fromJson({
-              ...doc.data() as Map<String, dynamic>,
-              'id': doc.id,
-            }),
-          )
-          .toList();
+      Map<String, Map<String, dynamic>> profissionaisData = {};
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        profissionaisData[doc.id] =
+            data; // Adiciona os dados do profissional com seu uid como chave
+      }
+
+      return profissionaisData; // Retorna o mapa com todos os profissionais e seus dados
     } catch (e) {
       throw Exception("Erro ao buscar profissionais: ${e.toString()}");
     }

@@ -14,7 +14,7 @@ class Paciente extends UserModel {
     required this.dataNascimento,
     required this.telefone,
     required this.endereco,
-  }) : super(papel: 'paciente');
+  }) : super(userType: 'userType');
 
   factory Paciente.fromJson(Map<String, dynamic> json) {
     return Paciente(
