@@ -1,18 +1,23 @@
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
+import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; // Import da página de busca
+import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; // Import da página de perfil público
 
 sealed class Routes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String homePaciente = '/paciente/home';
   static const String homeProfissional = '/profissional/home';
+  static const String perfilPublicoProfissional =
+      '/paciente/perfilProfissional'; // Nova rota
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -61,6 +66,16 @@ sealed class Routes {
               builder:
                   (context, state) =>
                       ProfissionalSearchPage(), //Pacientes buscam profissionais!!!
+            ),
+            GoRoute(
+              path: '/paciente/perfilProfissional',
+              name: 'perfilPublicoProfissional',
+              builder: (context, state) {
+                final profissional = state.extra as Profissional?;
+                return ProfissionalPerfilPublicoPage(
+                  key: ValueKey(profissional?.id),
+                );
+              },
             ),
           ],
         ),
