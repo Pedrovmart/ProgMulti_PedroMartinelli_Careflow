@@ -4,7 +4,7 @@ import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/widgets/profissional/profissional_search_card.dart';
 
 class ProfissionalSearchPage extends StatefulWidget {
-  const ProfissionalSearchPage({Key? key}) : super(key: key);
+  const ProfissionalSearchPage({super.key});
 
   @override
   State<ProfissionalSearchPage> createState() => _ProfissionalSearchPageState();
