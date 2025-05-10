@@ -10,6 +10,7 @@ import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; // Import da página de busca
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; // Import da página de perfil público
+import 'package:careflow_app/app/features/consultas/calendario_page.dart'; // Import da página CalendarioPage
 
 sealed class Routes {
   static const String login = '/login';
@@ -17,7 +18,9 @@ sealed class Routes {
   static const String homePaciente = '/paciente/home';
   static const String homeProfissional = '/profissional/home';
   static const String perfilPublicoProfissional =
-      '/paciente/perfilProfissional'; // Nova rota
+      '/paciente/busca/perfilProfissional'; // Alterada para /paciente/busca/perfilProfissional
+  static const String calendario =
+      '/paciente/calendario'; // Rota para o calendário
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -63,12 +66,11 @@ sealed class Routes {
             GoRoute(
               path: '/paciente/busca',
               name: 'pacienteBusca',
-              builder:
-                  (context, state) =>
-                      ProfissionalSearchPage(), //Pacientes buscam profissionais!!!
+              builder: (context, state) => ProfissionalSearchPage(),
             ),
             GoRoute(
-              path: '/paciente/perfilProfissional',
+              path:
+                  '/paciente/busca/perfilProfissional', // Alterada para /paciente/busca/perfilProfissional
               name: 'perfilPublicoProfissional',
               builder: (context, state) {
                 final profissional = state.extra as Profissional?;
@@ -76,6 +78,11 @@ sealed class Routes {
                   key: ValueKey(profissional?.id),
                 );
               },
+            ),
+            GoRoute(
+              path: '/paciente/calendario',
+              name: 'calendario',
+              builder: (context, state) => const CalendarioPage(),
             ),
           ],
         ),

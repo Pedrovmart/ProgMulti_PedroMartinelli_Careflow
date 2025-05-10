@@ -18,7 +18,7 @@ class PacienteMainPage extends StatelessWidget {
   static const List<String> _routes = [
     '/paciente/home',
     '/paciente/busca',
-    '/paciente/consultas',
+    '/paciente/calendario',
     '/paciente/perfil',
   ];
 
