@@ -6,6 +6,7 @@ import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; // Import da página de busca
 
 sealed class Routes {
   static const String login = '/login';
@@ -53,6 +54,13 @@ sealed class Routes {
               path: '/paciente/home',
               name: 'homePaciente',
               builder: (context, state) => PacienteHomePage(),
+            ),
+            GoRoute(
+              path: '/paciente/busca',
+              name: 'pacienteBusca',
+              builder:
+                  (context, state) =>
+                      ProfissionalSearchPage(), //Pacientes buscam profissionais!!!
             ),
           ],
         ),

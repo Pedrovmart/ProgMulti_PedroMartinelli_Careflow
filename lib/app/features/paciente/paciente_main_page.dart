@@ -10,12 +10,14 @@ class PacienteMainPage extends StatelessWidget {
 
   static const List<NavBarItem> _navItems = [
     NavBarItem(icon: Icons.home, label: 'Home'),
+    NavBarItem(icon: Icons.search, label: 'Busca'),
     NavBarItem(icon: Icons.calendar_today, label: 'Consultas'),
     NavBarItem(icon: Icons.person, label: 'Perfil'),
   ];
 
   static const List<String> _routes = [
     '/paciente/home',
+    '/paciente/busca',
     '/paciente/consultas',
     '/paciente/perfil',
   ];
