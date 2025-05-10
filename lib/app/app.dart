@@ -1,6 +1,8 @@
 import 'package:careflow_app/app/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/profissional_provider.dart';
+import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
@@ -8,8 +10,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ProfissionalProvider()),
+        ChangeNotifierProvider(create: (_) => PacienteProvider()),
+      ],
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           return MaterialApp.router(
