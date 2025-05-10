@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/widgets/profissional/profissional_search_card.dart';
+import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart';
 
 class ProfissionalSearchPage extends StatefulWidget {
   const ProfissionalSearchPage({super.key});
@@ -68,10 +69,25 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                       itemCount: profissionais.length,
                       itemBuilder: (context, index) {
                         final profissional = profissionais[index];
-                        return ProfissionalSearchCard(
-                          nome: profissional.nome,
-                          especialidade: profissional.especialidade,
-                          numeroRegistro: profissional.numeroRegistro,
+                        return GestureDetector(
+                          onTap: () {
+                            // Navega para a página de perfil do profissional
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const ProfissionalPerfilPublicoPage(),
+                                settings: RouteSettings(
+                                  arguments: profissional,
+                                ),
+                              ),
+                            );
+                          },
+                          child: ProfissionalSearchCard(
+                            nome: profissional.nome,
+                            especialidade: profissional.especialidade,
+                            numeroRegistro: profissional.numeroRegistro,
+                          ),
                         );
                       },
                     ),
