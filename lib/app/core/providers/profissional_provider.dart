@@ -12,9 +12,25 @@ class ProfissionalProvider extends ChangeNotifier {
 
   Future<void> fetchProfissionais() async {
     try {
-      _profissionais = await _profissionalRepository.getAllProfissionais();
+      // Busca os profissionais do repositório
+      final profissionaisMap =
+          await _profissionalRepository.getAllProfissionais();
+
+      // Converte o Map<String, Map<String, dynamic>> para List<Profissional>
+      _profissionais =
+          profissionaisMap.entries.map((entry) {
+            final id = entry.key;
+            final data = entry.value;
+            return Profissional.fromJson({
+              ...data,
+              'id': id, // Adiciona o ID do documento ao JSON
+            });
+          }).toList();
+
+      // Notifica os ouvintes sobre a mudança
       notifyListeners();
     } catch (e) {
+      // Lança uma exceção com a mensagem de erro
       throw Exception("Erro ao buscar profissionais: ${e.toString()}");
     }
   }
@@ -46,14 +62,11 @@ class ProfissionalProvider extends ChangeNotifier {
     try {
       await _profissionalRepository.updateProfissional(updatedProfissional);
       _profissionais =
-          _profissionais
-              .map(
-                (profissional) =>
-                    profissional.id == updatedProfissional.id
-                        ? updatedProfissional
-                        : profissional,
-              )
-              .toList();
+          _profissionais.map((profissional) {
+            return profissional.id == updatedProfissional.id
+                ? updatedProfissional
+                : profissional;
+          }).toList();
       notifyListeners();
     } catch (e) {
       throw Exception("Erro ao atualizar profissional: ${e.toString()}");
