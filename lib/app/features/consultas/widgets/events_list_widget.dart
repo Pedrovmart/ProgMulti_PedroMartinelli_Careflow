@@ -105,9 +105,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Médico ID: ${event.idMedico}'),
-                                  Text('Data: ${_formatDate(event.data)}'),
-                                  Text('Paciente ID: ${event.idPaciente}'),
+                                  Text('Médico: ${event.nomeMedico}'),
+                                  Text('Data: ${CalendarioController.formatDate(event.data)}'),
+                                  Text('Paciente: ${event.idPaciente}'),
                                   if (event.queixaPaciente.isNotEmpty)
                                     Text('Queixa: ${event.queixaPaciente}'),
                                   if (event.diagnostico.isNotEmpty)
@@ -149,19 +149,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
     );
   }
 
-  // Formata a data para exibição
-  String _formatDate(String date) {
-    try {
-      if (date.contains('T')) {
-        final dateTime = DateTime.parse(date);
-        return '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
-      }
-      return date;
-    } catch (e) {
-      return date;
-    }
-  }
-  
+
   // Mostra diálogo de edição de consulta
   void _showEditDialog(BuildContext context, ConsultaModel consulta) {
     // Controladores para os campos de texto
@@ -230,7 +218,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancelar Consulta'),
-        content: Text('Deseja realmente cancelar a consulta de ${_formatDate(consulta.data)} às ${consulta.hora}?'),
+        content: Text('Deseja realmente cancelar a consulta de ${CalendarioController.formatDate(consulta.data)} às ${consulta.hora}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

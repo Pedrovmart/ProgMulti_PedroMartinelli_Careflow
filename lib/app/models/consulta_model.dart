@@ -7,6 +7,7 @@ class ConsultaModel {
   final String queixaPaciente;
   final String idPaciente;
   final String idMedico;
+  final String nomeMedico;
   final String descricao;
   final String diagnostico;
 
@@ -17,6 +18,7 @@ class ConsultaModel {
     this.queixaPaciente = '',
     this.idPaciente = '',
     this.idMedico = '',
+    this.nomeMedico = '',
     this.descricao = '',
     this.diagnostico = '',
   });
@@ -28,6 +30,7 @@ class ConsultaModel {
       'queixaPaciente': queixaPaciente,
       'idPaciente': idPaciente,
       'idMedico': idMedico,
+      'nomeMedico': nomeMedico,
       'descricao': descricao,
       'diagnostico': diagnostico,
     };
@@ -57,11 +60,12 @@ class ConsultaModel {
       id: map['id'],
       data: data,
       hora: map['hora'] ?? '',
-      queixaPaciente: map['queixaPaciente'] ?? '',
+      queixaPaciente: map['queixaPaciente'] ?? 'Queixa não especificada.',
       idPaciente: map['idPaciente'] ?? '',
       idMedico: map['idMedico'] ?? '',
+      nomeMedico: map['nomeMedico'] ?? '',
       descricao: map['descricao'] ?? '',
-      diagnostico: map['diagnostico'] ?? '',
+      diagnostico: map['diagnostico'] ?? 'Diagnóstico pendente.',
     );
   }
 }

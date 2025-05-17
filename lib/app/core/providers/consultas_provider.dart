@@ -18,11 +18,7 @@ class ConsultasProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   
-  // Método para adicionar consultas de teste (apenas para demonstração)
-  void setConsultasForTesting(List<ConsultaModel> consultas) {
-    _consultas = consultas;
-    notifyListeners();
-  }
+
 
   // Limpa os erros
   void clearError() {

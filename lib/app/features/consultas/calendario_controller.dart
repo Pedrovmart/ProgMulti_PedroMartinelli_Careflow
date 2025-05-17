@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
@@ -71,64 +73,23 @@ class CalendarioController extends ChangeNotifier {
       final userId = _authProvider.currentUser?.uid;
       if (userId != null) {
         await _consultasProvider.fetchConsultasPorPaciente(userId);
-        print('Consultas carregadas: ${_consultasProvider.consultas.length}');
+        log('Consultas carregadas: ${_consultasProvider.consultas.length}');
         
-        // Se não houver consultas, adicionar dados de teste
-        if (_consultasProvider.consultas.isEmpty) {
-          print('Adicionando dados de teste para demonstração');
-          // Adicionar consultas de teste para o dia atual e próximos dias
-          final hoje = DateTime.now();
-          final consultas = [
-            ConsultaModel(
-              id: '1',
-              data: '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${hoje.day.toString().padLeft(2, '0')}',
-              hora: '09:00',
-              descricao: 'Consulta de rotina',
-              idMedico: 'MED001',
-              idPaciente: userId,
-            ),
-            ConsultaModel(
-              id: '2',
-              data: '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${(hoje.day + 2).toString().padLeft(2, '0')}',
-              hora: '14:30',
-              descricao: 'Retorno',
-              idMedico: 'MED002',
-              idPaciente: userId,
-            ),
-            ConsultaModel(
-              id: '3',
-              data: '${hoje.year}-${hoje.month.toString().padLeft(2, '0')}-${(hoje.day + 5).toString().padLeft(2, '0')}',
-              hora: '10:15',
-              descricao: 'Exame de sangue',
-              idMedico: 'MED003',
-              idPaciente: userId,
-            ),
-          ];
-          
-          // Adicionar as consultas de teste ao provider
-          _consultasProvider.setConsultasForTesting(consultas);
-          
-          print('Consultas de teste adicionadas: ${consultas.length}');
-          for (var consulta in consultas) {
-            print('Consulta de teste - data: ${consulta.data}, hora: ${consulta.hora}, desc: ${consulta.descricao}');
-          }
-        } else {
-          for (var consulta in _consultasProvider.consultas) {
-            print('Consulta data: ${consulta.data}, hora: ${consulta.hora}, desc: ${consulta.descricao}');
-          }
+        for (var consulta in _consultasProvider.consultas) {
+          log('Consulta data: ${consulta.data}, hora: ${consulta.hora}, desc: ${consulta.descricao}');
         }
         
         events = _groupConsultationsByDate(_consultasProvider.consultas);
-        print('Eventos agrupados: ${events.length} dias com consultas');
+        log('Eventos agrupados: ${events.length} dias com consultas');
         events.forEach((key, value) {
-          print('Data: ${key.toString()}, Consultas: ${value.length}');
+          log('Data: ${key.toString()}, Consultas: ${value.length}');
         });
         notifyListeners();
       } else {
-        print('Usuário não autenticado: userId é null');
+        log('Usuário não autenticado: userId é null');
       }
     } catch (e) {
-      print('Erro ao fazer fetch das consultas: $e');
+      log('Erro ao fazer fetch das consultas: $e');
       throw Exception('Erro ao fazer fetch das consultas: $e');
     }
   }
@@ -141,12 +102,12 @@ class CalendarioController extends ChangeNotifier {
   static String formatDate(dynamic date) {
     if (date is String) {
       if (date.contains('T')) {
-        return DateFormat('yyyy-MM-dd').format(DateTime.parse(date));
+        return DateFormat('dd/MM/yyyy').format(DateTime.parse(date));
       }
       return date;
     }
     if (date is DateTime) {
-      return DateFormat('yyyy-MM-dd').format(date);
+      return DateFormat('dd/MM/yyyy').format(date);
     }
     throw ArgumentError('Invalid date type: ${date.runtimeType}');
   }
@@ -183,11 +144,11 @@ class CalendarioController extends ChangeNotifier {
   // Eventos do calendário
   List<ConsultaModel> getEventsForDay(DateTime day) {
     final date = DateTime(day.year, day.month, day.day);
-    print('Buscando eventos para o dia: ${date.toString()}');
-    print('Eventos encontrados: ${events[date]?.length ?? 0}');
+    log('Buscando eventos para o dia: ${date.toString()}');
+    log('Eventos encontrados: ${events[date]?.length ?? 0}');
     if (events[date] != null && events[date]!.isNotEmpty) {
       for (var event in events[date]!) {
-        print('Evento: ${event.descricao}, hora: ${event.hora}');
+        log('Evento: ${event.descricao}, hora: ${event.hora}');
       }
     }
     return events[date] ?? [];
@@ -197,7 +158,7 @@ class CalendarioController extends ChangeNotifier {
   void onDaySelected(DateTime day) {
     selectedDay = day;
     dataController.text = DateFormat('dd/MM/yyyy').format(day);
-    print('Dia selecionado no controller: ${day.toString()}');
+    log('Dia selecionado no controller: ${day.toString()}');
     notifyListeners();
   }
   
@@ -209,7 +170,7 @@ class CalendarioController extends ChangeNotifier {
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
-      print('Erro ao atualizar consulta: $e');
+      log('Erro ao atualizar consulta: $e');
       rethrow;
     }
   }
@@ -222,7 +183,7 @@ class CalendarioController extends ChangeNotifier {
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
-      print('Erro ao cancelar consulta: $e');
+      log('Erro ao cancelar consulta: $e');
       rethrow;
     }
   }
@@ -244,7 +205,7 @@ class CalendarioController extends ChangeNotifier {
       ),
     );
 
-    if (pickedTime != null) {
+    if (pickedTime != null && context.mounted) {
       selectedTime = pickedTime;
       horaController.text = selectedTime!.format(context);
       notifyListeners();
@@ -282,7 +243,8 @@ class CalendarioController extends ChangeNotifier {
       await _consultasProvider.agendarConsulta(novaConsulta);
       notifyListeners();
     } catch (e) {
-      throw Exception('Erro ao agendar consulta: $e');
+      log('Erro ao agendar consulta: $e');
+      rethrow;
     }
   }
 
