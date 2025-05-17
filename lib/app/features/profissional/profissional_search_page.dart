@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
-import 'package:careflow_app/app/widgets/profissional/profissional_search_card.dart';
+import 'package:careflow_app/app/features/profissional/widgets/profissional_search_card.dart';
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart';
 
 class ProfissionalSearchPage extends StatefulWidget {
