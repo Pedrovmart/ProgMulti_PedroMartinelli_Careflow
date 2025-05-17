@@ -5,7 +5,7 @@ import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
 class FormWidget extends StatelessWidget {
   final CalendarioController controller;
   
-  const FormWidget({Key? key, required this.controller}) : super(key: key);
+  const FormWidget({super.key, required this.controller});
   
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class FormWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -48,7 +48,7 @@ class FormWidget extends StatelessWidget {
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
                 filled: true,
-                fillColor: AppColors.light.withOpacity(0.2),
+                fillColor: AppColors.light.withValues(alpha: 0.2),
                 labelStyle: TextStyle(color: AppColors.primaryDark),
               ),
             ),
@@ -58,6 +58,8 @@ class FormWidget extends StatelessWidget {
                 final currentContext = context;
                 showTimePicker(
                   context: currentContext,
+                  barrierColor: AppColors.primary.withValues(alpha: 0.5),
+                  initialEntryMode: TimePickerEntryMode.input,
                   initialTime: controller.selectedTime ?? TimeOfDay.now(),
                 ).then((time) {
                   if (time != null && currentContext.mounted) {
@@ -77,7 +79,7 @@ class FormWidget extends StatelessWidget {
                       borderSide: BorderSide(color: AppColors.primary),
                     ),
                     filled: true,
-                    fillColor: AppColors.light.withOpacity(0.2),
+                    fillColor: AppColors.light.withValues(alpha: 0.2),
                     labelStyle: TextStyle(color: AppColors.primaryDark),
                     suffixIcon: Icon(Icons.access_time, color: AppColors.primary),
                   ),
@@ -103,7 +105,7 @@ class FormWidget extends StatelessWidget {
                   borderSide: BorderSide(color: AppColors.primary),
                 ),
                 filled: true,
-                fillColor: AppColors.light.withOpacity(0.2),
+                fillColor: AppColors.light.withValues(alpha: 0.2),
                 labelStyle: TextStyle(color: AppColors.primaryDark),
               ),
             ),
