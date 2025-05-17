@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
@@ -31,9 +33,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   void _updateList() {
     if (mounted) {
       setState(() {
-        print('EventsListWidget atualizado via listener');
+        log('EventsListWidget atualizado via listener');
         final events = widget.controller.getEventsForDay(widget.controller.selectedDay);
-        print('Eventos na lista atualizada: ${events.length}');
+        log('Eventos na lista atualizada: ${events.length}');
       });
     }
   }
@@ -106,8 +108,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Médico: ${event.nomeMedico}'),
-                                  Text('Data: ${CalendarioController.formatDate(event.data)}'),
-                                  Text('Paciente: ${event.idPaciente}'),
+                                  Text('Data: ${event.data}'),
                                   if (event.queixaPaciente.isNotEmpty)
                                     Text('Queixa: ${event.queixaPaciente}'),
                                   if (event.diagnostico.isNotEmpty)
@@ -218,7 +219,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancelar Consulta'),
-        content: Text('Deseja realmente cancelar a consulta de ${CalendarioController.formatDate(consulta.data)} às ${consulta.hora}?'),
+        content: Text('Deseja realmente cancelar a consulta de ${consulta.data} às ${consulta.hora}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

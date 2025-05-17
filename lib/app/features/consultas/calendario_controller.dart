@@ -1,12 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
-import 'package:intl/intl.dart';
 
 class CalendarioController extends ChangeNotifier {
   final ConsultasProvider _consultasProvider;
@@ -24,7 +24,7 @@ class CalendarioController extends ChangeNotifier {
   String? selectedProfissionalId;
   late DateTime selectedDay;
   TimeOfDay? selectedTime;
-  Map<DateTime, List<ConsultaModel>> events = {};
+  Map<String, List<ConsultaModel>> events = {};
   
   // Construtor com inicialização
   CalendarioController(this._consultasProvider, this._profissionalProvider, this._authProvider) {
@@ -46,13 +46,19 @@ class CalendarioController extends ChangeNotifier {
     await fetchProfissionais();
   }
   
+  // Getters para as datas de início e fim do calendário
+  DateTime get firstDay {
+    final now = DateTime.now();
+    return DateTime(now.year - 3, 1, 1);  // 3 anos no passado
+  }
+
+  DateTime get lastDay {
+    final now = DateTime.now();
+    return DateTime(now.year + 3, 12, 31); // 3 anos no futuro
+  }
+
   // Validação de datas para o calendário
   DateTime getValidFocusedDay() {
-    // Definir um intervalo de 3 anos antes e 3 anos depois do ano atual
-    final now = DateTime.now();
-    final lastDay = DateTime(now.year + 3, 12, 31); // 3 anos no futuro
-    final firstDay = DateTime(now.year - 3, 1, 1);  // 3 anos no passado
-    
     // Se a data for posterior à lastDay, retorna lastDay
     if (selectedDay.isAfter(lastDay)) {
       return lastDay;
@@ -82,7 +88,7 @@ class CalendarioController extends ChangeNotifier {
         events = _groupConsultationsByDate(_consultasProvider.consultas);
         log('Eventos agrupados: ${events.length} dias com consultas');
         events.forEach((key, value) {
-          log('Data: ${key.toString()}, Consultas: ${value.length}');
+          log('Data: $key, Consultas: ${value.length}');
         });
         notifyListeners();
       } else {
@@ -98,60 +104,44 @@ class CalendarioController extends ChangeNotifier {
     await _profissionalProvider.fetchProfissionais();
   }
 
-  // Formatação de datas
-  static String formatDate(dynamic date) {
-    if (date is String) {
-      if (date.contains('T')) {
-        return DateFormat('dd/MM/yyyy').format(DateTime.parse(date));
-      }
-      return date;
-    }
-    if (date is DateTime) {
-      return DateFormat('dd/MM/yyyy').format(date);
-    }
-    throw ArgumentError('Invalid date type: ${date.runtimeType}');
-  }
-
   // Agrupamento de consultas
-  Map<DateTime, List<ConsultaModel>> _groupConsultationsByDate(
+  Map<String, List<ConsultaModel>> _groupConsultationsByDate(
     List<ConsultaModel> consultations,
   ) {
-    final groupedEvents = <DateTime, List<ConsultaModel>>{};
+    final groupedEvents = <String, List<ConsultaModel>>{};
 
     for (final consultation in consultations) {
-      DateTime date;
-      if (consultation.data.contains('T')) {
-        date = DateTime.parse(consultation.data);
-      } else {
-        date = DateTime.parse('${consultation.data}T00:00:00');
+      // A data já está no formato dd-MM-yyyy no modelo
+      final dateStr = consultation.data;
+      
+      if (groupedEvents[dateStr] == null) {
+        groupedEvents[dateStr] = [];
       }
-
-      date = DateTime(
-        date.year,
-        date.month,
-        date.day,
-      );
-
-      if (groupedEvents[date] == null) {
-        groupedEvents[date] = [];
-      }
-      groupedEvents[date]!.add(consultation);
+      groupedEvents[dateStr]!.add(consultation);
     }
 
     return groupedEvents;
   }
 
-  // Eventos do calendário
+
   List<ConsultaModel> getEventsForDay(DateTime day) {
-    final date = DateTime(day.year, day.month, day.day);
-    log('Buscando eventos para o dia: ${date.toString()}');
-    log('Eventos encontrados: ${events[date]?.length ?? 0}');
-    if (events[date] != null && events[date]!.isNotEmpty) {
-      for (var event in events[date]!) {
+    final formattedDate = DateFormat('dd/MM/yyyy').format(day);
+    
+    final matchingEvents = events.entries
+        .where((entry) => entry.key == formattedDate)
+        .expand((entry) => entry.value)
+        .toList();
+
+    log('Buscando eventos para o dia: $formattedDate');
+    log('Eventos encontrados: ${matchingEvents.length}');
+    
+    if (matchingEvents.isNotEmpty) {
+      for (var event in matchingEvents) {
         log('Evento: ${event.descricao}, hora: ${event.hora}');
       }
     }
-    return events[date] ?? [];
+    
+    return matchingEvents;
   }
   
   // Método chamado quando um dia é selecionado no calendário
@@ -230,7 +220,7 @@ class CalendarioController extends ChangeNotifier {
     }
 
     final novaConsulta = ConsultaModel(
-      data: formatDate(selectedDay),
+      data: DateFormat('dd/MM/yyyy').format(selectedDay),
       hora: hora,
       queixaPaciente: 'Queixa não especificada',
       idPaciente: pacienteId,

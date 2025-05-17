@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +10,7 @@ import 'package:careflow_app/app/models/consulta_model.dart';
 class CalendarWidget extends StatelessWidget {
   final CalendarioController controller;
   
-  const CalendarWidget({Key? key, required this.controller}) : super(key: key);
+  const CalendarWidget({super.key, required this.controller});
   
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,8 @@ class CalendarWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TableCalendar<ConsultaModel>(
-          firstDay: DateTime(DateTime.now().year - 3, 1, 1),  // 3 anos no passado
-          lastDay: DateTime(DateTime.now().year + 3, 12, 31), // 3 anos no futuro
+          firstDay: controller.firstDay,
+          lastDay: controller.lastDay,
           focusedDay: controller.getValidFocusedDay(),
           currentDay: DateTime.now(),
           startingDayOfWeek: StartingDayOfWeek.monday,
@@ -38,14 +40,13 @@ class CalendarWidget extends StatelessWidget {
             // Atualiza o dia selecionado no controller
             controller.selectedDay = selectedDay;
             controller.dataController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
-            
             // Força a atualização da UI
             (context as Element).markNeedsBuild();
             
             // Log para depuração
-            print('Dia selecionado: ${selectedDay.toString()}');
+            log('Dia selecionado: ${selectedDay.toString()}');
             final events = controller.getEventsForDay(selectedDay);
-            print('Número de eventos no dia selecionado: ${events.length}');
+            log('Número de eventos no dia selecionado: ${events.length}');
             
             // Atualiza o controller em um microtask para evitar problemas de build
             Future.microtask(() {

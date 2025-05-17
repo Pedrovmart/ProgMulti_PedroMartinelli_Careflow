@@ -54,7 +54,7 @@ class ConsultaModel {
       }
     }
     
-    data = DateFormat('yyyy-MM-dd').format(dateTime);
+    data = DateFormat('dd/MM/yyyy').format(dateTime);
     
     return ConsultaModel(
       id: map['id'],
