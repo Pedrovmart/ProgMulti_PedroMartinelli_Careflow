@@ -91,6 +91,24 @@ class _FormWidgetState extends State<FormWidget> {
               ),
             ),
             const SizedBox(height: 16),
+            // Campo de data (somente leitura)
+            TextField(
+              controller: widget.controller.dataController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Data Selecionada',
+                hintText: 'Selecione uma data no calendário',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primary),
+                ),
+                filled: true,
+                fillColor: AppColors.light.withValues(alpha: 0.2),
+                labelStyle: TextStyle(color: AppColors.primaryDark),
+                suffixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
+              ),
+            ),
+            const SizedBox(height: 16),
             GestureDetector(
               onTap: () {
                 final currentContext = context;
