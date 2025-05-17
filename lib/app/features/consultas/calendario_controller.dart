@@ -16,7 +16,7 @@ class CalendarioController extends ChangeNotifier {
 
 
   // Controllers
-  final TextEditingController descricaoController = TextEditingController();
+  final TextEditingController queixaPacienteController = TextEditingController();
   final TextEditingController dataController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
 
@@ -216,7 +216,7 @@ class CalendarioController extends ChangeNotifier {
   /// Valida os dados do formulário de agendamento
   void _validarDadosAgendamento({
     required String? profissionalId,
-    required String descricao,
+    required String queixaPaciente,
     required TimeOfDay? time,
     required String? pacienteId,
   }) {
@@ -224,8 +224,8 @@ class CalendarioController extends ChangeNotifier {
       throw Exception('Selecione um horário para a consulta');
     }
     
-    if (descricao.isEmpty) {
-      throw Exception('A descrição da consulta é obrigatória');
+    if (queixaPaciente.isEmpty) {
+      throw Exception('A queixa do paciente é obrigatória');
     }
     
     if (profissionalId == null || profissionalId.isEmpty) {
@@ -239,7 +239,7 @@ class CalendarioController extends ChangeNotifier {
 
   /// Limpa os campos do formulário após o agendamento
   void _limparCampos() {
-    descricaoController.clear();
+    queixaPacienteController.clear();
     horaController.clear();
     selectedTime = null;
     selectedProfissionalId = null;
@@ -251,14 +251,14 @@ class CalendarioController extends ChangeNotifier {
   Future<void> agendarConsulta(BuildContext context) async {
     final pacienteId = _authProvider.currentUser?.uid;
     final profissionalId = selectedProfissionalId;
-    final descricao = descricaoController.text.trim();
+    final queixaPaciente = queixaPacienteController.text.trim();
     final hora = horaController.text;
 
     try {
       // Valida os dados do formulário
       _validarDadosAgendamento(
         profissionalId: profissionalId,
-        descricao: descricao,
+        queixaPaciente: queixaPaciente,
         time: selectedTime,
         pacienteId: pacienteId,
       );
@@ -267,10 +267,10 @@ class CalendarioController extends ChangeNotifier {
       final novaConsulta = ConsultaModel(
         data: DateFormat('dd/MM/yyyy').format(selectedDay),
         hora: hora,
-        queixaPaciente: 'Queixa não especificada',
+        queixaPaciente: queixaPaciente,
         idPaciente: pacienteId!,
         idMedico: profissionalId!,
-        descricao: descricao,
+        descricao: 'Descrição pendente',
         diagnostico: 'Diagnóstico pendente',
       );
 
@@ -293,7 +293,7 @@ class CalendarioController extends ChangeNotifier {
 
   @override
   void dispose() {
-    descricaoController.dispose();
+    queixaPacienteController.dispose();
     dataController.dispose();
     horaController.dispose();
     super.dispose();

@@ -77,10 +77,10 @@ class _FormWidgetState extends State<FormWidget> {
               ),
             ),
             TextField(
-              controller: widget.controller.descricaoController,
+              controller: widget.controller.queixaPacienteController,
               decoration: InputDecoration(
-                labelText: 'Descrição',
-                hintText: 'Digite a descrição da consulta',
+                labelText: 'Queixa do Paciente',
+                hintText: 'Digite sua queixa',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: AppColors.primary),
@@ -196,7 +196,7 @@ class _FormWidgetState extends State<FormWidget> {
                     }
 
 
-                    widget.controller.descricaoController.clear();
+                    widget.controller.queixaPacienteController.clear();
                     widget.controller.horaController.clear();
                     widget.controller.selectedProfissionalId = null;
                     widget.controller.selectedTime = null;
