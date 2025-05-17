@@ -63,7 +63,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Agenda uma nova consulta
   Future<void> agendarConsulta(ConsultaModel consulta) async {
     _isLoading = true;
     _error = null;
@@ -71,7 +70,6 @@ class ConsultasProvider extends ChangeNotifier {
 
     try {
       await _consultasRepository.agendarConsulta(consulta);
-      // Recarrega a lista para garantir que temos os dados mais recentes
       await fetchConsultasAgendadas();
     } catch (e) {
       _error = "Erro ao agendar consulta: ${e.toString()}";
@@ -82,22 +80,18 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Atualiza uma consulta existente
   Future<void> atualizarConsulta(ConsultaModel consulta) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Implemente a lógica para obter o ID da consulta
-      // Isso depende de como seu modelo está estruturado
-      final consultaId = consulta.id; // Assumindo que você tem um ID no modelo
+      final consultaId = consulta.id;
       if (consultaId == null) {
         throw Exception('ID da consulta não encontrado');
       }
 
       await _consultasRepository.update(consultaId, consulta);
-      // Recarrega a lista para garantir que temos os dados mais recentes
       await fetchConsultasAgendadas();
     } catch (e) {
       _error = "Erro ao atualizar consulta: ${e.toString()}";
@@ -108,7 +102,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Cancela uma consulta pelo ID
   Future<void> cancelarConsulta(String consultaId) async {
     _isLoading = true;
     _error = null;
@@ -116,7 +109,6 @@ class ConsultasProvider extends ChangeNotifier {
 
     try {
       await _consultasRepository.cancelarConsulta(consultaId);
-      // Recarrega a lista para garantir que temos os dados mais recentes
       await fetchConsultasAgendadas();
     } catch (e) {
       _error = "Erro ao cancelar consulta: ${e.toString()}";
@@ -127,7 +119,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Busca uma consulta específica pelo ID
   Future<ConsultaModel?> fetchConsultaById(String consultaId) async {
     _isLoading = true;
     _error = null;
