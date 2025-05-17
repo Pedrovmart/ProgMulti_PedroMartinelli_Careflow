@@ -95,10 +95,11 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     final data = profissional.toJson();
     
     // Remover campos que não devem ser enviados ou que são gerenciados pelo servidor
-    data.remove('id');
+
     data.remove('userType');
     
     // Garantir que campos obrigatórios estejam presentes
+    data['id'] = profissional.id;
     data['nome'] = profissional.nome;
     data['email'] = profissional.email;
     data['especialidade'] = profissional.especialidade;

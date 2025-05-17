@@ -14,24 +14,32 @@ class CalendarioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        final consultasProvider = Provider.of<ConsultasProvider>(
-          context,
-          listen: false,
-        );
-        final profissionalProvider = Provider.of<ProfissionalProvider>(
-          context,
-          listen: false,
-        );
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CalendarioController>(
+          create: (context) {
+            final consultasProvider = Provider.of<ConsultasProvider>(
+              context,
+              listen: false,
+            );
+            final profissionalProvider = Provider.of<ProfissionalProvider>(
+              context,
+              listen: false,
+            );
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-        return CalendarioController(
-          consultasProvider,
-          profissionalProvider,
-          authProvider,
-        )..init();
-      },
+            return CalendarioController(
+              consultasProvider,
+              profissionalProvider,
+              authProvider,
+            )..init();
+          },
+        ),
+        // Garante que o ProfissionalProvider está disponível para os filhos
+        ProxyProvider<CalendarioController, ProfissionalProvider>(
+          update: (_, controller, __) => controller.profissionalProvider,
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Agendar Consulta'),

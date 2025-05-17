@@ -1,11 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
+import 'package:careflow_app/app/models/profissional_model.dart';
 
-class FormWidget extends StatelessWidget {
+class FormWidget extends StatefulWidget {
   final CalendarioController controller;
   
   const FormWidget({super.key, required this.controller});
+
+  @override
+  State<FormWidget> createState() => _FormWidgetState();
+}
+
+class _FormWidgetState extends State<FormWidget> {
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Carrega profissionais quando o widget inicializa se a lista estiver vazia
+    if (widget.controller.profissionais.isEmpty) {
+      _carregarProfissionais();
+    }
+  }
+
+  // Método para carregar profissionais usando o controller
+  Future<void> _carregarProfissionais() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      // Usa o método do controller para carregar os profissionais
+      await widget.controller.fetchProfissionais();
+    } catch (e) {
+      // Trata o erro silenciosamente
+      debugPrint('Erro ao carregar profissionais: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -39,7 +77,7 @@ class FormWidget extends StatelessWidget {
               ),
             ),
             TextField(
-              controller: controller.descricaoController,
+              controller: widget.controller.descricaoController,
               decoration: InputDecoration(
                 labelText: 'Descrição',
                 hintText: 'Digite a descrição da consulta',
@@ -60,17 +98,17 @@ class FormWidget extends StatelessWidget {
                   context: currentContext,
                   barrierColor: AppColors.primary.withValues(alpha: 0.5),
                   initialEntryMode: TimePickerEntryMode.input,
-                  initialTime: controller.selectedTime ?? TimeOfDay.now(),
+                  initialTime: widget.controller.selectedTime ?? TimeOfDay.now(),
                 ).then((time) {
                   if (time != null && currentContext.mounted) {
-                    controller.selectedTime = time;
-                    controller.horaController.text = time.format(currentContext);
+                    widget.controller.selectedTime = time;
+                    widget.controller.horaController.text = time.format(currentContext);
                   }
                 });
               },
               child: AbsorbPointer(
                 child: TextField(
-                  controller: controller.horaController,
+                  controller: widget.controller.horaController,
                   decoration: InputDecoration(
                     labelText: 'Hora',
                     hintText: 'Selecione a hora',
@@ -87,27 +125,58 @@ class FormWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: controller.selectedProfissionalId,
-              items: controller.profissionais.map((profissional) {
-                return DropdownMenuItem<String>(
-                  value: profissional.id,
-                  child: Text(profissional.nome),
-                );
-              }).toList(),
-              onChanged: (value) {
-                controller.selectedProfissionalId = value;
-              },
-              decoration: InputDecoration(
-                labelText: 'Selecione o Profissional',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary),
-                ),
-                filled: true,
-                fillColor: AppColors.light.withValues(alpha: 0.2),
-                labelStyle: TextStyle(color: AppColors.primaryDark),
-              ),
+            _isLoading
+              ? Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primary),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : DropdownButtonFormField<String>(
+                  value: widget.controller.selectedProfissionalId,
+                  hint: const Text('Selecione o profissional'),
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Profissional',
+                    hintText: 'Selecione o profissional',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.primary),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.light.withValues(alpha: 0.2),
+                    labelStyle: TextStyle(color: AppColors.primaryDark),
+                    suffixIcon: widget.controller.profissionais.isEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.refresh),
+                          onPressed: _carregarProfissionais,
+                          tooltip: 'Recarregar lista',
+                        )
+                      : null,
+                  ),
+                  items: widget.controller.profissionais.isEmpty
+                    ? [
+                        const DropdownMenuItem<String>(
+                          value: '',
+                          enabled: false,
+                          child: Text('Nenhum profissional encontrado'),
+                        )
+                      ]
+                    : widget.controller.profissionais.map((Profissional profissional) {
+                        return DropdownMenuItem<String>(
+                          value: profissional.id,
+                          child: Text('${profissional.nome} - ${profissional.especialidade}'),
+                        );
+                      }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      widget.controller.selectedProfissionalId = newValue;
+                    });
+                  },
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -116,7 +185,7 @@ class FormWidget extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   try {
-                    await controller.agendarConsulta(context);
+                    await widget.controller.agendarConsulta(context);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -126,14 +195,14 @@ class FormWidget extends StatelessWidget {
                       );
                     }
 
-                    // Reset form
-                    controller.descricaoController.clear();
-                    controller.horaController.clear();
-                    controller.selectedProfissionalId = null;
-                    controller.selectedTime = null;
 
-                    // Refresh events
-                    await controller.fetchConsultations();
+                    widget.controller.descricaoController.clear();
+                    widget.controller.horaController.clear();
+                    widget.controller.selectedProfissionalId = null;
+                    widget.controller.selectedTime = null;
+
+
+                    await widget.controller.fetchConsultations();
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

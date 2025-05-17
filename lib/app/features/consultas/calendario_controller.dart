@@ -21,7 +21,13 @@ class CalendarioController extends ChangeNotifier {
   final TextEditingController horaController = TextEditingController();
 
   // Estados
-  String? selectedProfissionalId;
+  String? _selectedProfissionalId;
+  String? get selectedProfissionalId => _selectedProfissionalId;
+  set selectedProfissionalId(String? value) {
+    _selectedProfissionalId = value;
+    notifyListeners();
+  }
+  
   late DateTime selectedDay;
   TimeOfDay? selectedTime;
   Map<String, List<ConsultaModel>> events = {};
@@ -31,6 +37,8 @@ class CalendarioController extends ChangeNotifier {
     // Inicializa o dia selecionado com o dia atual
     final now = DateTime.now();
     selectedDay = DateTime(now.year, now.month, now.day);
+    // Inicializa o profissional selecionado como nulo
+    selectedProfissionalId = null;
   }
 
   // Getters
@@ -38,6 +46,9 @@ class CalendarioController extends ChangeNotifier {
     final profs = _profissionalProvider.profissionais;
     return profs.isEmpty ? [] : profs;
   }
+  
+  // Getter para o ProfissionalProvider (usado pelo ProxyProvider)
+  ProfissionalProvider get profissionalProvider => _profissionalProvider;
 
   // Inicialização
   Future<void> init() async {
@@ -202,38 +213,80 @@ class CalendarioController extends ChangeNotifier {
     }
   }
 
-  // Agendamento de consulta
+  /// Valida os dados do formulário de agendamento
+  void _validarDadosAgendamento({
+    required String? profissionalId,
+    required String descricao,
+    required TimeOfDay? time,
+    required String? pacienteId,
+  }) {
+    if (time == null) {
+      throw Exception('Selecione um horário para a consulta');
+    }
+    
+    if (descricao.isEmpty) {
+      throw Exception('A descrição da consulta é obrigatória');
+    }
+    
+    if (profissionalId == null || profissionalId.isEmpty) {
+      throw Exception('Selecione um profissional para a consulta');
+    }
+    
+    if (pacienteId == null || pacienteId.isEmpty) {
+      throw Exception('Usuário não autenticado');
+    }
+  }
+
+  /// Limpa os campos do formulário após o agendamento
+  void _limparCampos() {
+    descricaoController.clear();
+    horaController.clear();
+    selectedTime = null;
+    selectedProfissionalId = null;
+  }
+
+  /// Agenda uma nova consulta
+  /// 
+  /// Lança uma exceção caso ocorra algum erro durante o agendamento
   Future<void> agendarConsulta(BuildContext context) async {
     final pacienteId = _authProvider.currentUser?.uid;
     final profissionalId = selectedProfissionalId;
-    final descricao = descricaoController.text;
+    final descricao = descricaoController.text.trim();
     final hora = horaController.text;
 
-    if (selectedTime == null ||
-        descricao.isEmpty ||
-        profissionalId == null) {
-      throw Exception('Preencha todos os campos!');
-    }
-
-    if (pacienteId == null) {
-      throw Exception('Erro: Usuário não autenticado!');
-    }
-
-    final novaConsulta = ConsultaModel(
-      data: DateFormat('dd/MM/yyyy').format(selectedDay),
-      hora: hora,
-      queixaPaciente: 'Queixa não especificada',
-      idPaciente: pacienteId,
-      idMedico: profissionalId,
-      descricao: descricao,
-      diagnostico: 'Diagnóstico pendente',
-    );
-
     try {
+      // Valida os dados do formulário
+      _validarDadosAgendamento(
+        profissionalId: profissionalId,
+        descricao: descricao,
+        time: selectedTime,
+        pacienteId: pacienteId,
+      );
+
+      // Cria o modelo da consulta diretamente
+      final novaConsulta = ConsultaModel(
+        data: DateFormat('dd/MM/yyyy').format(selectedDay),
+        hora: hora,
+        queixaPaciente: 'Queixa não especificada',
+        idPaciente: pacienteId!,
+        idMedico: profissionalId!,
+        descricao: descricao,
+        diagnostico: 'Diagnóstico pendente',
+      );
+
+      // Envia para o provider
       await _consultasProvider.agendarConsulta(novaConsulta);
+      
+      // Atualiza a interface
+      _limparCampos();
       notifyListeners();
+      
+      // Recarrega as consultas
+      if (pacienteId.isNotEmpty) {
+        await fetchConsultations();
+      }
     } catch (e) {
-      log('Erro ao agendar consulta: $e');
+      log('Erro ao agendar consulta', error: e);
       rethrow;
     }
   }

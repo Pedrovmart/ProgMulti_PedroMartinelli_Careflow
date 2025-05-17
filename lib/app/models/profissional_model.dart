@@ -20,7 +20,7 @@ class Profissional extends UserModel {
 
   factory Profissional.fromJson(Map<String, dynamic> json) {
     return Profissional(
-      id: json['id'] ?? '',
+      id: json['_id'] ?? '',
       nome: json['nome'] ?? 'Sem Nome',
       email: json['email'] ?? 'Sem Email',
       especialidade: json['especialidade'] ?? 'Sem Especialidade',
