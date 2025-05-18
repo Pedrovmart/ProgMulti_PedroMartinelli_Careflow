@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
-import 'package:careflow_app/app/core/repositories/profissional_repository.dart';
+import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
+import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 
 class ProfissionalProvider extends ChangeNotifier {
-  final ProfissionalRepository _profissionalRepository =
-      ProfissionalRepository();
+  // Repositório n8n para operações CRUD
+  late final N8nProfissionalRepository _n8nRepository;
+  
+  ProfissionalProvider() {
+    final n8nClient = N8nHttpClient();
+    _n8nRepository = N8nProfissionalRepository(n8nClient);
+  }
 
   List<Profissional> _profissionais = [];
 
@@ -12,20 +18,8 @@ class ProfissionalProvider extends ChangeNotifier {
 
   Future<void> fetchProfissionais() async {
     try {
-      // Busca os profissionais do repositório
-      final profissionaisMap =
-          await _profissionalRepository.getAllProfissionais();
-
-      // Converte o Map<String, Map<String, dynamic>> para List<Profissional>
-      _profissionais =
-          profissionaisMap.entries.map((entry) {
-            final id = entry.key;
-            final data = entry.value;
-            return Profissional.fromJson({
-              ...data,
-              'id': id, // Adiciona o ID do documento ao JSON
-            });
-          }).toList();
+      // Busca os profissionais do n8n
+      _profissionais = await _n8nRepository.getAll();
 
       // Notifica os ouvintes sobre a mudança
       notifyListeners();
@@ -35,23 +29,37 @@ class ProfissionalProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addProfissional(Profissional profissional) async {
+  // O método addProfissional não é mais necessário aqui
+  // A criação de profissionais é feita pelo AuthRepository
+  // Este método pode ser usado para sincronização se necessário
+  Future<void> syncProfissional(Profissional profissional) async {
     try {
-      await _profissionalRepository.addProfissional(profissional);
-      _profissionais.add(profissional);
-      notifyListeners();
+      // Verifica se o profissional já existe no n8n
+      final profissionalExistente = await _n8nRepository.getById(profissional.id);
+      
+      if (profissionalExistente == null) {
+        // Se não existir, cria um novo
+        await _n8nRepository.create(profissional);
+      } else {
+        // Se existir, atualiza
+        await _n8nRepository.update(profissional.id, profissional);
+      }
+      
+      // Atualiza a lista local
+      await fetchProfissionais();
     } catch (e) {
-      throw Exception("Erro ao adicionar profissional: ${e.toString()}");
+      debugPrint('Erro ao sincronizar profissional com n8n: $e');
+      // Não lança exceção para não interromper o fluxo principal
     }
   }
 
   Future<void> removeProfissional(String id) async {
     try {
-      await _profissionalRepository.deleteProfissional(id);
-      _profissionais =
-          _profissionais
-              .where((profissional) => profissional.id != id)
-              .toList();
+      // Remove do n8n
+      await _n8nRepository.delete(id);
+      
+      // Atualiza a lista local
+      _profissionais = _profissionais.where((p) => p.id != id).toList();
       notifyListeners();
     } catch (e) {
       throw Exception("Erro ao remover profissional: ${e.toString()}");
@@ -60,13 +68,14 @@ class ProfissionalProvider extends ChangeNotifier {
 
   Future<void> updateProfissional(Profissional updatedProfissional) async {
     try {
-      await _profissionalRepository.updateProfissional(updatedProfissional);
-      _profissionais =
-          _profissionais.map((profissional) {
-            return profissional.id == updatedProfissional.id
-                ? updatedProfissional
-                : profissional;
-          }).toList();
+      // Atualiza no n8n
+      await _n8nRepository.update(updatedProfissional.id, updatedProfissional);
+      
+      // Atualiza a lista local
+      _profissionais = _profissionais
+          .map((p) => p.id == updatedProfissional.id ? updatedProfissional : p)
+          .toList();
+          
       notifyListeners();
     } catch (e) {
       throw Exception("Erro ao atualizar profissional: ${e.toString()}");
@@ -75,9 +84,27 @@ class ProfissionalProvider extends ChangeNotifier {
 
   Future<Profissional?> getProfissionalById(String id) async {
     try {
-      return await _profissionalRepository.getProfissionalById(id);
+      return await _n8nRepository.getById(id);
     } catch (e) {
       throw Exception("Erro ao buscar profissional por ID: ${e.toString()}");
+    }
+  }
+  
+  // Método para buscar profissionais por especialidade
+  Future<List<Profissional>> getProfissionaisByEspecialidade(String especialidade) async {
+    try {
+      return await _n8nRepository.getByEspecialidade(especialidade);
+    } catch (e) {
+      throw Exception("Erro ao buscar profissionais por especialidade: ${e.toString()}");
+    }
+  }
+  
+  // Método para buscar profissionais por empresa
+  Future<List<Profissional>> getProfissionaisByEmpresa(String empresaId) async {
+    try {
+      return await _n8nRepository.getByEmpresa(empresaId);
+    } catch (e) {
+      throw Exception("Erro ao buscar profissionais por empresa: ${e.toString()}");
     }
   }
 }

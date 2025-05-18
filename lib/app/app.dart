@@ -4,8 +4,6 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
-import 'package:careflow_app/app/core/repositories/consultas_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
@@ -18,12 +16,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProfissionalProvider()),
         ChangeNotifierProvider(create: (_) => PacienteProvider()),
-        ChangeNotifierProvider(
-          create:
-              (_) => ConsultasProvider(
-                ConsultasRepository(FirebaseFirestore.instance),
-              ),
-        ),
+        ChangeNotifierProvider(create: (_) => ConsultasProvider()),
       ],
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {

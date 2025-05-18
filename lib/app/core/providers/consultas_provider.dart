@@ -1,62 +1,152 @@
+import 'package:careflow_app/app/core/repositories/n8n_consultas_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:careflow_app/app/core/repositories/repository_manager.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
-import 'package:careflow_app/app/core/repositories/consultas_repository.dart';
 
 class ConsultasProvider extends ChangeNotifier {
-  final ConsultasRepository _consultasRepository;
-
-  ConsultasProvider(this._consultasRepository);
+  final _consultasRepository =
+      RepositoryManager().get<N8nConsultasRepository>();
 
   List<ConsultaModel> _consultas = [];
   bool _isLoading = false;
+  String? _error;
+
+  // Construtor vazio - o repositório é obtido através do RepositoryManager
+  ConsultasProvider();
 
   List<ConsultaModel> get consultas => _consultas;
   bool get isLoading => _isLoading;
+  String? get error => _error;
+  
+
+
+  // Limpa os erros
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
 
   // Busca todas as consultas agendadas
   Future<void> fetchConsultasAgendadas() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
-      _consultas = await _consultasRepository.fetchConsultasAgendadas();
+      _consultas = await _consultasRepository.getAll();
     } catch (e) {
-      throw Exception("Erro ao buscar consultas agendadas: ${e.toString()}");
+      _error = "Erro ao buscar consultas agendadas: ${e.toString()}";
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // Agenda uma nova consulta
-  Future<void> agendarConsulta(ConsultaModel consulta) async {
+  Future<void> fetchConsultasPorPaciente(String pacienteId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      await _consultasRepository.agendarConsulta(consulta);
-      _consultas.add(consulta);
-      notifyListeners();
+      _consultas = await _consultasRepository.getByPacienteId(pacienteId);
     } catch (e) {
-      throw Exception("Erro ao agendar consulta: ${e.toString()}");
+      _error = "Erro ao buscar consultas do paciente: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Cancela uma consulta pelo ID
+  Future<String> agendarConsulta(ConsultaModel consulta) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final consultaId = await _consultasRepository.agendarConsulta(consulta);
+      return consultaId;
+    } catch (e) {
+      _error = "ConsultasProvider -Erro ao agendar consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> atualizarConsulta(ConsultaModel consulta) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final consultaId = consulta.id;
+      if (consultaId == null) {
+        throw Exception('ID da consulta não encontrado');
+      }
+
+      await _consultasRepository.update(consultaId, consulta);
+      await fetchConsultasAgendadas();
+    } catch (e) {
+      _error = "Erro ao atualizar consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> cancelarConsulta(String consultaId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
       await _consultasRepository.cancelarConsulta(consultaId);
-      _consultas =
-          _consultas.where((consulta) => consulta.id != consultaId).toList();
-      notifyListeners();
+      await fetchConsultasAgendadas();
     } catch (e) {
-      throw Exception("Erro ao cancelar consulta: ${e.toString()}");
+      _error = "Erro ao cancelar consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  // Busca uma consulta específica pelo ID
   Future<ConsultaModel?> fetchConsultaById(String consultaId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
     try {
-      return await _consultasRepository.fetchConsultaById(consultaId);
+      final consulta = await _consultasRepository.fetchConsultaById(consultaId);
+      return consulta;
     } catch (e) {
-      throw Exception("Erro ao buscar consulta pelo ID: ${e.toString()}");
+      _error = "Erro ao buscar consulta pelo ID: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Busca uma consulta específica pelo ID (alternativa usando o método base)
+  Future<ConsultaModel?> getConsultaById(String consultaId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final consulta = await _consultasRepository.getById(consultaId);
+      return consulta;
+    } catch (e) {
+      _error = "Erro ao buscar consulta pelo ID: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
