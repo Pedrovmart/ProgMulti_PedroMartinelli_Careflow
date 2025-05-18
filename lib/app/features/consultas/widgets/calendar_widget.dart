@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
@@ -20,7 +17,7 @@ class CalendarWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -37,22 +34,9 @@ class CalendarWidget extends StatelessWidget {
           startingDayOfWeek: StartingDayOfWeek.monday,
           selectedDayPredicate: (day) => isSameDay(day, controller.selectedDay),
           onDaySelected: (selectedDay, focusedDay) {
-            // Atualiza o dia selecionado no controller
-            controller.selectedDay = selectedDay;
-            controller.dataController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
-            // Força a atualização da UI
+            controller.onDaySelected(selectedDay);
+            
             (context as Element).markNeedsBuild();
-            
-            // Log para depuração
-            log('Dia selecionado: ${selectedDay.toString()}');
-            final events = controller.getEventsForDay(selectedDay);
-            log('Número de eventos no dia selecionado: ${events.length}');
-            
-            // Atualiza o controller em um microtask para evitar problemas de build
-            Future.microtask(() {
-              // Isso força o controller a atualizar seus listeners sem chamar notifyListeners diretamente
-              controller.onDaySelected(selectedDay);
-            });
           },
           eventLoader: (day) => controller.getEventsForDay(day),
           calendarBuilders: CalendarBuilders(
@@ -71,6 +55,35 @@ class CalendarWidget extends StatelessWidget {
                   height: 8,
                 ),
               );
+            },
+            // Personaliza a célula do dia para destacar dias com eventos
+            defaultBuilder: (context, day, focusedDay) {
+              final events = controller.getEventsForDay(day);
+              final isToday = isSameDay(day, DateTime.now());
+              final isSelected = isSameDay(day, controller.selectedDay);
+              
+              // Não personaliza dias já destacados (hoje/selecionado)
+              if (isToday || isSelected) {
+                return null; // Usa o estilo padrão para hoje/selecionado
+              }
+              
+              // Destaca dias com eventos
+              if (events.isNotEmpty) {
+                return Container(
+                  margin: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.success, width: 1.5),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${day.day}',
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                  ),
+                );
+              }
+              return null; // Usa o estilo padrão para dias sem eventos
             },
           ),
           calendarStyle: CalendarStyle(

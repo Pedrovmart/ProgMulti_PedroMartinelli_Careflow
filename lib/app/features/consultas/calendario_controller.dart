@@ -13,89 +13,89 @@ class CalendarioController extends ChangeNotifier {
   final ProfissionalProvider _profissionalProvider;
   final AuthProvider _authProvider;
 
-
-
-  // Controllers
-  final TextEditingController queixaPacienteController = TextEditingController();
+  final TextEditingController queixaPacienteController =
+      TextEditingController();
   final TextEditingController dataController = TextEditingController();
   final TextEditingController horaController = TextEditingController();
-
-  // Estados
   String? _selectedProfissionalId;
   String? get selectedProfissionalId => _selectedProfissionalId;
   set selectedProfissionalId(String? value) {
     _selectedProfissionalId = value;
     notifyListeners();
   }
-  
+
   late DateTime selectedDay;
   TimeOfDay? selectedTime;
   Map<String, List<ConsultaModel>> events = {};
-  
-  // Construtor com inicialização
-  CalendarioController(this._consultasProvider, this._profissionalProvider, this._authProvider) {
-    // Inicializa o dia selecionado com o dia atual
+
+  CalendarioController(
+    this._consultasProvider,
+    this._profissionalProvider,
+    this._authProvider,
+  ) {
     final now = DateTime.now();
     selectedDay = DateTime(now.year, now.month, now.day);
-    // Inicializa o profissional selecionado como nulo
     selectedProfissionalId = null;
   }
 
-  // Getters
   List<Profissional> get profissionais {
     final profs = _profissionalProvider.profissionais;
     return profs.isEmpty ? [] : profs;
   }
-  
-  // Getter para o ProfissionalProvider (usado pelo ProxyProvider)
+
   ProfissionalProvider get profissionalProvider => _profissionalProvider;
 
-  // Inicialização
   Future<void> init() async {
+    // Garantir que a data selecionada esteja no fuso horário local
+    selectedDay = DateTime.now().toLocal();
     dataController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
+
+    log('init - Data selecionada inicializada: ${selectedDay.toString()}');
+    log('init - Data formatada: ${dataController.text}');
+
+    // Carregar consultas e profissionais
     await fetchConsultations();
     await fetchProfissionais();
+
+    // Forçar notificação para atualizar a UI
+    notifyListeners();
   }
-  
-  // Getters para as datas de início e fim do calendário
+
   DateTime get firstDay {
     final now = DateTime.now();
-    return DateTime(now.year - 3, 1, 1);  // 3 anos no passado
+    return DateTime(now.year - 3, 1, 1);
   }
 
   DateTime get lastDay {
     final now = DateTime.now();
-    return DateTime(now.year + 3, 12, 31); // 3 anos no futuro
+    return DateTime(now.year + 3, 12, 31);
   }
 
-  // Validação de datas para o calendário
   DateTime getValidFocusedDay() {
-    // Se a data for posterior à lastDay, retorna lastDay
     if (selectedDay.isAfter(lastDay)) {
       return lastDay;
     }
-    
-    // Se a data for anterior à firstDay, retorna firstDay
+
     if (selectedDay.isBefore(firstDay)) {
       return firstDay;
     }
-    
-    // Caso contrário, retorna a data original
+
     return selectedDay;
   }
 
-  // Fetch de dados
   Future<void> fetchConsultations() async {
     try {
       final userId = _authProvider.currentUser?.uid;
       if (userId != null) {
         await _consultasProvider.fetchConsultasPorPaciente(userId);
         log('Consultas carregadas: ${_consultasProvider.consultas.length}');
-        
+
         for (var consulta in _consultasProvider.consultas) {
-          log('Consulta data: ${consulta.data}, hora: ${consulta.hora}, desc: ${consulta.descricao}');
+          log(
+            'Consulta data: ${consulta.data}, hora: ${consulta.hora}, desc: ${consulta.descricao}',
+          );
         }
-        
+
         events = _groupConsultationsByDate(_consultasProvider.consultas);
         log('Eventos agrupados: ${events.length} dias com consultas');
         events.forEach((key, value) {
@@ -115,59 +115,100 @@ class CalendarioController extends ChangeNotifier {
     await _profissionalProvider.fetchProfissionais();
   }
 
-  // Agrupamento de consultas
   Map<String, List<ConsultaModel>> _groupConsultationsByDate(
     List<ConsultaModel> consultations,
   ) {
     final groupedEvents = <String, List<ConsultaModel>>{};
 
+    log(
+      '_groupConsultationsByDate - Total de consultas: ${consultations.length}',
+    );
+
     for (final consultation in consultations) {
-      // A data já está no formato dd-MM-yyyy no modelo
-      final dateStr = consultation.data;
-      
+      String dateStr = consultation.data.trim();
+
+      if (dateStr.contains('/') && dateStr.split('/').length == 3) {
+        log(
+          '_groupConsultationsByDate - Data já está no formato correto: $dateStr',
+        );
+      } else {
+        try {
+          final DateTime dateTime = DateTime.parse(dateStr).toLocal();
+          dateStr = DateFormat('dd/MM/yyyy').format(dateTime);
+          log('_groupConsultationsByDate - Data convertida: $dateStr');
+        } catch (e) {
+          log(
+            '_groupConsultationsByDate - Erro ao processar data: $dateStr - $e',
+          );
+          // Se não conseguir converter, usa a data original
+        }
+      }
+
+      // Adicionar a consulta ao grupo correspondente
       if (groupedEvents[dateStr] == null) {
         groupedEvents[dateStr] = [];
       }
       groupedEvents[dateStr]!.add(consultation);
+
+      log('_groupConsultationsByDate - Consulta agrupada na data: $dateStr');
     }
 
+    log(
+      '_groupConsultationsByDate - Datas com eventos: ${groupedEvents.keys.join(', ')}',
+    );
     return groupedEvents;
   }
 
-
   List<ConsultaModel> getEventsForDay(DateTime day) {
-    final formattedDate = DateFormat('dd/MM/yyyy').format(day);
-    
-    final matchingEvents = events.entries
-        .where((entry) => entry.key == formattedDate)
-        .expand((entry) => entry.value)
-        .toList();
+    // Garantir que estamos usando a data local
+    final localDay = day.toLocal();
+    final formattedDate = DateFormat('dd/MM/yyyy').format(localDay);
 
-    log('Buscando eventos para o dia: $formattedDate');
-    log('Eventos encontrados: ${matchingEvents.length}');
-    
+    log(
+      'getEventsForDay - Data: ${localDay.toString()}, formatada: $formattedDate',
+    );
+    log('getEventsForDay - Chaves disponíveis: ${events.keys.join(', ')}');
+
+    final matchingEvents =
+        events.entries
+            .where((entry) => entry.key.trim() == formattedDate.trim())
+            .expand((entry) => entry.value)
+            .toList();
+
+    log(
+      'getEventsForDay - Eventos encontrados para $formattedDate: ${matchingEvents.length}',
+    );
+
     if (matchingEvents.isNotEmpty) {
       for (var event in matchingEvents) {
-        log('Evento: ${event.descricao}, hora: ${event.hora}');
+        log(
+          'getEventsForDay - Evento: ${event.queixaPaciente}, data: ${event.data}, hora: ${event.hora}',
+        );
       }
     }
-    
+
     return matchingEvents;
   }
-  
-  // Método chamado quando um dia é selecionado no calendário
+
   void onDaySelected(DateTime day) {
-    selectedDay = day;
-    dataController.text = DateFormat('dd/MM/yyyy').format(day);
-    log('Dia selecionado no controller: ${day.toString()}');
+    final localDay = day.toLocal();
+    selectedDay = localDay;
+
+    dataController.text = DateFormat('dd/MM/yyyy').format(localDay);
+
+    log(
+      'Dia selecionado: ${localDay.toString()}, formatado como: ${dataController.text}',
+    );
+
+    final eventsForDay = getEventsForDay(localDay);
+    log('Número de eventos no dia selecionado: ${eventsForDay.length}');
+
     notifyListeners();
   }
-  
-  // Atualiza uma consulta existente
+
   Future<void> atualizarConsulta(ConsultaModel consulta) async {
     try {
       await _consultasProvider.atualizarConsulta(consulta);
-      // Recarregar consultas após a atualização
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
@@ -175,12 +216,10 @@ class CalendarioController extends ChangeNotifier {
       rethrow;
     }
   }
-  
-  // Cancela uma consulta existente
+
   Future<void> cancelarConsulta(String consultaId) async {
     try {
       await _consultasProvider.cancelarConsulta(consultaId);
-      // Recarregar consultas após o cancelamento
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
@@ -189,21 +228,21 @@ class CalendarioController extends ChangeNotifier {
     }
   }
 
-  // Seleção de hora
   Future<void> selectTime(BuildContext context) async {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.light(
-            primary: Colors.blue,
-            onPrimary: Colors.white,
-            onSurface: Colors.blue[900]!,
+      builder:
+          (context, child) => Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: Colors.blue,
+                onPrimary: Colors.white,
+                onSurface: Colors.blue[900]!,
+              ),
+            ),
+            child: child!,
           ),
-        ),
-        child: child!,
-      ),
     );
 
     if (pickedTime != null && context.mounted) {
@@ -213,41 +252,6 @@ class CalendarioController extends ChangeNotifier {
     }
   }
 
-  /// Valida os dados do formulário de agendamento
-  void _validarDadosAgendamento({
-    required String? profissionalId,
-    required String queixaPaciente,
-    required TimeOfDay? time,
-    required String? pacienteId,
-  }) {
-    if (time == null) {
-      throw Exception('Selecione um horário para a consulta');
-    }
-    
-    if (queixaPaciente.isEmpty) {
-      throw Exception('A queixa do paciente é obrigatória');
-    }
-    
-    if (profissionalId == null || profissionalId.isEmpty) {
-      throw Exception('Selecione um profissional para a consulta');
-    }
-    
-    if (pacienteId == null || pacienteId.isEmpty) {
-      throw Exception('Usuário não autenticado');
-    }
-  }
-
-  /// Limpa os campos do formulário após o agendamento
-  void _limparCampos() {
-    queixaPacienteController.clear();
-    horaController.clear();
-    selectedTime = null;
-    selectedProfissionalId = null;
-  }
-
-  /// Agenda uma nova consulta
-  /// 
-  /// Lança uma exceção caso ocorra algum erro durante o agendamento
   Future<void> agendarConsulta(BuildContext context) async {
     final pacienteId = _authProvider.currentUser?.uid;
     final profissionalId = selectedProfissionalId;
@@ -255,15 +259,6 @@ class CalendarioController extends ChangeNotifier {
     final hora = horaController.text;
 
     try {
-      // Valida os dados do formulário
-      _validarDadosAgendamento(
-        profissionalId: profissionalId,
-        queixaPaciente: queixaPaciente,
-        time: selectedTime,
-        pacienteId: pacienteId,
-      );
-
-      // Cria o modelo da consulta diretamente
       final novaConsulta = ConsultaModel(
         data: DateFormat('dd/MM/yyyy').format(selectedDay),
         hora: hora,
@@ -274,19 +269,22 @@ class CalendarioController extends ChangeNotifier {
         diagnostico: 'Diagnóstico pendente',
       );
 
-      // Envia para o provider
-      await _consultasProvider.agendarConsulta(novaConsulta);
-      
-      // Atualiza a interface
-      _limparCampos();
+      final consultaId = await _consultasProvider.agendarConsulta(novaConsulta);
+      if (consultaId.isNotEmpty) {
+        log('Consulta criada com sucesso. ID: $consultaId');
+      }
+
+      queixaPacienteController.clear();
+      horaController.clear();
+      selectedTime = null;
+      selectedProfissionalId = null;
       notifyListeners();
-      
-      // Recarrega as consultas
+
       if (pacienteId.isNotEmpty) {
         await fetchConsultations();
       }
     } catch (e) {
-      log('Erro ao agendar consulta', error: e);
+      log('CalendarioController - Erro ao agendar consulta', error: e);
       rethrow;
     }
   }

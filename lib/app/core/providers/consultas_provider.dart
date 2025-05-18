@@ -59,16 +59,16 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> agendarConsulta(ConsultaModel consulta) async {
+  Future<String> agendarConsulta(ConsultaModel consulta) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await _consultasRepository.agendarConsulta(consulta);
-      await fetchConsultasAgendadas();
+      final consultaId = await _consultasRepository.agendarConsulta(consulta);
+      return consultaId;
     } catch (e) {
-      _error = "Erro ao agendar consulta: ${e.toString()}";
+      _error = "ConsultasProvider -Erro ao agendar consulta: ${e.toString()}";
       rethrow;
     } finally {
       _isLoading = false;

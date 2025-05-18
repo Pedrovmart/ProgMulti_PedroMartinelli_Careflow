@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:intl/intl.dart';
 
 class ConsultaModel {
@@ -41,20 +43,23 @@ class ConsultaModel {
   }
 
   factory ConsultaModel.fromMap(Map<String, dynamic> map) {
-    String data = map['data'] ?? '';
-    DateTime dateTime;
-    
-    if (data.contains('T')) {
-      dateTime = DateTime.parse(data);
+    String data = map['data'] ?? '';   
+    if (data.isEmpty) {
+      log('ConsultaModel.fromMap - Data vazia, usando data atual');
+      data = DateFormat('dd/MM/yyyy').format(DateTime.now().toLocal());
     } else {
-      try {
-        dateTime = DateTime.parse('$data T00:00:00');
-      } catch (e) {
-        dateTime = DateTime.now();
+      if (data.contains('/') && data.split('/').length == 3) {
+        log('ConsultaModel.fromMap - Data já está no formato brasileiro: $data');
+      } else {
+        try {
+          final dateTime = DateTime.parse(data).toLocal();
+          data = DateFormat('dd/MM/yyyy').format(dateTime);
+          log('ConsultaModel.fromMap - Data convertida para formato brasileiro: $data');
+        } catch (e) {
+          log('ConsultaModel.fromMap - Erro ao converter data: $e');
+        }
       }
     }
-    
-    data = DateFormat('dd/MM/yyyy').format(dateTime);
     
     return ConsultaModel(
       id: map['id'],

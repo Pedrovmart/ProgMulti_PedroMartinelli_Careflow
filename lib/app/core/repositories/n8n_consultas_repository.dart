@@ -10,16 +10,17 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   // Endpoints específicos
   final String _endpointConsultasPaciente = '/consultasPaciente';
   final String _endpointNovaConsulta = '/novaConsulta';
-  final String _endpointGetConsulta = '/consulta';
+  final String _endpointGetConsultas = '/consultas';
   final String _endpointUpdateConsulta = '/atualizarConsulta';
   final String _endpointDeleteConsulta = '/cancelarConsulta';
+  final String _endpointplaceholder = '/placeholder';
 
   N8nConsultasRepository(this._httpClient);
 
   @override
   Future<List<ConsultaModel>> getAll() async {
     try {
-      final response = await _httpClient.get(_endpointNovaConsulta);
+      final response = await _httpClient.get(_endpointGetConsultas);
       final List<dynamic> data = response.data;
       return data
           .whereType<Map<String, dynamic>>()
@@ -49,10 +50,10 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override
+  @override //TODO:nao é necessário
   Future<ConsultaModel?> getById(String id) async {
     try {
-      final response = await _httpClient.get('$_endpointGetConsulta/$id');
+      final response = await _httpClient.get('$_endpointplaceholder/$id');
       return ConsultaModel.fromMap(response.data);
     } catch (e) {
       if (e is DioException && e.response?.statusCode == 404) {
@@ -62,7 +63,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override
+  @override //TODO: nao é necessario
   Future<ConsultaModel> create(ConsultaModel item) async {
     try {
       final response = await _httpClient.post(_endpointNovaConsulta, data: item.toMap());
@@ -89,19 +90,26 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       throw Exception('Erro ao remover consulta: $e');
     }
   }
-
-  // Métodos específicos do domínio de consultas
-
-  /// Busca todas as consultas agendadas (alias para getAll)
+  // ESSA É A MANEIRA CORRETA PARA MIM FAZER 
   Future<List<ConsultaModel>> fetchConsultasAgendadas() => getAll();
 
-  /// Agenda uma nova consulta (alias para create)
-  Future<void> agendarConsulta(ConsultaModel consulta) => create(consulta);
+  Future<String> agendarConsulta(ConsultaModel consulta) async {
+    try {
+      final response = await _httpClient.post(_endpointNovaConsulta, data: consulta.toMap());
+      if (response.data is String) {
+        return response.data;
+      } else if (response.data is Map<String, dynamic>) {
+        final consultaObj = ConsultaModel.fromMap(response.data);
+        return consultaObj.id ?? '';
+      }
+      return '';
+    } catch (e) {
+      throw Exception('Erro ao criar consulta: $e');
+    }
+  }
 
-  /// Cancela uma consulta pelo ID (alias para delete)
   Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
 
-  /// Busca uma consulta específica pelo ID (alias para getById)
   Future<ConsultaModel?> fetchConsultaById(String consultaId) =>
       getById(consultaId);
 }
