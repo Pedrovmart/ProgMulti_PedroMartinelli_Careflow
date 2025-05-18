@@ -8,9 +8,9 @@ import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; // Import da página de busca
-import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; // Import da página de perfil público
-import 'package:careflow_app/app/features/consultas/calendario_page.dart'; // Import da página CalendarioPage
+import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
+import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
+import 'package:careflow_app/app/features/consultas/calendario_page.dart'; 
 
 sealed class Routes {
   static const String login = '/login';
@@ -18,9 +18,9 @@ sealed class Routes {
   static const String homePaciente = '/paciente/home';
   static const String homeProfissional = '/profissional/home';
   static const String perfilPublicoProfissional =
-      '/paciente/busca/perfilProfissional'; // Alterada para /paciente/busca/perfilProfissional
+      '/paciente/busca/perfilProfissional'; 
   static const String calendario =
-      '/paciente/calendario'; // Rota para o calendário
+      '/paciente/calendario'; 
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -70,7 +70,7 @@ sealed class Routes {
             ),
             GoRoute(
               path:
-                  '/paciente/busca/perfilProfissional', // Alterada para /paciente/busca/perfilProfissional
+                  '/paciente/busca/perfilProfissional', 
               name: 'perfilPublicoProfissional',
               builder: (context, state) {
                 final profissional = state.extra as Profissional?;
