@@ -1,0 +1,83 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+class N8nHttpClient {
+  final Dio _dio;
+  final String _baseUrl;
+  
+  /// Public getter for the base URL
+  String get baseUrl => _baseUrl;
+  final String _username;
+  final String _password;
+
+  N8nHttpClient({
+    Dio? dio,
+    String? baseUrl,
+    String? username,
+    String? password,
+  })  : _dio = dio ?? Dio(),
+        _baseUrl = baseUrl ?? dotenv.env['BASE_URL'] ?? '',
+        _username = username ?? dotenv.env['BASIC_AUTH_USERNAME'] ?? '',
+        _password = password ?? dotenv.env['BASIC_AUTH_PASSWORD'] ?? '' {
+    _configureDio();
+  }
+
+  void _configureDio() {
+    _dio.options.baseUrl = _baseUrl;
+    _dio.options.responseType = ResponseType.json; // Garante que sempre recebemos JSON
+    _dio.options.connectTimeout = const Duration(seconds: 30);
+    _dio.options.receiveTimeout = const Duration(seconds: 30);
+    
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final credentials = '$_username:$_password';
+          final base64Credentials = base64Encode(utf8.encode(credentials));
+          options.headers['Authorization'] = 'Basic $base64Credentials';
+          options.headers['Content-Type'] = 'application/json';
+          options.headers['Accept'] = 'application/json'; // Adiciona header Accept
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // Verifica se o response é uma string e tenta parsear como JSON
+          if (response.data is String) {
+            try {
+              response.data = json.decode(response.data);
+            } catch (e) {
+              // Se falhar, mantém como string para tratamento no repository
+            }
+          }
+          return handler.next(response);
+        },
+      ),
+    );
+    
+    _dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+      ),
+    );
+  }
+
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) {
+    return _dio.get(path, queryParameters: queryParameters);
+  }
+
+  Future<Response> post(String path, {dynamic data}) {
+    return _dio.post(path, data: data);
+  }
+
+  Future<Response> put(String path, {dynamic data}) {
+    return _dio.put(path, data: data);
+  }
+
+  Future<Response> delete(String path) {
+    return _dio.delete(path);
+  }
+}
