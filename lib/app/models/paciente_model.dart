@@ -8,9 +8,9 @@ class Paciente extends UserModel {
   final DateTime createdAt;
 
   Paciente({
-    required String id,
-    required String nome,
-    required String email,
+    required super.id,
+    required super.nome,
+    required super.email,
     String? cpf,
     DateTime? dataNascimento,
     String? telefone,
@@ -22,16 +22,11 @@ class Paciente extends UserModel {
         telefone = telefone ?? '',
         endereco = endereco ?? '',
         createdAt = createdAt ?? DateTime.now(),
-        super(
-          id: id,
-          nome: nome,
-          email: email,
-          userType: 'paciente',
-        );
+        super(userType: 'paciente');
 
   factory Paciente.fromJson(Map<String, dynamic> json) {
     return Paciente(
-      id: json['id']?.toString() ?? '',
+      id: json['_id']?.toString() ?? '',
       nome: json['nome']?.toString() ?? '',
       email: json['email']?.toString() ?? '',
       cpf: json['cpf']?.toString(),

@@ -10,7 +10,6 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   final N8nHttpClient _httpClient;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // Endpoints específicos para pacientes
   final String _endpointGetAll = '/pacientes';
   final String _endpointGetById = '/paciente';
   final String _endpointCreate = '/novoPaciente';
@@ -24,26 +23,31 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   Future<List<Paciente>> getAll() async {
     try {
       final response = await _httpClient.get(_endpointGetAll);
-      final List<dynamic> data = response.data;
       
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map((item) => Paciente.fromJson(item))
-          .toList();
+      if (response.data == null) {
+        return [];
+      }
+      
+      if (response.data is Map<String, dynamic>) {
+        final paciente = Paciente.fromJson(response.data);
+        return [paciente];
+      }
+      
+      if (response.data is List) {
+        final List<dynamic> data = response.data;
+        return data
+            .whereType<Map<String, dynamic>>()
+            .map((item) => Paciente.fromJson(item))
+            .toList();
+      }
+      
+      return [];
     } catch (e) {
-      throw Exception('Erro ao buscar todos os pacientes: $e');
-    }
-  }
-
-
-  Future<List<Paciente>> getByPacienteId(String pacienteId) async {
-    try {
-      final paciente = await getById(pacienteId);
-      return paciente != null ? [paciente] : [];
-    } catch (e) {
+      log('Erro ao buscar todos os pacientes: $e');
       return [];
     }
   }
+
 
   @override
   Future<Paciente?> getById(String id) async {
@@ -58,7 +62,13 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
         return null;
       }
       
-      return Paciente.fromJson(response.data);
+      log('Dados recebidos: ${response.data}');
+      
+      final responseData = response.data is Map<String, dynamic> 
+          ? response.data 
+          : Map<String, dynamic>.from(response.data);
+          
+      return Paciente.fromJson(responseData);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         log('Paciente não encontrado para o ID: $id');
