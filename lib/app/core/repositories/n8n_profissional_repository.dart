@@ -30,7 +30,7 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     }
   }
 
-  @override
+   //TODO: VERIFICAR SE VAI SER NECESSARIA IMPLEMENTAÇÃO
   Future<List<Profissional>> getByPacienteId(String pacienteId) async {
     // Se não houver um endpoint específico para buscar profissionais por paciente,
     // podemos retornar todos e filtrar localmente ou lançar uma exceção

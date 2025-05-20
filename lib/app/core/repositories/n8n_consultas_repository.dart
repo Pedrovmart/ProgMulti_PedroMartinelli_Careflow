@@ -31,7 +31,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override
+
   Future<List<ConsultaModel>> getByPacienteId(String pacienteId) async {
     try {
       final response = await _httpClient.get(

@@ -11,6 +11,7 @@ import 'package:careflow_app/app/features/profissional/profissional_main_page.da
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
 import 'package:careflow_app/app/features/consultas/calendario_page.dart'; 
+import 'package:careflow_app/app/features/paciente/paciente_perfil_page.dart';
 
 sealed class Routes {
   static const String login = '/login';
@@ -21,6 +22,8 @@ sealed class Routes {
       '/paciente/busca/perfilProfissional'; 
   static const String calendario =
       '/paciente/calendario'; 
+  static const String perfilPaciente =
+      '/paciente/perfil';
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -84,6 +87,11 @@ sealed class Routes {
               name: 'calendario',
               builder: (context, state) => const CalendarioPage(),
             ),
+            GoRoute(
+              path: '/paciente/perfil',
+              name: 'perfilPaciente',
+              builder: (context, state) => const PacientePerfilPage(),
+            ),
           ],
         ),
         ShellRoute(
@@ -100,25 +108,31 @@ sealed class Routes {
         ),
       ],
       redirect: (context, state) {
+        // Aguardar a inicialização da autenticação
+        if (!authProvider.initialized) {
+          return null; // Não redirecionar enquanto estiver inicializando
+        }
+        
         final user = authProvider.currentUser;
+        final location = state.uri.toString();
 
+        // Se o usuário não estiver autenticado e tentar acessar uma rota protegida
         if (user == null &&
-            state.uri.toString() != '/login' &&
-            state.uri.toString() != '/signup') {
-          return '/';
+            location != '/login' &&
+            location != '/signup') {
+          return '/login';  // Redirecionar para login, não para a raiz
         }
 
-        if (user != null) {
-          if (authProvider.userType == 'paciente' &&
-              state.uri.toString() == '/login') {
+        // Se o usuário estiver autenticado e tentar acessar login
+        if (user != null && location == '/login') {
+          if (authProvider.userType == 'paciente') {
             return '/paciente/home';
-          } else if (authProvider.userType == 'profissional' &&
-              state.uri.toString() == '/login') {
+          } else if (authProvider.userType == 'profissional') {
             return '/profissional/home';
           }
         }
 
-        return null;
+        return null; // Sem redirecionamento
       },
       errorBuilder: (context, state) => LoginPage(),
     );

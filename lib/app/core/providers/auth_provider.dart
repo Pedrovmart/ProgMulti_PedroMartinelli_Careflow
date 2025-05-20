@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:careflow_app/app/core/repositories/auth_repository.dart';
@@ -7,14 +9,48 @@ class AuthProvider extends ChangeNotifier {
 
   firebase_auth.User? _currentUser;
   String _userType = '';
+  bool _initialized = false;
 
   firebase_auth.User? get currentUser => _currentUser;
   String get userType => _userType;
 
   bool get isAuthenticated => _currentUser != null;
+  bool get initialized => _initialized;
 
   Stream<firebase_auth.User?> get authStateChanges =>
       _authRepository.authStateChanges;
+      
+  AuthProvider() {
+    _initializeAuth();
+  }
+  
+  Future<void> _initializeAuth() async {
+    try {
+      // Obter usuário atual do Firebase
+      _currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
+      
+      if (_currentUser != null) {
+        // Carregar o tipo de usuário
+        _userType = await _authRepository.getUserType(_currentUser!.uid);
+      }
+      
+      // Configurar listener para mudanças de autenticação
+      firebase_auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+        _currentUser = user;
+        if (user == null) {
+          _userType = '';
+        }
+        notifyListeners();
+      });
+      
+      _initialized = true;
+      notifyListeners();
+    } catch (e) {
+      log('Erro ao inicializar autenticação: $e');
+      _initialized = true;
+      notifyListeners();
+    }
+  }
 
   Future<void> login(String email, String password) async {
     try {

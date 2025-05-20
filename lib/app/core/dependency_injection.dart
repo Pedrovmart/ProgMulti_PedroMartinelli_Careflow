@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/n8n_consultas_repository.dart';
+import 'package:careflow_app/app/core/repositories/n8n_paciente_repository.dart';
+import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
 import 'package:careflow_app/app/core/repositories/repository_manager.dart';
 
 class DependencyInjection {
@@ -11,14 +15,19 @@ class DependencyInjection {
 
     try {
       _httpClient = N8nHttpClient();
-      RepositoryManager();
+      
+      final repositoryManager = RepositoryManager();
+      
+      repositoryManager.register<N8nPacienteRepository>(N8nPacienteRepository(_httpClient));
+      repositoryManager.register<N8nProfissionalRepository>(N8nProfissionalRepository(_httpClient));
+      repositoryManager.register<N8nConsultasRepository>(N8nConsultasRepository(_httpClient));
       
       _initialized = true;
       
-      print('Dependências inicializadas com sucesso');
-      print('Conectado ao n8n em: ${_httpClient.baseUrl}');
+      log('Dependências inicializadas com sucesso');
+      log('Conectado ao n8n em: ${_httpClient.baseUrl}');
     } catch (e) {
-      print('Erro ao inicializar dependências: $e');
+      log('Erro ao inicializar dependências: $e');
       rethrow;
     }
   }
@@ -26,7 +35,13 @@ class DependencyInjection {
   static N8nHttpClient get httpClient => _httpClient;
   
   static N8nConsultasRepository get consultasRepository => 
-      N8nConsultasRepository(httpClient);
+      RepositoryManager().getConsultasRepository();
+      
+  static N8nPacienteRepository get pacienteRepository => 
+      RepositoryManager().getPacienteRepository();
+      
+  static N8nProfissionalRepository get profissionalRepository => 
+      RepositoryManager().getProfissionalRepository();
   
   static void reset() {
     _initialized = false;
