@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 //TODO: Quando usuário tiver imagem remover placeholder
 
@@ -17,9 +18,7 @@ class ProfissionalSearchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.all(8.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      // Elevation, margin, shape, and color will be inherited from AppTheme.cardTheme
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -29,8 +28,8 @@ class ProfissionalSearchCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               child: CircleAvatar(
                 radius: 30,
-                backgroundColor: const Color.fromARGB(90, 0, 0, 0),
-                child: const Icon(Icons.person, size: 40, color: Colors.white),
+                backgroundColor: AppColors.accentLight.withOpacity(0.2),
+                child: const Icon(Icons.person, size: 40, color: AppColors.accent),
               ),
             ),
             const SizedBox(width: 16),
@@ -41,20 +40,21 @@ class ProfissionalSearchCard extends StatelessWidget {
                 children: [
                   Text(
                     nome,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium, // Uses AppTextStyles.titleMedium via AppTheme
                   ),
                   const SizedBox(height: 4),
                   Text(
                     especialidade,
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.primaryDark.withOpacity(0.9),
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Registro: $numeroRegistro',
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith( // Uses AppTextStyles.caption via AppTheme
+                          color: AppColors.primary.withOpacity(0.8),
+                        ),
                   ),
                 ],
               ),

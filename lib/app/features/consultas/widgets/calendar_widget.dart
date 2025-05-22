@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 
@@ -13,11 +14,11 @@ class CalendarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16), // Manter o borderRadius específico ou usar cardTheme.shape
+        boxShadow: [ // Manter boxShadow específico ou usar cardTheme.elevation para simular
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: AppColors.primaryDark.withValues(alpha: 0.08),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -49,7 +50,7 @@ class CalendarWidget extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.success,
+                    color: AppColors.accent,
                   ),
                   width: 8,
                   height: 8,
@@ -72,13 +73,13 @@ class CalendarWidget extends StatelessWidget {
                 return Container(
                   margin: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.success, width: 1.5),
+                    border: Border.all(color: AppColors.accent, width: 1.5),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: Center(
                     child: Text(
                       '${day.day}',
-                      style: const TextStyle(color: Colors.black87),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.primaryDark),
                     ),
                   ),
                 );
@@ -88,31 +89,31 @@ class CalendarWidget extends StatelessWidget {
           ),
           calendarStyle: CalendarStyle(
             todayDecoration: BoxDecoration(
-              color: AppColors.primaryDark,
+              color: AppColors.accentLight,
               shape: BoxShape.circle,
             ),
             selectedDecoration: BoxDecoration(
-              color: AppColors.accent,
+              color: AppColors.primary,
               shape: BoxShape.circle,
             ),
-            weekendTextStyle: TextStyle(color: AppColors.primary),
-            defaultTextStyle: TextStyle(color: AppColors.primaryDark),
-            todayTextStyle: const TextStyle(color: Colors.white),
-            selectedTextStyle: const TextStyle(color: Colors.white),
+            weekendTextStyle: const TextStyle(color: AppColors.primary),
+            defaultTextStyle: const TextStyle(color: AppColors.primaryDark),
+            todayTextStyle: const TextStyle(color: AppColors.primaryDark),
+            selectedTextStyle: const TextStyle(color: AppColors.light),
           ),
           headerStyle: HeaderStyle(
-            titleTextStyle: TextStyle(
-              color: AppColors.primaryDark,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
+            titleTextStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: AppColors.primaryDark,
+                // fontWeight: FontWeight.bold, // titleMedium já pode ter bold
+                // fontSize: 18, // titleMedium já define o tamanho
+              ),
             formatButtonDecoration: BoxDecoration(
-              color: AppColors.accent,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(8),
             ),
-            formatButtonTextStyle: const TextStyle(color: Colors.white),
-            leftChevronIcon: Icon(Icons.chevron_left, color: AppColors.primary),
-            rightChevronIcon: Icon(Icons.chevron_right, color: AppColors.primary),
+            formatButtonTextStyle: const TextStyle(color: AppColors.light),
+            leftChevronIcon: const Icon(Icons.chevron_left, color: AppColors.primary),
+            rightChevronIcon: const Icon(Icons.chevron_right, color: AppColors.primary),
             formatButtonVisible: false,
             titleCentered: true,
           ),

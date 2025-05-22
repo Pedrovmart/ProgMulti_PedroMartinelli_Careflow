@@ -1,26 +1,7 @@
 import 'package:flutter/material.dart';
 
-// Definições de Cores (aproximações do TailwindCSS)
-const Color _slate50 = Color(0xFFF8FAFC);
-const Color _slate200 = Color(0xFFE2E8F0);
-const Color _slate400 = Color(0xFF94A3B8);
-const Color _slate700 = Color(0xFF334155);
-const Color _slate800 = Color(0xFF1E293B);
-const Color _slate900 = Color(0xFF0F172A);
-
-const Color _sky100 = Color(0xFFE0F2FE);
-const Color _sky200 = Color(0xFFBAE6FD);
-const Color _sky500 = Color(0xFF0EA5E9);
-const Color _sky600 = Color(0xFF0284C7);
-const Color _sky800 = Color(0xFF075985);
-const Color _sky900 = Color(0xFF0C4A6E);
-
-const Color _amber100 = Color(0xFFFEF3C7);
-const Color _amber200 = Color(0xFFFDE68A);
-const Color _amber800 = Color(0xFF92400E);
-const Color _amber900 = Color(0xFF78350F);
-
-const Color _white = Colors.white;
+import '../../core/ui/app_colors.dart';
+import '../../core/ui/app_text_styles.dart';
 
 class ProfissionalAgendamentosPage extends StatelessWidget {
   const ProfissionalAgendamentosPage({super.key});
@@ -28,7 +9,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _slate50,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
       body: _buildBody(context),
     );
@@ -37,7 +18,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: _slate50.withOpacity(0.8),
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
       scrolledUnderElevation: 0,
       titleSpacing: 0,
@@ -51,21 +32,23 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                 const CircleAvatar(
                   radius: 20,
                   backgroundImage: NetworkImage(
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx'),
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx',
+                  ),
                 ),
                 const SizedBox(width: 12.0),
                 const Text(
                   'Olá, Dr. Silva',
-                  style: TextStyle(
-                    color: _slate900,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.headlineLarge,
                 ),
               ],
             ),
             IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: _slate700),
+              icon: Icon(
+                Icons.notifications_outlined,
+                color:
+                    Theme.of(context).appBarTheme.iconTheme?.color ??
+                    AppColors.primaryDark,
+              ),
               onPressed: () {},
               splashRadius: 24.0,
               padding: const EdgeInsets.all(8.0),
@@ -104,28 +87,33 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           context: context,
           title: 'Pacientes hoje',
           value: '12',
-          backgroundColor: _sky100.withOpacity(0.7),
-          borderColor: _sky200,
-          titleColor: _sky800,
-          valueColor: _sky900,
+          backgroundColor: AppColors.accentLight.withValues(alpha: 0.7),
+          borderColor: AppColors.accent,
+          titleColor: AppColors.primaryDark,
+          valueColor: AppColors.primaryDark,
         );
         Widget item2 = _buildStatCard(
           context: context,
           title: 'Consultas',
           value: '8',
-          backgroundColor: _sky100.withOpacity(0.7),
-          borderColor: _sky200,
-          titleColor: _sky800,
-          valueColor: _sky900,
+          backgroundColor: AppColors.accentLight.withValues(alpha: 0.7),
+          borderColor: AppColors.accent,
+          titleColor: AppColors.primaryDark,
+          valueColor: AppColors.primaryDark,
         );
         Widget item3 = _buildStatCard(
           context: context,
           title: 'Notificações',
           value: '3',
-          backgroundColor: _amber100.withOpacity(0.7),
-          borderColor: _amber200,
-          titleColor: _amber800,
-          valueColor: _amber900,
+          backgroundColor: AppColors.light.withValues(
+            alpha: 0.7,
+          ), // Was amber, using AppColors.light (yellowish-green)
+          borderColor:
+              AppColors.success, // Was amber, using AppColors.success (green)
+          titleColor:
+              AppColors.successDark, // Was amber, using AppColors.successDark
+          valueColor:
+              AppColors.successDark, // Was amber, using AppColors.successDark
         );
 
         if (isWide) {
@@ -135,7 +123,8 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12.0,
             mainAxisSpacing: 12.0,
-            childAspectRatio: (constraints.maxWidth / 3) / 110, // Ajustar altura do card
+            childAspectRatio:
+                (constraints.maxWidth / 3) / 110, // Ajustar altura do card
             children: [item1, item2, item3],
           );
         } else {
@@ -149,10 +138,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12.0),
-              SizedBox(
-                width: double.infinity,
-                child: item3,
-              ),
+              SizedBox(width: double.infinity, child: item3),
             ],
           );
         }
@@ -170,17 +156,17 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     required Color valueColor,
   }) {
     return Container(
-      height: 100, // Dar uma altura fixa para consistência
+      height: 110, // Aumentada para corrigir overflow e alinhar com aspect ratio do GridView
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12.0),
         border: Border.all(color: borderColor, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 3.0,
             offset: const Offset(0, 1),
-          )
+          ),
         ],
       ),
       padding: const EdgeInsets.all(16.0),
@@ -190,19 +176,13 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTextStyles.bodyMediumBold.copyWith(color: titleColor),
           ),
           const SizedBox(height: 4.0),
           Text(
             value,
-            style: TextStyle(
+            style: AppTextStyles.displayLarge.copyWith(
               color: valueColor,
-              fontSize: 30.0,
-              fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
             ),
           ),
@@ -219,11 +199,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(4.0, 0, 4.0, 12.0),
           child: Text(
             'Próximos compromissos',
-            style: TextStyle(
-              color: _slate800,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.headlineMedium,
           ),
         ),
         _buildAppointmentItem(
@@ -262,47 +238,39 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: _white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: _slate200, width: 1.0),
+        border: Border.all(color: Theme.of(context).dividerColor, width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 3.0,
             offset: const Offset(0, 1),
-          )
+          ),
         ],
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24.0,
-            backgroundImage: NetworkImage(imageUrl),
-          ),
+          CircleAvatar(radius: 24.0, backgroundImage: NetworkImage(imageUrl)),
           const SizedBox(width: 16.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    color: _slate900,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(name, style: AppTextStyles.titleMedium),
                 Text(
                   time,
-                  style: const TextStyle(
-                    color: _sky600,
-                    fontSize: 14.0,
+                  style: AppTextStyles.caption.copyWith(
+                    color: Theme.of(context).hintColor,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_outlined, color: _slate400),
+          const Icon(
+            Icons.chevron_right_outlined,
+            color: AppColors.primaryLight,
+          ),
         ],
       ),
     );
@@ -314,14 +282,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 12.0),
-          child: Text(
-            'Ações rápidas',
-            style: TextStyle(
-              color: _slate800,
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: Text('Ações rápidas', style: AppTextStyles.headlineMedium),
         ),
         Row(
           children: [
@@ -330,8 +291,16 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                 context: context,
                 icon: Icons.search_rounded,
                 label: 'Buscar paciente',
-                backgroundColor: _sky500,
-                foregroundColor: _white,
+                backgroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.backgroundColor
+                    ?.resolve({WidgetState.selected}),
+                foregroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.foregroundColor
+                    ?.resolve({WidgetState.selected}),
                 onPressed: () {},
               ),
             ),
@@ -341,8 +310,16 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                 context: context,
                 icon: Icons.add_circle_outline_rounded,
                 label: 'Novo agendamento',
-                backgroundColor: _slate200,
-                foregroundColor: _slate800,
+                backgroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.backgroundColor
+                    ?.resolve({WidgetState.selected}),
+                foregroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.foregroundColor
+                    ?.resolve({WidgetState.selected}),
                 onPressed: () {},
               ),
             ),
@@ -356,8 +333,8 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     required BuildContext context,
     required IconData icon,
     required String label,
-    required Color backgroundColor,
-    required Color foregroundColor,
+    Color? backgroundColor,
+    Color? foregroundColor,
     VoidCallback? onPressed,
   }) {
     return SizedBox(
@@ -376,15 +353,20 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 30.0),
+            Icon(
+              icon,
+              color: Theme.of(context)
+                  .elevatedButtonTheme
+                  .style
+                  ?.foregroundColor
+                  ?.resolve({WidgetState.selected}),
+              size: 20.0,
+            ),
             const SizedBox(height: 8.0),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14.0,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTextStyles.titleMedium,
             ),
           ],
         ),

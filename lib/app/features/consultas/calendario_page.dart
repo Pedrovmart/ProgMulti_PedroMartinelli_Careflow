@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
-import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'calendario_controller.dart';
 import 'widgets/calendar_widget.dart';
 import 'widgets/events_list_widget.dart';
@@ -43,8 +42,8 @@ class CalendarioPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Agendar Consulta'),
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          // O estilo do AppBar (backgroundColor, foregroundColor, titleTextStyle, etc.)
+          // será herdado do appBarTheme definido em AppTheme.dart
         ),
         body: const _CalendarioPageContent(),
       ),

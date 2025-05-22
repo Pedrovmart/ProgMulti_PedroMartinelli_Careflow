@@ -21,7 +21,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   Future<List<ConsultaModel>> getAll() async {
     try {
       final response = await _httpClient.get(_endpointGetConsultas);
-      final List<dynamic> data = response.data;
+      final List<dynamic> data = response.data ?? []; // Handle null response by defaulting to an empty list
       return data
           .whereType<Map<String, dynamic>>()
           .map((item) => ConsultaModel.fromMap(item))
@@ -39,7 +39,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
         queryParameters: {'pacienteId': pacienteId},
       );
 
-      final List<dynamic> data = response.data;
+      final List<dynamic> data = response.data ?? []; // Handle null response by defaulting to an empty list
 
       return data
           .whereType<Map<String, dynamic>>()

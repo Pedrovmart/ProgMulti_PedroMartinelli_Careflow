@@ -11,7 +11,7 @@ import 'package:careflow_app/app/features/profissional/profissional_main_page.da
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
 import 'package:careflow_app/app/features/consultas/calendario_page.dart'; 
-import 'package:careflow_app/app/features/paciente/paciente_perfil_page.dart';
+import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 
 sealed class Routes {
@@ -26,6 +26,7 @@ sealed class Routes {
   static const String perfilPaciente =
       '/paciente/perfil';
   static const String profissionalAgendamentos = '/profissional/agendamentos';
+  static const String perfilProfissional = '/profissional/perfil';
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -92,7 +93,7 @@ sealed class Routes {
             GoRoute(
               path: '/paciente/perfil',
               name: 'perfilPaciente',
-              builder: (context, state) => const PacientePerfilPage(),
+              builder: (context, state) => const PerfilPage(),
             ),
           ],
         ),
@@ -110,6 +111,11 @@ sealed class Routes {
               path: '/profissional/agendamentos',
               name: 'profissionalAgendamentos',
               builder: (context, state) => const ProfissionalAgendamentosPage(),
+            ),
+            GoRoute(
+              path: '/profissional/perfil',
+              name: 'perfilProfissional',
+              builder: (context, state) => const PerfilPage(),
             ),
           ],
         ),
