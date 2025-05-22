@@ -12,6 +12,7 @@ import 'package:careflow_app/app/features/profissional/profissional_search_page.
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
 import 'package:careflow_app/app/features/consultas/calendario_page.dart'; 
 import 'package:careflow_app/app/features/paciente/paciente_perfil_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 
 sealed class Routes {
   static const String login = '/login';
@@ -24,6 +25,7 @@ sealed class Routes {
       '/paciente/calendario'; 
   static const String perfilPaciente =
       '/paciente/perfil';
+  static const String profissionalAgendamentos = '/profissional/agendamentos';
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -103,6 +105,11 @@ sealed class Routes {
               path: '/profissional/home',
               name: 'homeProfissional',
               builder: (context, state) => ProfissionalHomePage(),
+            ),
+            GoRoute(
+              path: '/profissional/agendamentos',
+              name: 'profissionalAgendamentos',
+              builder: (context, state) => const ProfissionalAgendamentosPage(),
             ),
           ],
         ),
