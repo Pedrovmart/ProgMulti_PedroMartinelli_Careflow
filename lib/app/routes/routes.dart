@@ -1,4 +1,5 @@
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
@@ -10,7 +11,6 @@ import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
-import 'package:careflow_app/app/features/consultas/calendario_page.dart'; 
 import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 
@@ -88,7 +88,7 @@ sealed class Routes {
             GoRoute(
               path: '/paciente/calendario',
               name: 'calendario',
-              builder: (context, state) => const CalendarioPage(),
+              builder: (context, state) => const PacientesAgendamentosPage(),
             ),
             GoRoute(
               path: '/paciente/perfil',

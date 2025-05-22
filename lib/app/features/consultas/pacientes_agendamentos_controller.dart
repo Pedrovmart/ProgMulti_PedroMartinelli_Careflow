@@ -8,7 +8,7 @@ import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 
-class CalendarioController extends ChangeNotifier {
+class PacientesAgendamentosController extends ChangeNotifier {
   final ConsultasProvider _consultasProvider;
   final ProfissionalProvider _profissionalProvider;
   final AuthProvider _authProvider;
@@ -28,7 +28,7 @@ class CalendarioController extends ChangeNotifier {
   TimeOfDay? selectedTime;
   Map<String, List<ConsultaModel>> events = {};
 
-  CalendarioController(
+  PacientesAgendamentosController(
     this._consultasProvider,
     this._profissionalProvider,
     this._authProvider,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 
 class FormWidget extends StatefulWidget {
-  final CalendarioController controller;
+  final PacientesAgendamentosController controller;
 
   const FormWidget({super.key, required this.controller});
 

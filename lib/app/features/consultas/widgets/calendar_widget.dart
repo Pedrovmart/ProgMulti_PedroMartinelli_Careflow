@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 
 class CalendarWidget extends StatelessWidget {
-  final CalendarioController controller;
+  final PacientesAgendamentosController controller;
   
   const CalendarWidget({super.key, required this.controller});
   

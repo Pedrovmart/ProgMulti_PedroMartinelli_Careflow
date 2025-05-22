@@ -1,21 +1,21 @@
+import 'package:careflow_app/app/features/consultas/widgets/calendar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
-import 'calendario_controller.dart';
-import 'widgets/calendar_widget.dart';
-import 'widgets/events_list_widget.dart';
-import 'widgets/form_widget.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
+import 'package:careflow_app/app/features/consultas/widgets/events_list_widget.dart';
+import 'package:careflow_app/app/features/consultas/widgets/form_widget.dart';
 
-class CalendarioPage extends StatelessWidget {
-  const CalendarioPage({super.key});
+class PacientesAgendamentosPage extends StatelessWidget {
+  const PacientesAgendamentosPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<CalendarioController>(
+        ChangeNotifierProvider<PacientesAgendamentosController>(
           create: (context) {
             final consultasProvider = Provider.of<ConsultasProvider>(
               context,
@@ -27,7 +27,7 @@ class CalendarioPage extends StatelessWidget {
             );
             final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-            return CalendarioController(
+            return PacientesAgendamentosController(
               consultasProvider,
               profissionalProvider,
               authProvider,
@@ -35,7 +35,7 @@ class CalendarioPage extends StatelessWidget {
           },
         ),
         // Garante que o ProfissionalProvider está disponível para os filhos
-        ProxyProvider<CalendarioController, ProfissionalProvider>(
+        ProxyProvider<PacientesAgendamentosController, ProfissionalProvider>(
           update: (_, controller, __) => controller.profissionalProvider,
         ),
       ],
@@ -45,23 +45,23 @@ class CalendarioPage extends StatelessWidget {
           // O estilo do AppBar (backgroundColor, foregroundColor, titleTextStyle, etc.)
           // será herdado do appBarTheme definido em AppTheme.dart
         ),
-        body: const _CalendarioPageContent(),
+        body: const _PacientesAgendamentosPageContent(),
       ),
     );
   }
 }
 
-class _CalendarioPageContent extends StatefulWidget {
-  const _CalendarioPageContent();
+class _PacientesAgendamentosPageContent extends StatefulWidget {
+  const _PacientesAgendamentosPageContent();
 
   @override
-  _CalendarioPageContentState createState() => _CalendarioPageContentState();
+  _PacientesAgendamentosPageContentState createState() => _PacientesAgendamentosPageContentState();
 }
 
-class _CalendarioPageContentState extends State<_CalendarioPageContent> {
+class _PacientesAgendamentosPageContentState extends State<_PacientesAgendamentosPageContent> {
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<CalendarioController>();
+    final controller = context.watch<PacientesAgendamentosController>();
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
