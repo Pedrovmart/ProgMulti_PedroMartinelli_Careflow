@@ -27,7 +27,6 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Para usar fontes personalizadas como Manrope, adicione-as ao pubspec.yaml e à pasta de assets.
     return Scaffold(
       backgroundColor: _slate50,
       appBar: _buildAppBar(context),
@@ -37,30 +36,30 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      automaticallyImplyLeading: false, // Remove o botão de voltar padrão se não for necessário
-      backgroundColor: _slate50.withOpacity(0.8), // Similar a bg-slate-50/80
-      elevation: 0, // Remove a sombra padrão, o HTML usa backdrop-blur
+      automaticallyImplyLeading: false,
+      backgroundColor: _slate50.withOpacity(0.8),
+      elevation: 0,
       scrolledUnderElevation: 0,
       titleSpacing: 0,
       title: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0), // p-4 pb-2
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
                 const CircleAvatar(
-                  radius: 20, // size-10 / 2
+                  radius: 20,
                   backgroundImage: NetworkImage(
                       'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx'),
                 ),
-                const SizedBox(width: 12.0), // gap-3
+                const SizedBox(width: 12.0),
                 const Text(
                   'Olá, Dr. Silva',
                   style: TextStyle(
                     color: _slate900,
-                    fontSize: 20.0, // text-xl
-                    fontWeight: FontWeight.bold, // font-bold
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -69,7 +68,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
               icon: const Icon(Icons.notifications_outlined, color: _slate700),
               onPressed: () {},
               splashRadius: 24.0,
-              padding: const EdgeInsets.all(8.0), // p-2
+              padding: const EdgeInsets.all(8.0),
             ),
           ],
         ),
@@ -80,16 +79,16 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0), // main p-4
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildStatsSection(context),
-            const SizedBox(height: 24.0), // mb-6
+            const SizedBox(height: 24.0),
             _buildUpcomingAppointmentsSection(context),
-            const SizedBox(height: 24.0), // mb-6
+            const SizedBox(height: 24.0),
             _buildQuickActionsSection(context),
-            const SizedBox(height: 16.0), // Espaço extra no final
+            const SizedBox(height: 16.0),
           ],
         ),
       ),
@@ -99,52 +98,64 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
   Widget _buildStatsSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 600; // sm breakpoint
-        int crossAxisCount = isWide ? 3 : 2;
-        double childAspectRatio = isWide ? (constraints.maxWidth / 3 / 100) : (constraints.maxWidth / 2 / 100);
-        if (childAspectRatio < 1.2) childAspectRatio = 1.2;
-        if (childAspectRatio > 1.8 && !isWide) childAspectRatio = 1.8;
-        if (childAspectRatio > 2.0 && isWide) childAspectRatio = 2.0;
+        bool isWide = constraints.maxWidth > 600;
 
-
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 12.0, // gap-3
-          mainAxisSpacing: 12.0, // gap-3
-          childAspectRatio: childAspectRatio, 
-          children: [
-            _buildStatCard(
-              context: context,
-              title: 'Pacientes hoje',
-              value: '12',
-              backgroundColor: _sky100.withOpacity(0.7),
-              borderColor: _sky200,
-              titleColor: _sky800,
-              valueColor: _sky900,
-            ),
-            _buildStatCard(
-              context: context,
-              title: 'Consultas',
-              value: '8',
-              backgroundColor: _sky100.withOpacity(0.7),
-              borderColor: _sky200,
-              titleColor: _sky800,
-              valueColor: _sky900,
-            ),
-            _buildStatCard(
-              context: context,
-              title: 'Notificações',
-              value: '3',
-              backgroundColor: _amber100.withOpacity(0.7),
-              borderColor: _amber200,
-              titleColor: _amber800,
-              valueColor: _amber900,
-              fullSpan: !isWide, // Ocupa 2 colunas se não for wide
-            ),
-          ],
+        Widget item1 = _buildStatCard(
+          context: context,
+          title: 'Pacientes hoje',
+          value: '12',
+          backgroundColor: _sky100.withOpacity(0.7),
+          borderColor: _sky200,
+          titleColor: _sky800,
+          valueColor: _sky900,
         );
+        Widget item2 = _buildStatCard(
+          context: context,
+          title: 'Consultas',
+          value: '8',
+          backgroundColor: _sky100.withOpacity(0.7),
+          borderColor: _sky200,
+          titleColor: _sky800,
+          valueColor: _sky900,
+        );
+        Widget item3 = _buildStatCard(
+          context: context,
+          title: 'Notificações',
+          value: '3',
+          backgroundColor: _amber100.withOpacity(0.7),
+          borderColor: _amber200,
+          titleColor: _amber800,
+          valueColor: _amber900,
+        );
+
+        if (isWide) {
+          return GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 12.0,
+            mainAxisSpacing: 12.0,
+            childAspectRatio: (constraints.maxWidth / 3) / 110, // Ajustar altura do card
+            children: [item1, item2, item3],
+          );
+        } else {
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(child: item1),
+                  const SizedBox(width: 12.0),
+                  Expanded(child: item2),
+                ],
+              ),
+              const SizedBox(height: 12.0),
+              SizedBox(
+                width: double.infinity,
+                child: item3,
+              ),
+            ],
+          );
+        }
       },
     );
   }
@@ -157,12 +168,12 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     required Color borderColor,
     required Color titleColor,
     required Color valueColor,
-    bool fullSpan = false, // Para o GridView
   }) {
-    final cardContent = Container(
+    return Container(
+      height: 100, // Dar uma altura fixa para consistência
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12.0), // rounded-xl
+        borderRadius: BorderRadius.circular(12.0),
         border: Border.all(color: borderColor, width: 1.0),
         boxShadow: [
           BoxShadow(
@@ -172,7 +183,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           )
         ],
       ),
-      padding: const EdgeInsets.all(16.0), // p-4
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -181,27 +192,23 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
             title,
             style: TextStyle(
               color: titleColor,
-              fontSize: 14.0, // text-sm
-              fontWeight: FontWeight.w500, // font-medium
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 4.0), // gap-1
+          const SizedBox(height: 4.0),
           Text(
             value,
             style: TextStyle(
               color: valueColor,
-              fontSize: 30.0, // text-3xl
-              fontWeight: FontWeight.bold, // font-bold
-              letterSpacing: -0.5, // tracking-tight (aproximação)
+              fontSize: 30.0,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
             ),
           ),
         ],
       ),
     );
-    if (fullSpan) {
-        return GridTile(child: cardContent); // Ocupa o espaço que o GridView designar
-    }
-    return cardContent;
   }
 
   Widget _buildUpcomingAppointmentsSection(BuildContext context) {
@@ -209,13 +216,13 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(4.0, 0, 4.0, 12.0), // px-1 pb-3
+          padding: EdgeInsets.fromLTRB(4.0, 0, 4.0, 12.0),
           child: Text(
             'Próximos compromissos',
             style: TextStyle(
               color: _slate800,
-              fontSize: 18.0, // text-lg
-              fontWeight: FontWeight.w600, // font-semibold
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -226,7 +233,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           name: 'Consulta com Maria Souza',
           time: '10:00 - 10:30',
         ),
-        const SizedBox(height: 12.0), // space-y-3
+        const SizedBox(height: 12.0),
         _buildAppointmentItem(
           context: context,
           imageUrl:
@@ -234,7 +241,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           name: 'Consulta com Carlos Mendes',
           time: '11:00 - 11:45',
         ),
-        const SizedBox(height: 12.0), // space-y-3
+        const SizedBox(height: 12.0),
         _buildAppointmentItem(
           context: context,
           imageUrl:
@@ -253,10 +260,10 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     required String time,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12.0), // p-3
+      padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: _white,
-        borderRadius: BorderRadius.circular(12.0), // rounded-xl
+        borderRadius: BorderRadius.circular(12.0),
         border: Border.all(color: _slate200, width: 1.0),
         boxShadow: [
           BoxShadow(
@@ -269,10 +276,10 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 24.0, // size-12 / 2
+            radius: 24.0,
             backgroundImage: NetworkImage(imageUrl),
           ),
-          const SizedBox(width: 16.0), // gap-4
+          const SizedBox(width: 16.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,15 +288,15 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                   name,
                   style: const TextStyle(
                     color: _slate900,
-                    fontSize: 16.0, // text-base
-                    fontWeight: FontWeight.w500, // font-medium
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   time,
                   style: const TextStyle(
                     color: _sky600,
-                    fontSize: 14.0, // text-sm
+                    fontSize: 14.0,
                   ),
                 ),
               ],
@@ -306,13 +313,13 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 12.0), // px-1 pt-2 pb-3
+          padding: EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 12.0),
           child: Text(
             'Ações rápidas',
             style: TextStyle(
               color: _slate800,
-              fontSize: 18.0, // text-lg
-              fontWeight: FontWeight.w600, // font-semibold
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -328,7 +335,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
                 onPressed: () {},
               ),
             ),
-            const SizedBox(width: 12.0), // gap-3
+            const SizedBox(width: 12.0),
             Expanded(
               child: _buildQuickActionButton(
                 context: context,
@@ -354,29 +361,29 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     VoidCallback? onPressed,
   }) {
     return SizedBox(
-      height: 112, // h-28 (28 * 4.0)
+      height: 112,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
-          padding: const EdgeInsets.all(16.0), // p-4
+          padding: const EdgeInsets.all(16.0),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0), // rounded-xl
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          elevation: 2.0, // shadow-sm (aproximação)
+          elevation: 2.0,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 30.0), // text-3xl (aproximação para ícone)
-            const SizedBox(height: 8.0), // gap-2
+            Icon(icon, size: 30.0),
+            const SizedBox(height: 8.0),
             Text(
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14.0, // text-sm
-                fontWeight: FontWeight.w600, // font-semibold
+                fontSize: 14.0,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
