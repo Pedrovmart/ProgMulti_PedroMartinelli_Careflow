@@ -46,7 +46,7 @@ class PerfilController extends ChangeNotifier {
     try {
       final firebaseUser = _authProvider.currentUser;
       if (firebaseUser == null) {
-        log('No authenticated user found');
+        log('Nenhum usuário autenticado encontrado');
         _setLoading(false);
         return;
       }
@@ -54,31 +54,31 @@ class PerfilController extends ChangeNotifier {
       final userId = firebaseUser.uid;
       // Ensure userType is fresh from AuthProvider, in case it changed
       _userType = _authProvider.userType; 
-      log('Loading data for user type: $_userType with ID: $userId');
+      log('Carregando dados para o tipo de usuário: $_userType com ID: $userId');
 
       if (_userType == 'paciente') {
         final paciente = await _pacienteProvider.getPacienteById(userId);
         if (paciente != null) {
           _user = paciente;
-          log('Paciente data loaded: ${paciente.nome}');
+          log('Dados do paciente carregados: ${paciente.nome}');
           await _loadProfileImageForPaciente(userId);
         } else {
-          log('No paciente data found for ID: $userId');
+          log('Nenhum dado de paciente encontrado para o ID: $userId');
         }
       } else if (_userType == 'profissional') {
         final profissional = await _profissionalProvider.getProfissionalById(userId);
         if (profissional != null) {
           _user = profissional;
-          log('Profissional data loaded: ${profissional.nome}');
-          _profileImageUrl = null; // Reset as profissional_provider doesn't handle images
+          log('Dados do profissional carregados: ${profissional.nome}');
+          _profileImageUrl = null; 
         } else {
-          log('No profissional data found for ID: $userId');
+          log('Nenhum dado de profissional encontrado para o ID: $userId');
         }
       } else {
-        log('Unknown user type: $_userType');
+        log('Tipo de usuário desconhecido: $_userType');
       }
     } catch (e) {
-      log('Error loading user data: $e');
+      log('Erro ao carregar dados do usuário: $e');
     } finally {
       _setLoading(false);
     }
@@ -92,12 +92,12 @@ class PerfilController extends ChangeNotifier {
         _profileImageUrl = url;
       } else {
         _profileImageUrl = null; // Ensure it's null if not found
-        log('No profile image found for paciente $userId');
+        log('Nenhuma imagem de perfil encontrada para o paciente $userId');
       }
       notifyListeners();
     } catch (e) {
       _profileImageUrl = null;
-      log('Error loading paciente profile image: $e');
+      log('Erro ao carregar imagem de perfil do paciente: $e');
       notifyListeners();
     }
   }
@@ -131,10 +131,10 @@ class PerfilController extends ChangeNotifier {
         _imageFile = null;
         notifyListeners();
       } else {
-        log('Failed to upload paciente image: URL not returned');
+        log('Falha ao enviar imagem do paciente: URL não retornada');
       }
     } catch (e) {
-      log('Error uploading paciente image: $e');
+      log('Erro ao enviar imagem do paciente: $e');
       rethrow;
     }
   }
@@ -146,7 +146,7 @@ class PerfilController extends ChangeNotifier {
     try {
       final userId = _authProvider.currentUser?.uid;
       if (userId == null) {
-        log('User not authenticated for saving profile');
+        log('Usuário não autenticado para salvar perfil');
         _setLoading(false);
         return;
       }
@@ -185,7 +185,7 @@ class PerfilController extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      log('Error saving profile data: $e');
+      log('Erro ao salvar dados do perfil: $e');
       rethrow;
     } finally {
       _setLoading(false);
@@ -207,8 +207,4 @@ class PerfilController extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
