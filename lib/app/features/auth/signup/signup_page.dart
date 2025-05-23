@@ -25,11 +25,6 @@ class SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.light,
-      appBar: AppBar(
-        backgroundColor: AppColors.light,
-        elevation: 0,
-        iconTheme: IconThemeData(color: AppColors.primaryDark),
-      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),

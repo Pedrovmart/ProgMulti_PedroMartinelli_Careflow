@@ -10,57 +10,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: _buildAppBar(context),
-      body: _buildBody(context),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      titleSpacing: 0,
-      title: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx',
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                const Text(
-                  'Olá, Dr. Silva',
-                  style: AppTextStyles.headlineLarge,
-                ),
-              ],
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.notifications_outlined,
-                color:
-                    Theme.of(context).appBarTheme.iconTheme?.color ??
-                    AppColors.primaryDark,
-              ),
-              onPressed: () {},
-              splashRadius: 24.0,
-              padding: const EdgeInsets.all(8.0),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    return SingleChildScrollView(
+      body: SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -75,6 +25,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           ],
         ),
       ),
+    ) 
     );
   }
 

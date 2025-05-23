@@ -11,14 +11,14 @@ class ProfileHeaderWidget extends StatelessWidget {
   final VoidCallback onLogoutTap;
 
   const ProfileHeaderWidget({
-    Key? key,
+    super.key,
     required this.profileImageUrl,
     this.imageFile,
     required this.userName,
     required this.userEmail,
     required this.onImageTap,
     required this.onLogoutTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

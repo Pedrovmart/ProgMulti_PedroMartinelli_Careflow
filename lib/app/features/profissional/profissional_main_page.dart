@@ -1,3 +1,4 @@
+import 'package:careflow_app/app/widgets/app_bars/default_app_bar_widget.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,18 @@ class ProfissionalMainPage extends StatelessWidget {
     final String location = state.uri.toString();
 
     return Scaffold(
+      appBar: DefaultAppBar(
+      title: 'Agendamentos',
+      userName: 'Dr. Silva',
+      userImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx',
+      userRole: 'Médico',
+      onNotificationPressed: () {
+        // TODO: Implementar navegação para notificações
+      },
+      onProfilePressed: () {
+        // TODO: Implementar navegação para perfil
+      },
+    ),
       body: Stack(
         children: [
           // Conteúdo da página atual

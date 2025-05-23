@@ -18,7 +18,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch profissionais when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProfissionalProvider>(
         context,
@@ -40,10 +39,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Buscar Profissionais'),
-        // AppBar styling will be inherited from AppTheme.appBarTheme
-      ),
       body: Column(
         children: [
           Padding(
@@ -51,8 +46,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar por nome',
-                // TextField labelText and prefixIcon colors will be derived from ThemeData.colorScheme
-                // Input text style will use ThemeData.textTheme.bodyLarge or bodyMedium
                 prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -91,7 +84,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                         final profissional = profissionais[index];
                         return GestureDetector(
                           onTap: () {
-                            // Navega para a página de perfil do profissional
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder:
