@@ -1,11 +1,15 @@
+import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/profissional_provider.dart';
+import 'package:careflow_app/app/models/profissional_model.dart';
 import 'package:careflow_app/app/widgets/app_bars/default_app_bar_widget.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/routes/routes.dart';
+import 'package:provider/provider.dart';
 
-class ProfissionalMainPage extends StatelessWidget {
+class ProfissionalMainPage extends StatefulWidget {
   const ProfissionalMainPage({
     super.key,
     required this.state,
@@ -14,6 +18,41 @@ class ProfissionalMainPage extends StatelessWidget {
 
   final Widget child;
   final GoRouterState state;
+
+  @override
+  State<ProfissionalMainPage> createState() => _ProfissionalMainPageState();
+}
+
+class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
+  Profissional? _profissional;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfissionalData();
+  }
+
+  Future<void> _loadProfissionalData() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final profissionalProvider = Provider.of<ProfissionalProvider>(context, listen: false);
+    
+    if (authProvider.currentUser != null) {
+      final profissional = await profissionalProvider.getProfissionalById(authProvider.currentUser!.uid);
+      if (mounted) {
+        setState(() {
+          _profissional = profissional;
+          _isLoading = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   static const List<NavBarItem> _navItems = [
     NavBarItem(icon: Icons.home, label: 'Home'),
@@ -29,43 +68,81 @@ class ProfissionalMainPage extends StatelessWidget {
     '/profissional/perfil',
   ];
 
+  Future<void> _handleLogout() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sair'),
+        content: const Text('Tem certeza que deseja sair da sua conta?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await authProvider.signOut();
+      if (context.mounted) {
+        context.go('/login');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String location = state.uri.toString();
+    final String location = widget.state.uri.toString();
+    final isPerfilPage = location.startsWith('/profissional/perfil');
+
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: DefaultAppBar(
-      title: 'Agendamentos',
-      userName: 'Dr. Silva',
-      userImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBwuP-lo9ZtcJc7iOj6X-wksnZIcSRorecaIW5UnKkqM0OnMhmoY-xkk-3OXzg6kkPOObNRLEb_Y50oeWzBds8eo7YuP4dfhi4tz3JRas84dQJUseeqXN-DXb7_IGE6IIBmcNYGo0UlOQgXQsr2v5umwVToOYjZjaRaeiFZiIxeHp3xchLInTrR7y7W6JvX4CQBFsU5ihSvpi6gVqY2G37W1OZ6adu0EAB3rr7u6uqylbIocSmQqoonA1QdsK79-f7W2vt-G801vPFx',
-      userRole: 'Médico',
-      onNotificationPressed: () {
-        // TODO: Implementar navegação para notificações
-      },
-      onProfilePressed: () {
-        // TODO: Implementar navegação para perfil
-      },
-    ),
+        title: isPerfilPage ? 'Perfil' : 'Agendamentos',
+        userName: _profissional?.nome ?? 'Profissional',
+        userImageUrl: 'https://via.placeholder.com/150',
+        userRole: _profissional?.especialidade ?? 'Profissional',
+        showNotificationIcon: !isPerfilPage,
+        showLogoutButton: isPerfilPage,
+        onLogoutPressed: _handleLogout,
+        onNotificationPressed: () {
+          // TODO: Implementar navegação para notificações
+        },
+        onProfilePressed: isPerfilPage 
+            ? null 
+            : () => context.go('/profissional/perfil'),
+      ),
       body: Stack(
         children: [
-          // Conteúdo da página atual
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 76),
-              child: child,
+              child: widget.child,
             ),
           ),
-          // Barra de navegação flutuante
           Positioned(
             bottom: 15,
             left: 15,
             right: 15,
             child: NavBarWidget(
               onTap: (index) {
-                context.go(_routes[index]); // Navegação via GoRouter
+                context.go(_routes[index]);
               },
-              selectedIndex: _routes.indexOf(location),
-              items: _navItems, // Ícones e rótulos dinâmicos
+              selectedIndex: _routes.indexWhere((route) => location.startsWith(route.split('/').take(3).join('/'))),
+              items: _navItems,
             ),
           ),
         ],

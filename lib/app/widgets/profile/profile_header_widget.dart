@@ -8,7 +8,7 @@ class ProfileHeaderWidget extends StatelessWidget {
   final String userName;
   final String userEmail;
   final VoidCallback onImageTap;
-  final VoidCallback onLogoutTap;
+
 
   const ProfileHeaderWidget({
     super.key,
@@ -17,24 +17,12 @@ class ProfileHeaderWidget extends StatelessWidget {
     required this.userName,
     required this.userEmail,
     required this.onImageTap,
-    required this.onLogoutTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppBar(
-          title: const Text('Meu Perfil'),
-          backgroundColor: AppColors.primary,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: onLogoutTap,
-              tooltip: 'Sair',
-            ),
-          ],
-        ),
         const SizedBox(height: 20),
         GestureDetector(
           onTap: onImageTap,

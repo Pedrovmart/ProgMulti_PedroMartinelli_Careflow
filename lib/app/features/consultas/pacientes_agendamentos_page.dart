@@ -25,7 +25,10 @@ class PacientesAgendamentosPage extends StatelessWidget {
               context,
               listen: false,
             );
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final authProvider = Provider.of<AuthProvider>(
+              context,
+              listen: false,
+            );
 
             return PacientesAgendamentosController(
               consultasProvider,
@@ -39,14 +42,7 @@ class PacientesAgendamentosPage extends StatelessWidget {
           update: (_, controller, __) => controller.profissionalProvider,
         ),
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Agendar Consulta'),
-          // O estilo do AppBar (backgroundColor, foregroundColor, titleTextStyle, etc.)
-          // será herdado do appBarTheme definido em AppTheme.dart
-        ),
-        body: const _PacientesAgendamentosPageContent(),
-      ),
+      child: Scaffold(body: const _PacientesAgendamentosPageContent()),
     );
   }
 }
@@ -55,10 +51,12 @@ class _PacientesAgendamentosPageContent extends StatefulWidget {
   const _PacientesAgendamentosPageContent();
 
   @override
-  _PacientesAgendamentosPageContentState createState() => _PacientesAgendamentosPageContentState();
+  _PacientesAgendamentosPageContentState createState() =>
+      _PacientesAgendamentosPageContentState();
 }
 
-class _PacientesAgendamentosPageContentState extends State<_PacientesAgendamentosPageContent> {
+class _PacientesAgendamentosPageContentState
+    extends State<_PacientesAgendamentosPageContent> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<PacientesAgendamentosController>();

@@ -52,7 +52,6 @@ class PerfilController extends ChangeNotifier {
       }
 
       final userId = firebaseUser.uid;
-      // Ensure userType is fresh from AuthProvider, in case it changed
       _userType = _authProvider.userType; 
       log('Carregando dados para o tipo de usuário: $_userType com ID: $userId');
 
@@ -190,6 +189,73 @@ class PerfilController extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Retorna um mapa com as informações formatadas do usuário para exibição
+  Map<String, String> getUserInfoMap() {
+    if (_user == null) return {};
+
+    if (_userType == 'paciente' && _user is Paciente) {
+      final paciente = _user as Paciente;
+      return {
+        'Nome': paciente.nome,
+        'Email': paciente.email,
+        'Telefone': paciente.telefone,
+        'Endereço': paciente.endereco,
+        'CPF': paciente.cpf,
+        'Data de Nascimento': '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
+      };
+    } else if (_userType == 'profissional' && _user is Profissional) {
+      final profissional = _user as Profissional;
+      return {
+        'Nome': profissional.nome,
+        'Email': profissional.email,
+        'Telefone': profissional.telefone ?? 'Não informado',
+        'Especialidade': profissional.especialidade,
+        'Número de Registro': profissional.numeroRegistro,
+      };
+    }
+    return {};
+  }
+
+
+  Map<String, dynamic> getEditModalData() {
+    if (_user == null) return {};
+
+    Map<String, String> initialData = {};
+    List<String> editableFields = [];
+    List<String> readOnlyFields = [];
+
+    if (_userType == 'paciente' && _user is Paciente) {
+      final paciente = _user as Paciente;
+      initialData = {
+        'nome': paciente.nome,
+        'email': paciente.email,
+        'telefone': paciente.telefone,
+        'endereco': paciente.endereco,
+        'cpf': paciente.cpf,
+        'dataNascimento': '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
+      };
+      editableFields = ['nome', 'telefone', 'endereco'];
+      readOnlyFields = ['email', 'cpf', 'dataNascimento'];
+    } else if (_userType == 'profissional' && _user is Profissional) {
+      final profissional = _user as Profissional;
+      initialData = {
+        'nome': profissional.nome,
+        'email': profissional.email,
+        'telefone': profissional.telefone ?? '',
+        'especialidade': profissional.especialidade,
+        'numeroRegistro': profissional.numeroRegistro,
+      };
+      editableFields = ['nome', 'telefone', 'especialidade'];
+      readOnlyFields = ['email', 'numeroRegistro'];
+    }
+
+    return {
+      'initialData': initialData,
+      'editableFields': editableFields,
+      'readOnlyFields': readOnlyFields,
+    };
   }
 
   Future<void> logout() async {
