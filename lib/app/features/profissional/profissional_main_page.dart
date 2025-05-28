@@ -6,8 +6,11 @@ import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:careflow_app/app/routes/routes.dart';
 import 'package:provider/provider.dart';
+import 'package:careflow_app/app/features/auth/login/login_page.dart'; 
+import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart';
 
 class ProfissionalMainPage extends StatefulWidget {
   const ProfissionalMainPage({
@@ -62,10 +65,10 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
   ];
 
   static const List<String> _routes = [
-    '/profissional/home',
-    Routes.profissionalAgendamentos,
-    '/profissional/roadmap',
-    '/profissional/perfil',
+    ProfissionalHomePage.route,
+    ProfissionalAgendamentosPage.route,
+    ProfissionalRoadmapPage.route,
+    '/profissional/perfil', // PerfilPage route is defined directly in routes.dart for professionals
   ];
 
   Future<void> _handleLogout() async {
@@ -91,7 +94,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     if (confirmed == true) {
       await authProvider.signOut();
       if (context.mounted) {
-        context.go('/login');
+        context.go(LoginPage.route); // Use LoginPage.route
       }
     }
   }
@@ -123,7 +126,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
         },
         onProfilePressed: isPerfilPage 
             ? null 
-            : () => context.go('/profissional/perfil'),
+            : () => context.go('/profissional/perfil'), // This specific string is fine as it's unique to this context
       ),
       body: Stack(
         children: [

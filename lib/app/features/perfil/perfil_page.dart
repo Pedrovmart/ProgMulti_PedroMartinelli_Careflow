@@ -11,6 +11,13 @@ import 'package:provider/provider.dart';
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
 
+  // Note: This page is used for both paciente and profissional profiles.
+  // The actual route path will be defined in the routes.dart file
+  // based on the user type. For consistency, we can define a base or no route here,
+  // or acknowledge that its route is contextually defined.
+  // For now, let's assume a generic constant or leave it to be handled by the router.
+  // static const String route = '/perfil'; // This would be too generic.
+
   @override
   State<PerfilPage> createState() => _PerfilPageState();
 }

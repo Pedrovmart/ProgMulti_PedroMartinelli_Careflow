@@ -7,6 +7,8 @@ import 'package:careflow_app/app/core/ui/app_colors.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
+  static const String route = '/signup';
+
   @override
   SignUpPageState createState() => SignUpPageState();
 }

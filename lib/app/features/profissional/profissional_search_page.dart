@@ -8,6 +8,8 @@ import 'package:careflow_app/app/features/profissional/profissional_perfil_publi
 class ProfissionalSearchPage extends StatefulWidget {
   const ProfissionalSearchPage({super.key});
 
+  static const String route = '/paciente/busca'; // Assuming this is the correct route path
+
   @override
   State<ProfissionalSearchPage> createState() => _ProfissionalSearchPageState();
 }

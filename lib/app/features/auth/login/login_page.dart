@@ -7,6 +7,8 @@ import 'package:careflow_app/app/core/ui/app_colors.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
+  static const String route = '/login';
+
   @override
   State<LoginPage> createState() {
     return _LoginPageState();

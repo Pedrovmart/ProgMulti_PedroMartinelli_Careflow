@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class PacienteHomePage extends StatelessWidget {
   const PacienteHomePage({super.key});
 
+  static const String route = '/paciente/home';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -6,6 +6,8 @@ import '../../core/ui/app_text_styles.dart';
 class ProfissionalAgendamentosPage extends StatelessWidget {
   const ProfissionalAgendamentosPage({super.key});
 
+  static const String route = '/profissional/agendamentos';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

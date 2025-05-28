@@ -11,6 +11,8 @@ import 'package:careflow_app/app/features/consultas/widgets/form_widget.dart';
 class PacientesAgendamentosPage extends StatelessWidget {
   const PacientesAgendamentosPage({super.key});
 
+  static const String route = '/paciente/calendario';
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

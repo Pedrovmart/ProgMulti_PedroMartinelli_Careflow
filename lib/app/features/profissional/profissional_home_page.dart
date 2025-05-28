@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class ProfissionalHomePage extends StatelessWidget {
   const ProfissionalHomePage({super.key});
 
+  static const String route = '/profissional/home';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
