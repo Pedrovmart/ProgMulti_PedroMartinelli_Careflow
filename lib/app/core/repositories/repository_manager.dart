@@ -1,42 +1,26 @@
-import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/n8n_consultas_repository.dart';
 import 'package:careflow_app/app/core/repositories/n8n_paciente_repository.dart';
 import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
 
 class RepositoryManager {
   static final RepositoryManager _instance = RepositoryManager._internal();
-  final N8nHttpClient _httpClient = N8nHttpClient();
   
   final Map<Type, dynamic> _repositories = {};
-  bool _initialized = false;
 
   factory RepositoryManager() {
     return _instance;
   }
 
-  RepositoryManager._internal() {
-    _initialize();
-  }
-
-  void _initialize() {
-    if (!_initialized) {
-      _repositories[N8nConsultasRepository] = N8nConsultasRepository(_httpClient);
-      _repositories[N8nPacienteRepository] = N8nPacienteRepository(_httpClient);
-      _repositories[N8nProfissionalRepository] = N8nProfissionalRepository(_httpClient);
-      
-      _initialized = true;
-    }
-  }
+  RepositoryManager._internal();
 
   T get<T>() {
     if (_repositories.containsKey(T)) {
       return _repositories[T] as T;
     }
 
-    throw Exception('Repositório não encontrado: $T');
+    throw Exception('Repositório não encontrado: $T. Certifique-se de que foi registrado.');
   }
   
-  // Métodos de conveniência para acessar repositórios específicos
   N8nPacienteRepository getPacienteRepository() {
     return get<N8nPacienteRepository>();
   }
@@ -50,11 +34,10 @@ class RepositoryManager {
   }
 
   void register<T>(T repository) {
-    _repositories[T] = repository;
+    _repositories[T.runtimeType] = repository; //  runtimeType para garantir o tipo correto como chave
   }
+
   void reset() {
     _repositories.clear();
-    _initialized = false;
-    _initialize();
   }
 }

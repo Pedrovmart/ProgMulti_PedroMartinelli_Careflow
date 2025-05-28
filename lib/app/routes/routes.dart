@@ -13,14 +13,9 @@ import 'package:careflow_app/app/features/profissional/profissional_search_page.
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
 import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart'; // Added import
+import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart'; 
 
 sealed class Routes {
-  // Constants for route names can be kept if they are used for named navigation,
-  // but the path strings themselves will now come from the page files.
-  // It's also an option to remove these string constants if paths are always sourced from pages.
-  // For now, I'll leave them as they might be used for `name:` parameter in GoRoute.
-
   static const String loginName = 'login';
   static const String signupName = 'signup';
   static const String homePacienteName = 'homePaciente';
@@ -39,30 +34,17 @@ sealed class Routes {
     required AuthProvider authProvider,
   }) {
     return GoRouter(
-      initialLocation: initialLocation ?? LoginPage.route, // Use constant
+      initialLocation: initialLocation ?? LoginPage.route, 
       refreshListenable: authProvider,
       routes: [
         GoRoute(
-          path: LoginPage.route, // Use constant
-          name: loginName, // Use name constant
-          builder: (context, state) {
-            final user = authProvider.currentUser;
-            if (user == null) {
-              return const LoginPage();
-            } else if (authProvider.userType == 'paciente') {
-              return PacienteMainPage(state: state, child: const PacienteHomePage());
-            } else if (authProvider.userType == 'profissional') {
-              return ProfissionalMainPage(
-                state: state,
-                child: const ProfissionalHomePage(),
-              );
-            }
-            return const LoginPage();
-          },
+          path: LoginPage.route, 
+          name: loginName,
+          builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          path: SignUpPage.route, // Use constant
-          name: signupName, // Use name constant
+          path: SignUpPage.route, 
+          name: signupName, 
           builder: (context, state) => const SignUpPage(),
         ),
         ShellRoute(
@@ -71,18 +53,17 @@ sealed class Routes {
                   PacienteMainPage(state: state, child: child),
           routes: [
             GoRoute(
-              path: PacienteHomePage.route, // Use constant
-              name: homePacienteName, // Use name constant
+              path: PacienteHomePage.route, 
+              name: homePacienteName, 
               builder: (context, state) => const PacienteHomePage(),
             ),
             GoRoute(
-              path: ProfissionalSearchPage.route, // Use constant
-              name: pacienteBuscaName, // Use name constant
+              path: ProfissionalSearchPage.route,
+              name: pacienteBuscaName,
               builder: (context, state) => const ProfissionalSearchPage(),
             ),
             GoRoute(
-              path: ProfissionalPerfilPublicoPage.route, // Use constant
-              name: perfilPublicoProfissionalName, // Use name constant
+              path: ProfissionalPerfilPublicoPage.route,
               builder: (context, state) {
                 final profissional = state.extra as Profissional?;
                 return ProfissionalPerfilPublicoPage(
@@ -91,13 +72,13 @@ sealed class Routes {
               },
             ),
             GoRoute(
-              path: PacientesAgendamentosPage.route, // Use constant
-              name: calendarioName, // Use name constant
+              path: PacientesAgendamentosPage.route,
+              name: calendarioName,
               builder: (context, state) => const PacientesAgendamentosPage(),
             ),
             GoRoute(
-              path: '/paciente/perfil', // PerfilPage route is context-dependent
-              name: perfilPacienteName, // Use name constant
+              path: '/paciente/perfil',
+              name: perfilPacienteName,
               builder: (context, state) => const PerfilPage(),
             ),
           ],
@@ -108,54 +89,52 @@ sealed class Routes {
                   ProfissionalMainPage(state: state, child: child),
           routes: [
             GoRoute(
-              path: ProfissionalHomePage.route, // Use constant
-              name: homeProfissionalName, // Use name constant
+              path: ProfissionalHomePage.route,
+              name: homeProfissionalName,
               builder: (context, state) => const ProfissionalHomePage(),
             ),
             GoRoute(
-              path: ProfissionalAgendamentosPage.route, // Use constant
-              name: profissionalAgendamentosName, // Use name constant
+              path: ProfissionalAgendamentosPage.route,
+              name: profissionalAgendamentosName,
               builder: (context, state) => const ProfissionalAgendamentosPage(),
             ),
             GoRoute(
-              path: ProfissionalRoadmapPage.route, // Already using constant
-              name: profissionalRoadmapName, // Use name constant
+              path: ProfissionalRoadmapPage.route,
+              name: profissionalRoadmapName,
               builder: (context, state) => const ProfissionalRoadmapPage(),
             ),
             GoRoute(
-              path: '/profissional/perfil', // PerfilPage route is context-dependent
-              name: perfilProfissionalName, // Use name constant
+              path: '/profissional/perfil', 
+              name: perfilProfissionalName, 
               builder: (context, state) => const PerfilPage(),
             ),
           ],
         ),
       ],
       redirect: (context, state) {
-        // Aguardar a inicialização da autenticação
+
         if (!authProvider.initialized) {
-          return null; // Não redirecionar enquanto estiver inicializando
+          return null; 
         }
         
         final user = authProvider.currentUser;
         final location = state.uri.toString();
 
-        // Se o usuário não estiver autenticado e tentar acessar uma rota protegida
+       
         if (user == null &&
-            location != LoginPage.route && // Use constant
-            location != SignUpPage.route) { // Use constant
-          return LoginPage.route;  // Redirecionar para login, não para a raiz
+            location != LoginPage.route &&
+            location != SignUpPage.route) {
+          return LoginPage.route;
         }
 
-        // Se o usuário estiver autenticado e tentar acessar login
-        if (user != null && location == LoginPage.route) { // Use constant
+       
+        if (user != null && location == LoginPage.route) {
           if (authProvider.userType == 'paciente') {
-            return PacienteHomePage.route; // Use constant
-          } else if (authProvider.userType == 'profissional') {
-            return ProfissionalHomePage.route; // Use constant
+            return PacienteHomePage.route;
           }
         }
 
-        return null; // Sem redirecionamento
+        return null;
       },
       errorBuilder: (context, state) => const LoginPage(),
     );
