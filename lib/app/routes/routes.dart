@@ -128,9 +128,11 @@ sealed class Routes {
         }
 
        
-        if (user != null && location == LoginPage.route) {
+        if (user != null && (location == LoginPage.route || location == SignUpPage.route)) {
           if (authProvider.userType == 'paciente') {
             return PacienteHomePage.route;
+          } else if (authProvider.userType == 'profissional') {
+            return ProfissionalHomePage.route;
           }
         }
 

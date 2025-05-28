@@ -34,10 +34,17 @@ class LoginController extends ChangeNotifier {
         passwordController.text.trim(),
       );
 
-
-      loginSuccess = true;
-
+      if (_authProvider.isAuthenticated && _authProvider.userType.isNotEmpty) {
+        loginSuccess = true;
+      } else if (_authProvider.isAuthenticated && _authProvider.userType.isEmpty) {
+        _errorMessage = 'Não foi possível determinar o tipo de usuário. Verifique os dados cadastrais.';
+        loginSuccess = false;
+      } else {
+        _errorMessage = 'Falha no login. Verifique suas credenciais.';
+        loginSuccess = false;
+      }
     } catch (e) {
+      loginSuccess = false;
       if (e is Exception) {
         String exceptionMessage = e.toString();
         if (exceptionMessage.startsWith("Exception: ")) {
@@ -47,7 +54,7 @@ class LoginController extends ChangeNotifier {
       } else {
         _errorMessage = 'Ocorreu um erro desconhecido ao tentar fazer login.';
       }
-      // TODO: Adicionar loging do erro para depuração
+      // TODO: Adicionar logging do erro para depuração
     } finally {
       _isLoading = false;
       notifyListeners();

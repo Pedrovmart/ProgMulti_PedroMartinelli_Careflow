@@ -3,28 +3,59 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
+import 'package:careflow_app/app/core/ui/app_text_styles.dart';
+import 'package:careflow_app/app/features/auth/signup/signup_controller.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 
   static const String route = '/signup';
 
   @override
-  SignUpPageState createState() => SignUpPageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => SignupController(context.read<AuthProvider>()),
+      child: const _SignUpView(),
+    );
+  }
 }
 
-class SignUpPageState extends State<SignUpPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _especialidadeController = TextEditingController();
-  final _numRegistroController = TextEditingController();
+class _SignUpView extends StatelessWidget {
+  const _SignUpView();
 
-  bool _isLoading = false;
-  bool _isProfissional = false;
+  // Helper para criar os TextFields padronizados
+  Widget _buildAuthTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData icon,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.primary),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.primaryDark),
+        ),
+        prefixIcon: Icon(icon, color: AppColors.primary),
+      ),
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      cursorColor: AppColors.primaryDark,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<SignupController>();
+
     return Scaffold(
       backgroundColor: AppColors.light,
       body: Center(
@@ -41,230 +72,94 @@ class SignUpPageState extends State<SignUpPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Título
                   Text(
                     'Crie sua conta',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                    ),
+                    style: AppTextStyles.headlineLarge.copyWith(fontSize: 24),
                   ),
                   const SizedBox(height: 16),
-
-                  // Toggle para selecionar Paciente ou Profissional
                   Center(
                     child: ToggleButtons(
-                      isSelected: [_isProfissional == false, _isProfissional],
+                      isSelected: [!controller.isProfissional, controller.isProfissional],
                       onPressed: (index) {
-                        setState(() {
-                          _isProfissional = index == 1;
-                        });
+                        controller.setIsProfissional(index == 1);
                       },
                       borderRadius: BorderRadius.circular(8),
                       selectedColor: Colors.white,
                       fillColor: AppColors.primaryDark,
                       color: AppColors.primary,
-                      constraints: const BoxConstraints(
-                        minHeight: 40,
-                        minWidth: 120,
-                      ),
+                      constraints: const BoxConstraints(minHeight: 40, minWidth: 120),
                       children: const [Text('Paciente'), Text('Profissional')],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Campo de Nome
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nome',
-                      labelStyle: TextStyle(color: AppColors.primary),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primary),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primaryDark),
-                      ),
-                      prefixIcon: Icon(Icons.person, color: AppColors.primary),
-                    ),
-                    cursorColor: AppColors.primaryDark,
+                  _buildAuthTextField(
+                    controller: controller.nameController,
+                    labelText: 'Nome Completo',
+                    icon: Icons.person_outline,
                   ),
                   const SizedBox(height: 16),
-
-                  // Campo de Email
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: AppColors.primary),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primary),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primaryDark),
-                      ),
-                      prefixIcon: Icon(Icons.email, color: AppColors.primary),
-                    ),
-                    cursorColor: AppColors.primaryDark,
+                  _buildAuthTextField(
+                    controller: controller.emailController,
+                    labelText: 'Email',
+                    icon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
-
-                  // Campos adicionais para Profissional
-                  if (_isProfissional) ...[
-                    TextField(
-                      controller: _especialidadeController,
-                      decoration: InputDecoration(
-                        labelText: 'Especialidade',
-                        labelStyle: TextStyle(color: AppColors.primary),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: AppColors.primaryDark),
-                        ),
-                        prefixIcon: Icon(Icons.work, color: AppColors.primary),
-                      ),
-                      cursorColor: AppColors.primaryDark,
+                  if (controller.isProfissional) ...[
+                    _buildAuthTextField(
+                      controller: controller.especialidadeController,
+                      labelText: 'Especialidade',
+                      icon: Icons.medical_services_outlined,
                     ),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _numRegistroController,
-                      decoration: InputDecoration(
-                        labelText: 'Número de Registro',
-                        labelStyle: TextStyle(color: AppColors.primary),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: AppColors.primaryDark),
-                        ),
-                        prefixIcon: Icon(Icons.badge, color: AppColors.primary),
-                      ),
-                      cursorColor: AppColors.primaryDark,
+                    _buildAuthTextField(
+                      controller: controller.numRegistroController,
+                      labelText: 'Número de Registro (Ex: CRM/12345)',
+                      icon: Icons.badge_outlined,
                     ),
                     const SizedBox(height: 16),
                   ],
-
-                  // Campo de Senha
-                  TextField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Senha',
-                      labelStyle: TextStyle(color: AppColors.primary),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primary),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.primaryDark),
-                      ),
-                      prefixIcon: Icon(Icons.lock, color: AppColors.primary),
-                    ),
-                    cursorColor: AppColors.primaryDark,
+                  _buildAuthTextField(
+                    controller: controller.passwordController,
+                    labelText: 'Senha',
+                    icon: Icons.lock_outline,
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
-
-                  // Botão de Cadastro ou Indicador de Carregamento
-                  if (_isLoading)
-                    const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryDark,
-                      ),
-                    )
+                  if (controller.isLoading)
+                    const Center(child: CircularProgressIndicator(color: AppColors.primaryDark))
                   else
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        try {
-                          if (_isProfissional) {
-                            await context
-                                .read<AuthProvider>()
-                                .registerProfissional(
-                                  _emailController.text.trim(),
-                                  _passwordController.text.trim(),
-                                  _nameController.text.trim(),
-                                  _especialidadeController.text.trim(),
-                                );
-                          } else {
-                            await context.read<AuthProvider>().registerPaciente(
-                              _emailController.text.trim(),
-                              _passwordController.text.trim(),
-                              _nameController.text.trim(),
-                            );
-                          }
-
-                          if (context.mounted &&
-                              context.read<AuthProvider>().isAuthenticated) {
-                            if (_isProfissional) {
-                              context.go('/homeProfissional');
-                            } else {
-                              context.go('/homePaciente');
-                            }
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Cadastro falhou'),
-                                ),
-                              );
-                            }
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
+                        final navRoute = await controller.registerUser(context);
+                        if (context.mounted) {
+                          if (navRoute != null) {
+                            // Navega para a rota retornada em caso de sucesso
+                            context.go(navRoute);
+                          } else if (controller.errorMessage != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Erro ao cadastrar'),
+                              SnackBar(
+                                content: Text(controller.errorMessage!),
+                                backgroundColor: Colors.red,
                               ),
                             );
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isLoading = false;
-                            });
                           }
                         }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryDark,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: const Text(
-                        'Cadastrar',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
+                      child: Text('Cadastrar', style: AppTextStyles.labelLarge.copyWith(fontSize: 16)),
                     ),
                   const SizedBox(height: 16),
-
-                  // Botão para Voltar ao Login
                   TextButton(
-                    onPressed: () {
-                      context.pop();
-                    },
+                    onPressed: () => controller.goToLoginPage(context),
                     child: Text(
                       'Já tem uma conta? Faça login',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryDark,
-                      ),
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryDark),
                     ),
                   ),
                 ],

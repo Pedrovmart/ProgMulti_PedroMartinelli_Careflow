@@ -34,7 +34,7 @@ class RepositoryManager {
   }
 
   void register<T>(T repository) {
-    _repositories[T.runtimeType] = repository; //  runtimeType para garantir o tipo correto como chave
+    _repositories[T] = repository;
   }
 
   void reset() {
