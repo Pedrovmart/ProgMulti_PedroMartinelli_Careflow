@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'paciente_home_controller.dart';
 
 class PacienteHomePage extends StatelessWidget {
-  const PacienteHomePage({super.key});
+  PacienteHomePage({super.key});
+
+  final PacienteHomeController _controller = PacienteHomeController();
+
 
   static const String route = '/paciente/home';
 
@@ -32,7 +36,7 @@ class PacienteHomePage extends StatelessWidget {
                 title: Text('Próximas Consultas'),
                 subtitle: Text('Veja suas consultas agendadas'),
                 onTap: () {
-                  // Navegar para a página de consultas
+                  _controller.navigateToConsultas(context);
                 },
               ),
             ),
@@ -60,7 +64,7 @@ class PacienteHomePage extends StatelessWidget {
                 title: Text('Histórico Médico'),
                 subtitle: Text('Acesse seu histórico de saúde'),
                 onTap: () {
-                  // Navegar para a página de histórico médico
+                  _controller.navigateToHistoricoMedico(context);
                 },
               ),
             ),
@@ -75,7 +79,7 @@ class PacienteHomePage extends StatelessWidget {
                 title: Text('Perfil'),
                 subtitle: Text('Atualize suas informações pessoais'),
                 onTap: () {
-                  // Navegar para a página de perfil
+                  _controller.navigateToPerfil(context);
                 },
               ),
             ),

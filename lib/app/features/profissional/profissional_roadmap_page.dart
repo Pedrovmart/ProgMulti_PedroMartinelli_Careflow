@@ -5,9 +5,6 @@ import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 import 'package:careflow_app/app/features/profissional/profissional_roadmap_controller.dart';
 
 
-// TODO: Potentially import a shared AppBar widget if available
-// import 'package:careflow_app/app/widgets/app_bars/default_app_bar_widget.dart';
-
 class ProfissionalRoadmapPage extends StatelessWidget {
   const ProfissionalRoadmapPage({super.key});
 
@@ -15,10 +12,8 @@ class ProfissionalRoadmapPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Idealmente, o provider seria injetado mais acima na árvore de widgets
-    // ou através de um sistema de injeção de dependências.
     return ChangeNotifierProvider(
-      create: (context) => ProfissionalRoadmapController(), // Adicionar dependências do controller se houver
+      create: (context) => ProfissionalRoadmapController(),
       child: const _ProfissionalRoadmapView(),
     );
   }
@@ -40,7 +35,6 @@ class _ProfissionalRoadmapView extends StatelessWidget {
         backgroundColor: AppColors.primary,
         elevation: 2,
         iconTheme: const IconThemeData(color: Colors.white),
-        // centerTitle: true, // Uncomment if title should be centered
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

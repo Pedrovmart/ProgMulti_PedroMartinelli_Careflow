@@ -64,7 +64,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     NavBarItem(icon: Icons.person, label: 'Perfil'),
   ];
 
-  static const List<String> _routes = [
+  static final List<String> _routes = [
     ProfissionalHomePage.route,
     ProfissionalAgendamentosPage.route,
     ProfissionalRoadmapPage.route,

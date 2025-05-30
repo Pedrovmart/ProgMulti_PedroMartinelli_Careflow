@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_text_styles.dart';
 
+
 class AppTheme {
   static ThemeData get themeData {
     return ThemeData(
@@ -12,23 +13,21 @@ class AppTheme {
       // errorColor: AppColors.error, // errorColor está depreciado, use colorScheme.error
 
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
+        seedColor: AppColors.primaryDark,
         brightness: Brightness.light,
-        // Você pode descomentar e ajustar estas linhas se a geração automática
-        // do fromSeed não atender exatamente às suas expectativas para cores específicas:
+        surface: Colors.white,    // Definindo a superfície como branca
+        // Outras cores podem ser ajustadas conforme necessário
         // primary: AppColors.primary, // O seedColor já define isso
         // onPrimary: Colors.white,
         // secondary: AppColors.accent,
         // onSecondary: Colors.white,
         // error: AppColors.error, // Se você tiver AppColors.error definido
         // onError: Colors.white,
-        // background: AppColors.light, // Por exemplo, se quiser um fundo específico
         // onBackground: AppColors.primaryDark,
-        // surface: Colors.white, // Por exemplo, para cards
         // onSurface: AppColors.primaryDark,
       ),
 
-      scaffoldBackgroundColor: AppColors.light, // Usando AppColors.light para o fundo do scaffold
+      scaffoldBackgroundColor: Colors.white, // Mudando para fundo branco conforme solicitado
 
       fontFamily: 'Manrope', // Definindo a fonte primária como padrão (se configurada)
 
@@ -77,9 +76,10 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
-        color: Colors.white, // Cor de fundo padrão para Cards
+        color: AppColors.accentLight.withValues(alpha: 0.7), // Cor de fundo clara para Cards com maior opacidade
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
       ),
+
 
       // Defina outros temas de componentes aqui ( InputDecorationTheme, etc.)
 

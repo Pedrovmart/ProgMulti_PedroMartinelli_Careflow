@@ -106,7 +106,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Médico: ${event.nomeMedico}'),
+                                  Text('Médico: ${event.nome}'),
                                   Text('Data: ${event.data}'),
                                   if (event.queixaPaciente.isNotEmpty)
                                     Text('Queixa: ${event.queixaPaciente}'),

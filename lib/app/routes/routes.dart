@@ -55,7 +55,7 @@ sealed class Routes {
             GoRoute(
               path: PacienteHomePage.route, 
               name: homePacienteName, 
-              builder: (context, state) => const PacienteHomePage(),
+              builder: (context, state) => PacienteHomePage(),
             ),
             GoRoute(
               path: ProfissionalSearchPage.route,
