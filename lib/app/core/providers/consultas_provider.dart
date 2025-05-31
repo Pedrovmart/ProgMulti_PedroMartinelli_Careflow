@@ -58,6 +58,22 @@ class ConsultasProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  
+  Future<void> fetchConsultasPorProfissional(String profissionalId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _consultas = await _consultasRepository.getByProfissionalId(profissionalId);
+    } catch (e) {
+      _error = "Erro ao buscar consultas do profissional: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   Future<String> agendarConsulta(ConsultaModel consulta) async {
     _isLoading = true;
@@ -132,7 +148,7 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Busca uma consulta específica pelo ID (alternativa usando o método base)
+  // Busca uma consulta específica pelo ID (alternativa usando o método base) REDUNDANTE??
   Future<ConsultaModel?> getConsultaById(String consultaId) async {
     _isLoading = true;
     _error = null;

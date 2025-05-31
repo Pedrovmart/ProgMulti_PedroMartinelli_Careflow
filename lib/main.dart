@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'app/app.dart';
 import 'app/core/dependency_injection.dart';
+import 'app/core/ui/app_theme.dart';
 
 void main() { 
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -24,7 +25,7 @@ void main() {
       debugPrint('Firebase inicializado com sucesso');
       await DependencyInjection.init();
       debugPrint('Injeção de dependências inicializada');
-      runApp(const App());
+      runApp(App(theme: AppTheme.themeData));
     } catch (e, stackTrace) {
       debugPrint('ERRO CRÍTICO durante a inicialização:');
       debugPrint('Erro: $e');

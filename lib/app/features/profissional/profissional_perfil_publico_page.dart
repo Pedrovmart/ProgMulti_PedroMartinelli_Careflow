@@ -4,6 +4,8 @@ import 'package:careflow_app/app/models/profissional_model.dart';
 class ProfissionalPerfilPublicoPage extends StatelessWidget {
   const ProfissionalPerfilPublicoPage({super.key});
 
+  static const String route = '/paciente/busca/perfilProfissional';
+
   @override
   Widget build(BuildContext context) {
     // Obtém o profissional do contexto
@@ -12,10 +14,6 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
 
     if (profissional == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('Perfil do Profissional'),
-          centerTitle: true,
-        ),
         body: const Center(
           child: Text('Dados do profissional não encontrados.'),
         ),
@@ -23,10 +21,6 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perfil do Profissional'),
-        centerTitle: true,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
