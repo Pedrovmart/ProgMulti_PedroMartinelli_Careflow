@@ -1,12 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
+
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
+import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 class EventsListWidget extends StatefulWidget {
-  final CalendarioController controller;
+  final PacientesAgendamentosController controller;
   
   const EventsListWidget({super.key, required this.controller});
 
@@ -46,11 +47,11 @@ class _EventsListWidgetState extends State<EventsListWidget> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16), // Ou cardTheme.shape
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: AppColors.primaryDark.withValues(alpha: 0.08), // Ou simular com cardTheme.elevation
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -66,19 +67,17 @@ class _EventsListWidgetState extends State<EventsListWidget> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Consultas do Dia',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.primaryDark, // primaryDark é muito específico
                 ),
               ),
             ),
             const Divider(),
             events.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.all(16.0),
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Center(
-                      child: Text('Nenhuma consulta agendada para este dia'),
+                      child: Text('Nenhuma consulta agendada para este dia', style: TextStyle(color: AppColors.primary.withValues(alpha: 0.7))),
                     ),
                   )
                 : ListView.builder(
@@ -89,25 +88,25 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                       final event = events[index];
                       return Card(
                         elevation: 0,
-                        color: AppColors.light.withOpacity(0.1),
+                        color: AppColors.light.withValues(alpha: 0.5),
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         child: ExpansionTile(
                           leading: CircleAvatar(
-                            backgroundColor: AppColors.accent,
-                            child: const Icon(Icons.calendar_today, color: Colors.white),
+                            backgroundColor: AppColors.accentLight,
+                            child: const Icon(Icons.calendar_today, color: AppColors.accentDark),
                           ),
                           title: Text(
                             event.descricao,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
-                          subtitle: Text('Horário: ${event.hora}'),
+                          subtitle: Text('Horário: ${event.hora}', style: Theme.of(context).textTheme.bodyMedium),
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Médico: ${event.nomeMedico}'),
+                                  Text('Médico: ${event.nome}'),
                                   Text('Data: ${event.data}'),
                                   if (event.queixaPaciente.isNotEmpty)
                                     Text('Queixa: ${event.queixaPaciente}'),
@@ -119,7 +118,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                                     children: [
                                       TextButton.icon(
                                         icon: const Icon(Icons.edit, color: AppColors.primary),
-                                        label: const Text('Editar'),
+                                        label: const Text('Editar', style: TextStyle(color: AppColors.primary)),
                                         onPressed: () {
                                           // Implementar edição de consulta
                                           _showEditDialog(context, event);
@@ -127,8 +126,8 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                                       ),
                                       const SizedBox(width: 8),
                                       TextButton.icon(
-                                        icon: const Icon(Icons.cancel, color: Colors.red),
-                                        label: const Text('Cancelar'),
+                                        icon: const Icon(Icons.cancel, color: AppColors.accentDark),
+                                        label: const Text('Cancelar', style: TextStyle(color: AppColors.accentDark)),
                                         onPressed: () {
                                           // Implementar cancelamento de consulta
                                           _showCancelDialog(context, event);
@@ -160,7 +159,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Editar Consulta'),
+        title: const Text('Editar Consulta', style: TextStyle(color: AppColors.primaryDark)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -169,6 +168,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                 controller: descricaoController,
                 decoration: const InputDecoration(
                   labelText: 'Descrição',
+                  labelStyle: TextStyle(color: AppColors.primary),
+                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.accent)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primaryLight)),
                 ),
               ),
               const SizedBox(height: 8),
@@ -176,6 +178,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                 controller: horaController,
                 decoration: const InputDecoration(
                   labelText: 'Horário',
+                  labelStyle: TextStyle(color: AppColors.primary),
+                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.accent)),
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primaryLight)),
                 ),
               ),
             ],
@@ -184,9 +189,10 @@ class _EventsListWidgetState extends State<EventsListWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar', style: TextStyle(color: AppColors.primary)),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.light),
             onPressed: () {
               // Criar uma nova consulta com os dados atualizados
               final consultaAtualizada = ConsultaModel(

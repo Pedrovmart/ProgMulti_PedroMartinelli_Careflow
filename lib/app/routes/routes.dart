@@ -1,4 +1,5 @@
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
@@ -8,50 +9,43 @@ import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; // Import da página de busca
-import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; // Import da página de perfil público
-import 'package:careflow_app/app/features/consultas/calendario_page.dart'; // Import da página CalendarioPage
+import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
+import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
+import 'package:careflow_app/app/features/perfil/perfil_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart'; 
 
 sealed class Routes {
-  static const String login = '/login';
-  static const String signup = '/signup';
-  static const String homePaciente = '/paciente/home';
-  static const String homeProfissional = '/profissional/home';
-  static const String perfilPublicoProfissional =
-      '/paciente/busca/perfilProfissional'; // Alterada para /paciente/busca/perfilProfissional
-  static const String calendario =
-      '/paciente/calendario'; // Rota para o calendário
+  static const String loginName = 'login';
+  static const String signupName = 'signup';
+  static const String homePacienteName = 'homePaciente';
+  static const String pacienteBuscaName = 'pacienteBusca';
+  static const String perfilPublicoProfissionalName = 'perfilPublicoProfissional';
+  static const String calendarioName = 'calendario';
+  static const String perfilPacienteName = 'perfilPaciente';
+  static const String homeProfissionalName = 'homeProfissional';
+  static const String profissionalAgendamentosName = 'profissionalAgendamentos';
+  static const String profissionalRoadmapName = 'profissionalRoadmap';
+  static const String perfilProfissionalName = 'perfilProfissional';
+
 
   static GoRouter createRouter({
     String? initialLocation,
     required AuthProvider authProvider,
   }) {
     return GoRouter(
-      initialLocation: initialLocation ?? '/login',
+      initialLocation: initialLocation ?? LoginPage.route, 
       refreshListenable: authProvider,
       routes: [
         GoRoute(
-          path: '/login',
-          name: 'login',
-          builder: (context, state) {
-            final user = authProvider.currentUser;
-            if (user == null) {
-              return LoginPage();
-            } else if (authProvider.userType == 'paciente') {
-              return PacienteMainPage(state: state, child: PacienteHomePage());
-            } else if (authProvider.userType == 'profissional') {
-              return ProfissionalMainPage(
-                state: state,
-                child: ProfissionalHomePage(),
-              );
-            }
-            return LoginPage();
-          },
+          path: LoginPage.route, 
+          name: loginName,
+          builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          path: '/signup',
-          name: 'signup',
-          builder: (context, state) => SignUpPage(),
+          path: SignUpPage.route, 
+          name: signupName, 
+          builder: (context, state) => const SignUpPage(),
         ),
         ShellRoute(
           builder:
@@ -59,19 +53,17 @@ sealed class Routes {
                   PacienteMainPage(state: state, child: child),
           routes: [
             GoRoute(
-              path: '/paciente/home',
-              name: 'homePaciente',
+              path: PacienteHomePage.route, 
+              name: homePacienteName, 
               builder: (context, state) => PacienteHomePage(),
             ),
             GoRoute(
-              path: '/paciente/busca',
-              name: 'pacienteBusca',
-              builder: (context, state) => ProfissionalSearchPage(),
+              path: ProfissionalSearchPage.route,
+              name: pacienteBuscaName,
+              builder: (context, state) => const ProfissionalSearchPage(),
             ),
             GoRoute(
-              path:
-                  '/paciente/busca/perfilProfissional', // Alterada para /paciente/busca/perfilProfissional
-              name: 'perfilPublicoProfissional',
+              path: ProfissionalPerfilPublicoPage.route,
               builder: (context, state) {
                 final profissional = state.extra as Profissional?;
                 return ProfissionalPerfilPublicoPage(
@@ -80,9 +72,14 @@ sealed class Routes {
               },
             ),
             GoRoute(
-              path: '/paciente/calendario',
-              name: 'calendario',
-              builder: (context, state) => const CalendarioPage(),
+              path: PacientesAgendamentosPage.route,
+              name: calendarioName,
+              builder: (context, state) => const PacientesAgendamentosPage(),
+            ),
+            GoRoute(
+              path: '/paciente/perfil',
+              name: perfilPacienteName,
+              builder: (context, state) => const PerfilPage(),
             ),
           ],
         ),
@@ -92,35 +89,56 @@ sealed class Routes {
                   ProfissionalMainPage(state: state, child: child),
           routes: [
             GoRoute(
-              path: '/profissional/home',
-              name: 'homeProfissional',
-              builder: (context, state) => ProfissionalHomePage(),
+              path: ProfissionalHomePage.route,
+              name: homeProfissionalName,
+              builder: (context, state) => const ProfissionalHomePage(),
+            ),
+            GoRoute(
+              path: ProfissionalAgendamentosPage.route,
+              name: profissionalAgendamentosName,
+              builder: (context, state) => const ProfissionalAgendamentosPage(),
+            ),
+            GoRoute(
+              path: ProfissionalRoadmapPage.route,
+              name: profissionalRoadmapName,
+              builder: (context, state) => const ProfissionalRoadmapPage(),
+            ),
+            GoRoute(
+              path: '/profissional/perfil', 
+              name: perfilProfissionalName, 
+              builder: (context, state) => const PerfilPage(),
             ),
           ],
         ),
       ],
       redirect: (context, state) {
-        final user = authProvider.currentUser;
 
+        if (!authProvider.initialized) {
+          return null; 
+        }
+        
+        final user = authProvider.currentUser;
+        final location = state.uri.toString();
+
+       
         if (user == null &&
-            state.uri.toString() != '/login' &&
-            state.uri.toString() != '/signup') {
-          return '/';
+            location != LoginPage.route &&
+            location != SignUpPage.route) {
+          return LoginPage.route;
         }
 
-        if (user != null) {
-          if (authProvider.userType == 'paciente' &&
-              state.uri.toString() == '/login') {
-            return '/paciente/home';
-          } else if (authProvider.userType == 'profissional' &&
-              state.uri.toString() == '/login') {
-            return '/profissional/home';
+       
+        if (user != null && (location == LoginPage.route || location == SignUpPage.route)) {
+          if (authProvider.userType == 'paciente') {
+            return PacienteHomePage.route;
+          } else if (authProvider.userType == 'profissional') {
+            return ProfissionalHomePage.route;
           }
         }
 
         return null;
       },
-      errorBuilder: (context, state) => LoginPage(),
+      errorBuilder: (context, state) => const LoginPage(),
     );
   }
 }

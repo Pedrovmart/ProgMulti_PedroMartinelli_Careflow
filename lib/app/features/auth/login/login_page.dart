@@ -3,26 +3,32 @@ import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
+import 'package:careflow_app/app/core/ui/app_text_styles.dart';
+import 'package:careflow_app/app/features/auth/login/login_controller.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  @override
-  State<LoginPage> createState() {
-    return _LoginPageState();
-  }
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  bool _isLoading = false;
+  static const String route = '/login';
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => LoginController(context.read<AuthProvider>()),
+      child: const _LoginView(),
+    );
+  }
+}
+
+class _LoginView extends StatelessWidget {
+  const _LoginView();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<LoginController>();
+
     return Scaffold(
-      backgroundColor: AppColors.light, // Fundo claro
+      backgroundColor: AppColors.light,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -40,19 +46,14 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'Bem-vindo ao CareFlow',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                    ),
+                    style: AppTextStyles.headlineLarge.copyWith(fontSize: 24),
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
-                    controller: _emailController,
+                    controller: controller.emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      labelStyle: TextStyle(color: AppColors.primary),
+                      labelStyle: AppTextStyles.bodyMedium,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: AppColors.primary),
@@ -63,15 +64,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       prefixIcon: Icon(Icons.email, color: AppColors.primary),
                     ),
+                    keyboardType: TextInputType.emailAddress,
                     cursorColor: AppColors.primaryDark,
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
-                    controller: _passwordController,
+                    controller: controller.passwordController,
                     decoration: InputDecoration(
                       labelText: 'Senha',
-                      labelStyle: TextStyle(color: AppColors.primary),
+                      labelStyle: AppTextStyles.bodyMedium,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: AppColors.primary),
@@ -82,13 +83,11 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       prefixIcon: Icon(Icons.lock, color: AppColors.primary),
                     ),
-                    cursorColor: AppColors.primaryDark,
                     obscureText: true,
+                    cursorColor: AppColors.primaryDark,
                   ),
                   const SizedBox(height: 24),
-
-                  // Botão de Login ou Indicador de Carregamento
-                  if (_isLoading)
+                  if (controller.isLoading)
                     const Center(
                       child: CircularProgressIndicator(
                         color: AppColors.primaryDark,
@@ -97,39 +96,17 @@ class _LoginPageState extends State<LoginPage> {
                   else
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        try {
-                          await context.read<AuthProvider>().login(
-                            _emailController.text.trim(),
-                            _passwordController.text.trim(),
-                          );
-
-                          if (context.mounted &&
-                              context.read<AuthProvider>().isAuthenticated) {
+                        final success = await controller.loginUser(context);
+                        if (context.mounted) {
+                          if (success) {
                             context.replace('/');
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Login falhou')),
-                              );
-                            }
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
+                          } else if (controller.errorMessage != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Erro ao fazer login'),
+                              SnackBar(
+                                content: Text(controller.errorMessage!),
+                                backgroundColor: Colors.red,
                               ),
                             );
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              _isLoading = false;
-                            });
                           }
                         }
                       },
@@ -140,24 +117,17 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Login',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                        style: AppTextStyles.labelLarge.copyWith(fontSize: 16),
                       ),
                     ),
                   const SizedBox(height: 16),
-
-                  // Botão de Cadastro
                   TextButton(
-                    onPressed: () {
-                      context.push('/signup');
-                    },
+                    onPressed: () => controller.goToSignupPage(context),
                     child: Text(
                       'Não tem uma conta? Cadastre-se',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryDark,
-                      ),
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryDark),
                     ),
                   ),
                 ],

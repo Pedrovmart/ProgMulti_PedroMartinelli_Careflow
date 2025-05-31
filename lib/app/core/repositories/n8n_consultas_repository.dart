@@ -9,6 +9,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
   // Endpoints específicos
   final String _endpointConsultasPaciente = '/consultasPaciente';
+  final String _endpointConsultasProfissional = '/consultasProfissional';
   final String _endpointNovaConsulta = '/novaConsulta';
   final String _endpointGetConsultas = '/consultas';
   final String _endpointUpdateConsulta = '/atualizarConsulta';
@@ -21,7 +22,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   Future<List<ConsultaModel>> getAll() async {
     try {
       final response = await _httpClient.get(_endpointGetConsultas);
-      final List<dynamic> data = response.data;
+      final List<dynamic> data = response.data ?? []; 
       return data
           .whereType<Map<String, dynamic>>()
           .map((item) => ConsultaModel.fromMap(item))
@@ -31,7 +32,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override
+
   Future<List<ConsultaModel>> getByPacienteId(String pacienteId) async {
     try {
       final response = await _httpClient.get(
@@ -39,7 +40,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
         queryParameters: {'pacienteId': pacienteId},
       );
 
-      final List<dynamic> data = response.data;
+      final List<dynamic> data = response.data ?? []; 
 
       return data
           .whereType<Map<String, dynamic>>()
@@ -47,6 +48,24 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
           .toList();
     } catch (e) {
       throw Exception('Erro ao buscar consultas do paciente: $e');
+    }
+  }
+  
+  Future<List<ConsultaModel>> getByProfissionalId(String profissionalId) async {
+    try {
+      final response = await _httpClient.get(
+        _endpointConsultasProfissional,
+        queryParameters: {'idMedico': profissionalId},
+      );
+
+      final List<dynamic> data = response.data ?? []; 
+
+      return data
+          .whereType<Map<String, dynamic>>()
+          .map((item) => ConsultaModel.fromMap(item))
+          .toList();
+    } catch (e) {
+      throw Exception('Erro ao buscar consultas do profissional: $e');
     }
   }
 

@@ -3,9 +3,6 @@ abstract class BaseRepository<T> {
   /// Busca todos os itens
   Future<List<T>> getAll();
   
-  /// Busca itens por paciente
-  Future<List<T>> getByPacienteId(String pacienteId);
-  
   /// Busca um item pelo ID
   Future<T?> getById(String id);
   

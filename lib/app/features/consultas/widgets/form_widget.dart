@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/consultas/calendario_controller.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 
 class FormWidget extends StatefulWidget {
-  final CalendarioController controller;
-  
+  final PacientesAgendamentosController controller;
+
   const FormWidget({super.key, required this.controller});
 
   @override
@@ -29,7 +29,7 @@ class _FormWidgetState extends State<FormWidget> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       // Usa o método do controller para carregar os profissionais
       await widget.controller.fetchProfissionais();
@@ -44,16 +44,18 @@ class _FormWidgetState extends State<FormWidget> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:
+            Theme.of(context).cardTheme.color ??
+            Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: AppColors.primaryDark.withValues(alpha: 0.08),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -83,10 +85,21 @@ class _FormWidgetState extends State<FormWidget> {
                 hintText: 'Digite sua queixa',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary),
+                  borderSide: const BorderSide(color: AppColors.primaryLight),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.accent,
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primaryLight),
                 ),
                 filled: true,
-                fillColor: AppColors.light.withValues(alpha: 0.2),
+                fillColor: AppColors.light.withValues(alpha: 0.1),
                 labelStyle: TextStyle(color: AppColors.primaryDark),
               ),
             ),
@@ -99,12 +112,26 @@ class _FormWidgetState extends State<FormWidget> {
                 hintText: 'Selecione uma data no calendário',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primary),
+                  borderSide: const BorderSide(color: AppColors.primaryLight),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.accent,
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primaryLight),
                 ),
                 filled: true,
-                fillColor: AppColors.light.withValues(alpha: 0.2),
+                fillColor: AppColors.light.withValues(alpha: 0.1),
                 labelStyle: TextStyle(color: AppColors.primaryDark),
-                suffixIcon: Icon(Icons.calendar_today, color: AppColors.primary),
+                suffixIcon: Icon(
+                  Icons.calendar_today,
+                  color: AppColors.primary,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -113,13 +140,16 @@ class _FormWidgetState extends State<FormWidget> {
                 final currentContext = context;
                 showTimePicker(
                   context: currentContext,
-                  barrierColor: AppColors.primary.withValues(alpha: 0.5),
+                  barrierColor: AppColors.primaryDark.withValues(alpha: 0.5),
                   initialEntryMode: TimePickerEntryMode.input,
-                  initialTime: widget.controller.selectedTime ?? TimeOfDay.now(),
+                  initialTime:
+                      widget.controller.selectedTime ?? TimeOfDay.now(),
                 ).then((time) {
                   if (time != null && currentContext.mounted) {
                     widget.controller.selectedTime = time;
-                    widget.controller.horaController.text = time.format(currentContext);
+                    widget.controller.horaController.text = time.format(
+                      currentContext,
+                    );
                   }
                 });
               },
@@ -131,70 +161,126 @@ class _FormWidgetState extends State<FormWidget> {
                     hintText: 'Selecione a hora',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.primary),
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryLight,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.accent,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryLight,
+                      ),
                     ),
                     filled: true,
-                    fillColor: AppColors.light.withValues(alpha: 0.2),
+                    fillColor: AppColors.light.withValues(alpha: 0.1),
                     labelStyle: TextStyle(color: AppColors.primaryDark),
-                    suffixIcon: Icon(Icons.access_time, color: AppColors.primary),
+                    suffixIcon: Icon(
+                      Icons.access_time,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             _isLoading
-              ? Container(
+                ? Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.primary),
+                    border: Border.all(color: AppColors.primaryLight),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   child: const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
                   ),
                 )
-              : DropdownButtonFormField<String>(
+                : DropdownButtonFormField<String>(
                   value: widget.controller.selectedProfissionalId,
-                  hint: const Text('Selecione o profissional'),
+                  hint: const Text(
+                    'Selecione o profissional',
+                    style: TextStyle(color: AppColors.primary),
+                  ),
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Profissional',
                     hintText: 'Selecione o profissional',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppColors.primary),
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryLight,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.accent,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryLight,
+                      ),
                     ),
                     filled: true,
-                    fillColor: AppColors.light.withValues(alpha: 0.2),
+                    fillColor: AppColors.light.withValues(alpha: 0.1),
                     labelStyle: TextStyle(color: AppColors.primaryDark),
-                    suffixIcon: widget.controller.profissionais.isEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.refresh),
-                          onPressed: _carregarProfissionais,
-                          tooltip: 'Recarregar lista',
-                        )
-                      : null,
+                    suffixIcon:
+                        widget.controller.profissionais.isEmpty
+                            ? IconButton(
+                              icon: const Icon(
+                                Icons.refresh,
+                                color: AppColors.primary,
+                              ),
+                              onPressed: _carregarProfissionais,
+                              tooltip: 'Recarregar lista',
+                            )
+                            : null,
                   ),
-                  items: widget.controller.profissionais.isEmpty
-                    ? [
-                        const DropdownMenuItem<String>(
-                          value: '',
-                          enabled: false,
-                          child: Text('Nenhum profissional encontrado'),
-                        )
-                      ]
-                    : widget.controller.profissionais.map((Profissional profissional) {
-                        return DropdownMenuItem<String>(
-                          value: profissional.id,
-                          child: Text('${profissional.nome} - ${profissional.especialidade}'),
-                        );
-                      }).toList(),
+                  items:
+                      widget.controller.profissionais.isEmpty
+                          ? [
+                            DropdownMenuItem<String>(
+                              value: '',
+                              enabled: false,
+                              child: Text(
+                                'Nenhum profissional encontrado',
+                                style: TextStyle(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ]
+                          : widget.controller.profissionais.map((
+                            Profissional profissional,
+                          ) {
+                            return DropdownMenuItem<String>(
+                              value: profissional.id,
+                              child: Text(
+                                '${profissional.nome} - ${profissional.especialidade}',
+                              ),
+                            );
+                          }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       widget.controller.selectedProfissionalId = newValue;
                     });
                   },
-            ),
+                ),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -212,12 +298,10 @@ class _FormWidgetState extends State<FormWidget> {
                       );
                     }
 
-
                     widget.controller.queixaPacienteController.clear();
                     widget.controller.horaController.clear();
                     widget.controller.selectedProfissionalId = null;
                     widget.controller.selectedTime = null;
-
 
                     await widget.controller.fetchConsultations();
                   } catch (e) {

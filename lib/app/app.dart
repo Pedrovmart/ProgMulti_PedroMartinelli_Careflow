@@ -7,7 +7,8 @@ import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final ThemeData? theme;
+  const App({super.key, this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class App extends StatelessWidget {
           return MaterialApp.router(
             title: 'CareFlow',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(primarySwatch: Colors.blue),
+            theme: theme,
             routerConfig: Routes.createRouter(authProvider: authProvider),
           );
         },

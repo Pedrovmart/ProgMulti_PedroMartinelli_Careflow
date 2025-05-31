@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/features/profissional/widgets/profissional_search_card.dart';
@@ -6,6 +7,8 @@ import 'package:careflow_app/app/features/profissional/profissional_perfil_publi
 
 class ProfissionalSearchPage extends StatefulWidget {
   const ProfissionalSearchPage({super.key});
+
+  static const String route = '/paciente/busca'; // Assuming this is the correct route path
 
   @override
   State<ProfissionalSearchPage> createState() => _ProfissionalSearchPageState();
@@ -17,7 +20,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch profissionais when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProfissionalProvider>(
         context,
@@ -39,7 +41,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Buscar Profissionais')),
       body: Column(
         children: [
           Padding(
@@ -47,9 +48,18 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar por nome',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primary),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.accent),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.primaryLight),
                 ),
               ),
               onChanged: (value) {
@@ -62,8 +72,13 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
           Expanded(
             child:
                 profissionais.isEmpty
-                    ? const Center(
-                      child: Text('Nenhum profissional encontrado.'),
+                    ? Center(
+                      child: Text(
+                        'Nenhum profissional encontrado.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.primaryDark.withValues(alpha: 0.7),
+                            ),
+                      ),
                     )
                     : ListView.builder(
                       itemCount: profissionais.length,
@@ -71,7 +86,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                         final profissional = profissionais[index];
                         return GestureDetector(
                           onTap: () {
-                            // Navega para a página de perfil do profissional
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder:

@@ -1,3 +1,4 @@
+import 'dart:developer'; // Adicionado para log
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -42,12 +43,13 @@ class AuthRepository {
     }
   }
 
-  // Método de cadastro para Profissional
+
   Future<User?> registerProfissional(
     String email,
     String password,
     String name,
     String especialidade,
+    String numRegistro, 
   ) async {
     try {
       final UserCredential userCredential = await _firebaseAuth
@@ -62,6 +64,7 @@ class AuthRepository {
             'nome': name,
             'email': email,
             'especialidade': especialidade,
+            'numRegistro': numRegistro,
             'userType': 'profissional',
             'createdAt': FieldValue.serverTimestamp(),
           });
@@ -71,9 +74,10 @@ class AuthRepository {
     }
   }
 
-  // Método para obter o tipo de usuário
   Future<String> getUserType(String uid) async {
+    log('AuthRepository: Iniciando getUserType para UID: $uid');
     try {
+      log('AuthRepository: Tentando buscar documento do paciente...');
       final pacienteDoc =
           await FirebaseFirestore.instance
               .collection('usuarios')
@@ -81,8 +85,13 @@ class AuthRepository {
               .collection('pacientes')
               .doc(uid)
               .get();
-      if (pacienteDoc.exists) return 'paciente';
+      log('AuthRepository: Documento do paciente buscado. Existe: ${pacienteDoc.exists}');
+      if (pacienteDoc.exists) {
+        log('AuthRepository: Usuário é paciente.');
+        return 'paciente';
+      }
 
+      log('AuthRepository: Tentando buscar documento do profissional...');
       final profissionalDoc =
           await FirebaseFirestore.instance
               .collection('usuarios')
@@ -90,15 +99,20 @@ class AuthRepository {
               .collection('profissionais')
               .doc(uid)
               .get();
-      if (profissionalDoc.exists) return 'profissional';
+      log('AuthRepository: Documento do profissional buscado. Existe: ${profissionalDoc.exists}');
+      if (profissionalDoc.exists) {
+        log('AuthRepository: Usuário é profissional.');
+        return 'profissional';
+      }
 
+      log('AuthRepository: Usuário não encontrado em nenhuma coleção.');
       throw Exception('Usuário não encontrado.');
     } catch (e) {
+      log('AuthRepository: Erro em getUserType: ${e.toString()}');
       throw Exception("Erro ao verificar tipo de usuário: ${e.toString()}");
     }
   }
 
-  // Método de logout
   Future<void> signOut() async {
     try {
       await _firebaseAuth.signOut();
@@ -115,6 +129,5 @@ class AuthRepository {
     }
   }
 
-  // Stream de estado de autenticação
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 }

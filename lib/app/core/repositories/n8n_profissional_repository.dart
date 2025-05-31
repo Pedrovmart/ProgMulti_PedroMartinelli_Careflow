@@ -1,5 +1,6 @@
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/base_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 
 class N8nProfissionalRepository implements BaseRepository<Profissional> {
@@ -20,7 +21,7 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     try {
       final response = await _httpClient.get(_endpointGetAll);
       final List<dynamic> data = response.data;
-      
+
       return data
           .whereType<Map<String, dynamic>>()
           .map((item) => Profissional.fromJson(item))
@@ -30,25 +31,44 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     }
   }
 
-  @override
+  //TODO: VERIFICAR SE VAI SER NECESSARIA IMPLEMENTAÇÃO
   Future<List<Profissional>> getByPacienteId(String pacienteId) async {
     // Se não houver um endpoint específico para buscar profissionais por paciente,
     // podemos retornar todos e filtrar localmente ou lançar uma exceção
-    // Esta implementação retorna todos os profissionais (pode ser ajustada conforme necessidade)
     return getAll();
   }
 
   @override
   Future<Profissional?> getById(String id) async {
     try {
-      final response = await _httpClient.get('$_endpointGetById/$id');
-      return Profissional.fromJson(response.data);
-    } catch (e) {
-      // Se o erro for 404 (não encontrado), retorna null
-      if (e.toString().contains('404')) {
+      final response = await _httpClient.get(
+        _endpointGetById,
+        queryParameters: {'id': id},
+      );
+
+      if (response.data == null) {
         return null;
       }
-      throw Exception('Erro ao buscar profissional por ID: $e');
+
+      if (response.data is List) {
+        final listData = response.data as List;
+        if (listData.isNotEmpty && listData.first is Map<String, dynamic>) {
+          return Profissional.fromJson(listData.first as Map<String, dynamic>);
+        } else {
+          return null;
+        }
+      } else if (response.data is Map<String, dynamic>) {
+        return Profissional.fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('Formato de dados inesperado recebido da API para profissional ID: $id');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return null;
+      }
+      throw Exception('Erro de comunicação ao buscar profissional por ID: $id. Detalhes: ${e.message}');
+    } catch (e) {
+      throw Exception('Erro inesperado ao buscar profissional por ID: $id. Detalhes: $e');
     }
   }
 
@@ -56,11 +76,10 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   Future<Profissional> create(Profissional profissional) async {
     try {
       final response = await _httpClient.post(
-        _endpointCreate, 
+        _endpointCreate,
         data: _toRequestData(profissional),
       );
-      
-      // Retorna o profissional com o ID atualizado (se necessário)
+
       return Profissional.fromJson(response.data);
     } catch (e) {
       throw Exception('Erro ao criar profissional: $e');
@@ -71,7 +90,7 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   Future<void> update(String id, Profissional profissional) async {
     try {
       await _httpClient.put(
-        '$_endpointUpdate/$id', 
+        '$_endpointUpdate/$id',
         data: _toRequestData(profissional),
       );
     } catch (e) {
@@ -89,47 +108,41 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   }
 
   // Métodos auxiliares
-  
-  /// Converte um objeto Profissional para o formato esperado pela API
+
   Map<String, dynamic> _toRequestData(Profissional profissional) {
     final data = profissional.toJson();
-    
-    // Remover campos que não devem ser enviados ou que são gerenciados pelo servidor
 
     data.remove('userType');
-    
-    // Garantir que campos obrigatórios estejam presentes
+
     data['id'] = profissional.id;
     data['nome'] = profissional.nome;
     data['email'] = profissional.email;
     data['especialidade'] = profissional.especialidade;
     data['numRegistro'] = profissional.numeroRegistro;
     data['idEmpresa'] = profissional.idEmpresa;
-    
-    // Adicionar campos opcionais apenas se estiverem preenchidos
+
     if (profissional.dataNascimento != null) {
       data['dataNascimento'] = profissional.dataNascimento;
     }
-    
+
     if (profissional.telefone != null) {
       data['telefone'] = profissional.telefone;
     }
-    
+
     return data;
   }
-  
+
   // Métodos específicos do domínio de profissionais
-  
-  /// Busca profissionais por especialidade
+
   Future<List<Profissional>> getByEspecialidade(String especialidade) async {
     try {
       final response = await _httpClient.get(
         _endpointBase,
         queryParameters: {'especialidade': especialidade},
       );
-      
+
       final List<dynamic> data = response.data is List ? response.data : [];
-      
+
       return data
           .whereType<Map<String, dynamic>>()
           .map((item) => Profissional.fromJson(item))
@@ -138,17 +151,16 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       throw Exception('Erro ao buscar profissionais por especialidade: $e');
     }
   }
-  
-  /// Busca profissionais por empresa
+
   Future<List<Profissional>> getByEmpresa(String empresaId) async {
     try {
       final response = await _httpClient.get(
         _endpointBase,
         queryParameters: {'idEmpresa': empresaId},
       );
-      
+
       final List<dynamic> data = response.data is List ? response.data : [];
-      
+
       return data
           .whereType<Map<String, dynamic>>()
           .map((item) => Profissional.fromJson(item))

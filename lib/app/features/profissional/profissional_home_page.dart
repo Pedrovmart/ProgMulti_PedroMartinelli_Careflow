@@ -1,104 +1,310 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ProfissionalHomePage extends StatelessWidget {
+import '../../core/providers/auth_provider.dart';
+import '../../core/providers/consultas_provider.dart';
+import '../../core/ui/app_colors.dart';
+import '../../core/ui/app_text_styles.dart';
+import 'controllers/profissional_home_controller.dart';
+import 'widgets/home_stats_cards.dart';
+
+class ProfissionalHomePage extends StatefulWidget {
   const ProfissionalHomePage({super.key});
+
+  static const String route = '/profissional/home';
+  
+  @override
+  State<ProfissionalHomePage> createState() => _ProfissionalHomePageState();
+}
+
+class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
+  late ProfissionalHomeController _controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initController();
+    });
+  }
+  
+  void _initController() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final consultasProvider = Provider.of<ConsultasProvider>(context, listen: false);
+    
+    _controller = ProfissionalHomeController(
+      authProvider: authProvider,
+      consultasProvider: consultasProvider,
+    );
+    
+    _controller.addListener(_refreshUI);
+    _controller.carregarDados();
+  }
+  
+  void _refreshUI() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+  
+  @override
+  void dispose() {
+    _controller.removeListener(_refreshUI);
+    super.dispose();
+  }
+  
+  // Todos os métodos de processamento de dados foram movidos para o controller
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Área do Profissional'),
-        backgroundColor: Colors.blueAccent,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStatsSection(context),
+              const SizedBox(height: 24.0),
+              _buildUpcomingAppointmentsSection(context),
+              const SizedBox(height: 24.0),
+              _buildQuickActionsSection(context),
+              const SizedBox(height: 16.0),
+            ],
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Bem-vindo, Dr. João!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  Widget _buildStatsSection(BuildContext context) {
+    if (_controller.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    return HomeStatsCards(
+      patientCount: _controller.pacientesHoje,
+      consultationCount: _controller.consultasTotal,
+    );
+  }
+
+  Widget _buildUpcomingAppointmentsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(4.0, 0, 4.0, 12.0),
+          child: Text(
+            'Próximos compromissos',
+            style: AppTextStyles.headlineMedium,
+          ),
+        ),
+        if (_controller.isLoading)
+          const Center(child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ))
+        else if (_controller.proximosCompromissos.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(12.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 3.0,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-              child: ListTile(
-                leading: const Icon(Icons.calendar_today, color: Colors.blue),
-                title: const Text('Consultas Agendadas'),
-                subtitle: const Text(
-                  'Confira as consultas marcadas para hoje.',
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  // Navegar para a página de consultas
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.timeline, color: Colors.green),
-                title: const Text('Roadmap de Pacientes'),
-                subtitle: const Text(
-                  'Acompanhe o progresso dos seus pacientes.',
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  // Navegar para o roadmap de pacientes
-                },
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(16),
+              child: Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Notificações Recentes',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    Icon(
+                      Icons.event_busy_outlined,
+                      size: 48,
+                      color: AppColors.primaryDark,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Sua agenda está livre hoje',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.primaryDark,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text('- Consulta com Maria às 14:00.'),
-                    const Text('- Novo paciente adicionado ao roadmap.'),
-                    const Text('- Atualização no prontuário de José.'),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Rota Atual:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Nenhum compromisso agendado para o dia',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primaryDark,
                       ),
-                    ),
-                    Builder(
-                      builder: (context) {
-                        final routeName =
-                            ModalRoute.of(context)?.settings.name ??
-                            'Rota desconhecida';
-                        return Text(
-                          routeName,
-                          style: const TextStyle(fontSize: 14),
-                        );
-                      },
                     ),
                   ],
                 ),
               ),
+            ),
+          )
+        else
+          ..._controller.proximosCompromissos.map((compromisso) {
+            return Column(
+              children: [
+                _buildAppointmentItem(
+                  context: context,
+                  imageUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(compromisso["nome"])}&background=random',
+                  name: 'Consulta com ${compromisso["nome"]}',
+                  time: compromisso["horario"],
+                ),
+                const SizedBox(height: 12.0),
+              ],
+            );
+          }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildAppointmentItem({
+    required BuildContext context,
+    required String imageUrl,
+    required String name,
+    required String time,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: Theme.of(context).dividerColor, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 3.0,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(radius: 24.0, backgroundImage: NetworkImage(imageUrl)),
+          const SizedBox(width: 16.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: AppTextStyles.titleMedium),
+                Text(
+                  time,
+                  style: AppTextStyles.caption.copyWith(
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.chevron_right_outlined,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(4.0, 8.0, 4.0, 12.0),
+          child: Text('Ações rápidas', style: AppTextStyles.headlineMedium),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildQuickActionButton(
+                context: context,
+                icon: Icons.search_rounded,
+                label: 'Buscar paciente',
+                backgroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.backgroundColor
+                    ?.resolve({WidgetState.selected}),
+                foregroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.foregroundColor
+                    ?.resolve({WidgetState.selected}),
+                onPressed: () {},
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: _buildQuickActionButton(
+                context: context,
+                icon: Icons.add_circle_outline_rounded,
+                label: 'Novo agendamento',
+                backgroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.backgroundColor
+                    ?.resolve({WidgetState.selected}),
+                foregroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style
+                    ?.foregroundColor
+                    ?.resolve({WidgetState.selected}),
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      height: 112,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          padding: const EdgeInsets.all(16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          elevation: 2.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: Theme.of(context)
+                  .elevatedButtonTheme
+                  .style
+                  ?.foregroundColor
+                  ?.resolve({WidgetState.selected}),
+              size: 20.0,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.titleMedium,
             ),
           ],
         ),
