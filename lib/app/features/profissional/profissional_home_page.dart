@@ -18,14 +18,16 @@ class ProfissionalHomePage extends StatefulWidget {
 }
 
 class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
-  late ProfissionalHomeController _controller;
+  late final ProfissionalHomeController _controller;
+  bool _isInitialized = false;
   
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
       _initController();
-    });
+      _isInitialized = true;
+    }
   }
   
   void _initController() {
@@ -53,7 +55,7 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
     super.dispose();
   }
   
-  // Todos os métodos de processamento de dados foram movidos para o controller
+
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +164,7 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
                 const SizedBox(height: 12.0),
               ],
             );
-          }).toList(),
+          }),
       ],
     );
   }
@@ -229,16 +231,8 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
                 context: context,
                 icon: Icons.search_rounded,
                 label: 'Buscar paciente',
-                backgroundColor: Theme.of(context)
-                    .elevatedButtonTheme
-                    .style
-                    ?.backgroundColor
-                    ?.resolve({WidgetState.selected}),
-                foregroundColor: Theme.of(context)
-                    .elevatedButtonTheme
-                    .style
-                    ?.foregroundColor
-                    ?.resolve({WidgetState.selected}),
+                backgroundColor: Theme.of(context).primaryColorDark,
+                foregroundColor: Colors.white,
                 onPressed: () {},
               ),
             ),
@@ -248,16 +242,8 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
                 context: context,
                 icon: Icons.add_circle_outline_rounded,
                 label: 'Novo agendamento',
-                backgroundColor: Theme.of(context)
-                    .elevatedButtonTheme
-                    .style
-                    ?.backgroundColor
-                    ?.resolve({WidgetState.selected}),
-                foregroundColor: Theme.of(context)
-                    .elevatedButtonTheme
-                    .style
-                    ?.foregroundColor
-                    ?.resolve({WidgetState.selected}),
+                backgroundColor: Theme.of(context).primaryColorDark,
+                foregroundColor: Theme.of(context).primaryColorLight,
                 onPressed: () {},
               ),
             ),
@@ -293,18 +279,16 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
           children: [
             Icon(
               icon,
-              color: Theme.of(context)
-                  .elevatedButtonTheme
-                  .style
-                  ?.foregroundColor
-                  ?.resolve({WidgetState.selected}),
+              color: Theme.of(context).primaryColorLight,
               size: 20.0,
             ),
             const SizedBox(height: 8.0),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: AppTextStyles.titleMedium,
+              style: AppTextStyles.titleMedium.copyWith(
+                color: Theme.of(context).primaryColorLight,
+              ),
             ),
           ],
         ),

@@ -93,7 +93,7 @@ class ConsultaModel {
       queixaPaciente: map['queixaPaciente'] ?? 'Queixa não especificada.',
       idPaciente: map['idPaciente'] ?? '',
       idMedico: map['idMedico'] ?? '',
-      nome: map['nomePaciente'] ?? '',
+      nome: map['nomeMedico'] ?? map['nomePaciente'],
       descricao: map['descricao'] ?? '',
       diagnostico: map['diagnostico'] ?? 'Diagnóstico pendente.',
     );
