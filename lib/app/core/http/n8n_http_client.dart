@@ -25,9 +25,9 @@ class N8nHttpClient {
 
   void _configureDio() {
     _dio.options.baseUrl = _baseUrl;
-    _dio.options.responseType = ResponseType.json; // Garante que sempre recebemos JSON
-    _dio.options.connectTimeout = const Duration(seconds: 30);
-    _dio.options.receiveTimeout = const Duration(seconds: 30);
+    _dio.options.responseType = ResponseType.json; 
+    _dio.options.connectTimeout = const Duration(seconds: 3000); 
+    _dio.options.receiveTimeout = const Duration(seconds: 3000); 
     
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -36,16 +36,15 @@ class N8nHttpClient {
           final base64Credentials = base64Encode(utf8.encode(credentials));
           options.headers['Authorization'] = 'Basic $base64Credentials';
           options.headers['Content-Type'] = 'application/json';
-          options.headers['Accept'] = 'application/json'; // Adiciona header Accept
+          options.headers['Accept'] = 'application/json'; 
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          // Verifica se o response é uma string e tenta parsear como JSON
           if (response.data is String) {
             try {
               response.data = json.decode(response.data);
             } catch (e) {
-              // Se falhar, mantém como string para tratamento no repository
+              //tratamento no repository
             }
           }
           return handler.next(response);

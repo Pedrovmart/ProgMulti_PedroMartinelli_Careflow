@@ -16,6 +16,20 @@ class AppTextStyles {
     color: AppColors.primaryDark,
     letterSpacing: -0.5,
   );
+  
+  static const TextStyle headlineSmall = TextStyle(
+    fontFamily: _fontFamilyPrimary,
+    fontSize: 20.0,
+    fontWeight: FontWeight.w600, // semibold
+    color: AppColors.primaryDark,
+  );
+  
+  static const TextStyle titleLarge = TextStyle(
+    fontFamily: _fontFamilyPrimary,
+    fontSize: 22.0,
+    fontWeight: FontWeight.w600, // semibold
+    color: AppColors.primaryDark,
+  );
 
   static const TextStyle headlineLarge = TextStyle(
     // Exemplo: 'Olá, Dr. Silva'

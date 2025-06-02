@@ -165,4 +165,27 @@ class ConsultasProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  
+  Future<Map<String, dynamic>> getDetalhesConsultaProfissionalPaciente({
+    required String idProfissional,
+    required String idPaciente,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final detalhes = await _consultasRepository.getDetalhesConsultaProfissionalPaciente(
+        idProfissional: idProfissional,
+        idPaciente: idPaciente,
+      );
+      return detalhes;
+    } catch (e) {
+      _error = "Erro ao buscar detalhes da consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

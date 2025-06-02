@@ -14,6 +14,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   final String _endpointGetConsultas = '/consultas';
   final String _endpointUpdateConsulta = '/atualizarConsulta';
   final String _endpointDeleteConsulta = '/cancelarConsulta';
+  final String _endpointConsultaProfissionalPaciente = '/consultasProfissionalPaciente';
   final String _endpointplaceholder = '/placeholder';
 
   N8nConsultasRepository(this._httpClient);
@@ -131,4 +132,27 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
   Future<ConsultaModel?> fetchConsultaById(String consultaId) =>
       getById(consultaId);
+      
+  Future<Map<String, dynamic>> getDetalhesConsultaProfissionalPaciente({
+    required String idProfissional,
+    required String idPaciente,
+  }) async {
+    try {
+      final response = await _httpClient.get(
+        _endpointConsultaProfissionalPaciente,
+        queryParameters: {
+          'idProfissional': idProfissional,
+          'idPaciente': idPaciente,
+        },
+      );
+      
+      if (response.data is Map<String, dynamic>) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception('Formato de resposta inesperado do servidor');
+      }
+    } catch (e) {
+      throw Exception('Erro ao buscar detalhes da consulta: $e');
+    }
+  }
 }

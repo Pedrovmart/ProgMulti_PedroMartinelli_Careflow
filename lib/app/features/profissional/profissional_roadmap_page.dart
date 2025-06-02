@@ -4,6 +4,7 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_roadmap_controller.dart';
 
 class ProfissionalRoadmapPage extends StatelessWidget {
@@ -96,9 +97,15 @@ class _ProfissionalRoadmapView extends StatelessWidget {
           ),
           child: InkWell(
             onTap: () {
-              // TODO: Implementar navegação para detalhes da consulta
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Detalhes da consulta de $nomePaciente')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConsultaDetalhesPage(
+                    idProfissional: consulta.idMedico,
+                    idPaciente: consulta.idPaciente,
+                    nomePaciente: nomePaciente,
+                  ),
+                ),
               );
             },
             borderRadius: BorderRadius.circular(12.0),
@@ -110,7 +117,7 @@ class _ProfissionalRoadmapView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withOpacity(0.2),
+                      color: AppColors.primaryLight.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Column(
