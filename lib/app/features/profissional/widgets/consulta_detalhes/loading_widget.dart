@@ -20,25 +20,31 @@ class LoadingWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 48),
-            // Container com sombra para o card
             Container(
               decoration: controller.loadingContainerDecoration,
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Gif de carregamento
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     child: Image.asset(
                       'assets/loading_animation.gif',
-                      //height: 120,
-                      //width: 120,
-                      fit: BoxFit.cover,
+                      height: 120, 
+                      width: 120,
+                      fit: BoxFit.contain, 
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (frame == null) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        return child;
+                      },
+                      cacheWidth: 240, 
+                      cacheHeight: 240, 
+                      filterQuality: FilterQuality.low, 
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Título
                   Text(
                     ConsultaDetalhesController.tituloProcessando,
                     style: const TextStyle(
@@ -49,7 +55,6 @@ class LoadingWidget extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
-                  // Mensagem personalizada
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
@@ -63,7 +68,6 @@ class LoadingWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // Indicador de progresso com texto
                   Column(
                     children: [
                       const SizedBox(height: 16),
@@ -80,7 +84,6 @@ class LoadingWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            // Nota informativa
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
