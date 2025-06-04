@@ -142,4 +142,33 @@ class ConsultaDetalhesController extends ChangeNotifier {
     color: AppColors.primary,
     fontSize: 14,
   );
+
+  /// Atualiza o diagnóstico do paciente
+  Future<void> atualizarDiagnostico({
+    required String idProfissional,
+    required String idPaciente,
+    required String novoDiagnostico,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // Aqui você deve implementar a lógica para atualizar o diagnóstico
+      // usando o _consultasProvider
+      await Future.delayed(const Duration(seconds: 1)); // Simulação de chamada de API
+      
+      // Recarrega os detalhes da consulta para refletir as alterações
+      await carregarDetalhesConsulta(
+        idProfissional: idProfissional,
+        idPaciente: idPaciente,
+      );
+    } catch (e) {
+      _errorMessage = 'Erro ao atualizar diagnóstico: $e';
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
