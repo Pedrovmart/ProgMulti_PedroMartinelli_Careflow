@@ -8,7 +8,6 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtém o profissional do contexto
     final profissional =
         ModalRoute.of(context)?.settings.arguments as Profissional?;
 

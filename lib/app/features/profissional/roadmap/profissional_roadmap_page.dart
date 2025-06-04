@@ -1,11 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_roadmap_controller.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_page.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_controller.dart';
 
 class ProfissionalRoadmapPage extends StatelessWidget {
   const ProfissionalRoadmapPage({super.key});
@@ -104,6 +106,7 @@ class _ProfissionalRoadmapView extends StatelessWidget {
                     idProfissional: consulta.idMedico,
                     idPaciente: consulta.idPaciente,
                     nomePaciente: nomePaciente,
+                    idConsulta: consulta.id,
                   ),
                 ),
               );
@@ -113,7 +116,6 @@ class _ProfissionalRoadmapView extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               child: Row(
                 children: [
-                  // Ícone de relógio com horário
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -140,7 +142,6 @@ class _ProfissionalRoadmapView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16.0),
-                  // Informações do paciente
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +167,6 @@ class _ProfissionalRoadmapView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Ícone de seta
                   const Icon(
                     Icons.chevron_right,
                     color: AppColors.primary,
@@ -180,7 +180,6 @@ class _ProfissionalRoadmapView extends StatelessWidget {
     );
   }
   
-  // Formata a hora para exibição (ex: "14:30" -> "14h30")
   String _formatarHora(String hora) {
     try {
       final partes = hora.split(':');
@@ -190,7 +189,7 @@ class _ProfissionalRoadmapView extends StatelessWidget {
         return '${horaInt.toString().padLeft(2, '0')}h${minutoInt.toString().padLeft(2, '0')}';
       }
     } catch (e) {
-      // Em caso de erro, retorna a hora original
+      log('Erro ao formatar hora: $e');
     }
     return hora;
   }

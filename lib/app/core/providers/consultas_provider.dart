@@ -59,6 +59,29 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
   
+  /// Atualiza o diagnóstico de uma consulta
+  Future<void> atualizarDiagnostico({
+    required String idConsulta,
+    required String diagnostico,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _consultasRepository.atualizarDiagnostico(
+        idConsulta: idConsulta,
+        diagnostico: diagnostico,
+      );
+    } catch (e) {
+      _error = 'Erro ao atualizar diagnóstico: ${e.toString()}';
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchConsultasPorProfissional(String profissionalId) async {
     _isLoading = true;
     _error = null;

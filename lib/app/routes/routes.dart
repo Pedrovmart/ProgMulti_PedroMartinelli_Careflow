@@ -9,11 +9,12 @@ import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_search_page.dart'; 
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_page.dart' show ConsultaDetalhesPage;
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
 import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart'; 
+import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_page.dart';
+import 'package:careflow_app/app/features/profissional/profissional_search_page.dart';
 
 sealed class Routes {
   static const String loginName = 'login';
@@ -26,6 +27,7 @@ sealed class Routes {
   static const String homeProfissionalName = 'homeProfissional';
   static const String profissionalAgendamentosName = 'profissionalAgendamentos';
   static const String profissionalRoadmapName = 'profissionalRoadmap';
+  static const String profissionalConsultaDetalhesName = 'profissionalConsultaDetalhes';
   static const String perfilProfissionalName = 'perfilProfissional';
 
 
@@ -107,6 +109,18 @@ sealed class Routes {
               path: '/profissional/perfil', 
               name: perfilProfissionalName, 
               builder: (context, state) => const PerfilPage(),
+            ),
+            GoRoute(
+              path: '/profissional/consulta-detalhes/:idConsulta',
+              name: profissionalConsultaDetalhesName,
+              builder: (context, state) {
+                final args = state.extra as Map<String, dynamic>? ?? {};
+                return ConsultaDetalhesPage(
+                  idProfissional: args['idProfissional'] ?? '',
+                  idPaciente: args['idPaciente'] ?? '',
+                  nomePaciente: args['nomePaciente'] ?? 'Paciente',
+                );
+              },
             ),
           ],
         ),

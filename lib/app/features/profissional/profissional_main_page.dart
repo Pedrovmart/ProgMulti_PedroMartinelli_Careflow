@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:careflow_app/app/features/auth/login/login_page.dart'; 
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
-import 'package:careflow_app/app/features/profissional/profissional_roadmap_page.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_page.dart';
 
 class ProfissionalMainPage extends StatefulWidget {
   const ProfissionalMainPage({
@@ -68,7 +68,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     ProfissionalHomePage.route,
     ProfissionalAgendamentosPage.route,
     ProfissionalRoadmapPage.route,
-    '/profissional/perfil', // PerfilPage route is defined directly in routes.dart for professionals
+    '/profissional/perfil', // TODO: AJUSTAR PerfilPage route is defined directly in routes.dart for professionals
   ];
 
   Future<void> _handleLogout() async {

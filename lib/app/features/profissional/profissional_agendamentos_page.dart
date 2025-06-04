@@ -60,13 +60,13 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
           value: '3',
           backgroundColor: AppColors.light.withValues(
             alpha: 0.7,
-          ), // Was amber, using AppColors.light (yellowish-green)
+          ),
           borderColor:
-              AppColors.success, // Was amber, using AppColors.success (green)
+              AppColors.success,
           titleColor:
-              AppColors.successDark, // Was amber, using AppColors.successDark
+              AppColors.successDark,
           valueColor:
-              AppColors.successDark, // Was amber, using AppColors.successDark
+              AppColors.successDark,
         );
 
         if (isWide) {
@@ -77,7 +77,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
             crossAxisSpacing: 12.0,
             mainAxisSpacing: 12.0,
             childAspectRatio:
-                (constraints.maxWidth / 3) / 110, // Ajustar altura do card
+                (constraints.maxWidth / 3) / 110,
             children: [item1, item2, item3],
           );
         } else {
@@ -109,7 +109,7 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
     required Color valueColor,
   }) {
     return Container(
-      height: 110, // Aumentada para corrigir overflow e alinhar com aspect ratio do GridView
+      height: 110,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12.0),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
@@ -47,26 +46,9 @@ class ConsultaDetalhesController extends ChangeNotifier {
     ),
     strong: const TextStyle(
       fontWeight: FontWeight.bold,
-      color: AppColors.primaryDark,
     ),
-    blockquoteDecoration: BoxDecoration(
-      color: AppColors.primaryLight.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(4.0),
-      border: const Border(
-        left: BorderSide(
-          color: AppColors.primary,
-          width: 4.0,
-        ),
-      ),
-    ),
-    code: const TextStyle(
-      backgroundColor: Color(0xFFEEEEEE),
-      fontFamily: 'monospace',
-      fontSize: 13.0,
-    ),
-    codeblockDecoration: BoxDecoration(
-      color: Colors.grey[100],
-      borderRadius: BorderRadius.circular(4.0),
+    em: const TextStyle(
+      fontStyle: FontStyle.italic,
     ),
   );
 
@@ -87,91 +69,56 @@ class ConsultaDetalhesController extends ChangeNotifier {
         idProfissional: idProfissional,
         idPaciente: idPaciente,
       );
-      
 
       _markdownContent = _detalhesConsulta?['output'] as String?;
+      _conteudoSemFormatacao = _removerFormatacaoMarkdown(_markdownContent ?? '');
       
-      if (_markdownContent == null) {
-        throw Exception('Conteúdo da consulta não encontrado');
+      if (_markdownContent == null || _markdownContent!.isEmpty) {
+        _markdownContent = mensagemSemConteudo;
       }
-      
-
-      atualizarConteudoSemFormatacao();
     } catch (e) {
-      _errorMessage = 'Erro ao carregar detalhes da consulta: $e';
-      rethrow;
+      _errorMessage = 'Erro ao carregar os detalhes da consulta: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
-  BoxDecoration get loadingContainerDecoration => BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(20.0),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.grey.withValues(alpha: 0.2),
-        spreadRadius: 3,
-        blurRadius: 10,
-        offset: const Offset(0, 5),
-      ),
-    ],
-  );
-  
-  BoxDecoration get errorContainerDecoration => BoxDecoration(
-    color: Colors.red.withValues(alpha: 0.1),
-    shape: BoxShape.circle,
-  );
-  
-  BoxDecoration get contentCardDecoration => BoxDecoration(
-    borderRadius: BorderRadius.circular(12.0),
-    border: Border.all(
-      color: AppColors.primaryLight.withValues(alpha: 0.5),
-      width: 1.0,
-    ),
-  );
-  
-  ButtonStyle get primaryButtonStyle => ElevatedButton.styleFrom(
-    backgroundColor: AppColors.primary,
-    foregroundColor: Colors.white,
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(30),
-    ),
-  );
-  
-  TextStyle get textButtonStyle => const TextStyle(
-    color: AppColors.primary,
-    fontSize: 14,
-  );
-  
-  void atualizarConteudoSemFormatacao() {
-    if (_markdownContent == null) {
-      _conteudoSemFormatacao = '';
-      return;
-    }
+
+  /// Remove formatação Markdown para exibição em campos de texto simples
+  String _removerFormatacaoMarkdown(String markdown) {
+    if (markdown.isEmpty) return '';
     
-    String result = _markdownContent!;
+    // Remove cabeçalhos
+    String texto = markdown.replaceAll(RegExp(r'^#+\s*', multiLine: true), '');
     
-    result = result.replaceAll(RegExp(r'```[\s\S]*?```', multiLine: true), '');
+    // Remove negrito e itálico
+    texto = texto.replaceAll(RegExp(r'[*_]{1,3}(.*?)[*_]{1,3}'), r'$1');
     
-    result = result.replaceAll(RegExp(r'^#+\s*', multiLine: true), '');
+    // Remove links
+    texto = texto.replaceAll(RegExp(r'\[(.*?)\]\(.*?\)'), r'$1');
     
-    result = result.replaceAll(RegExp(r'[*_]{1,2}(.*?)[*_]{1,2}'), r'$1');
+    // Remove listas
+    texto = texto.replaceAll(RegExp(r'^[\s]*[-*+]\s', multiLine: true), '');
     
-    result = result.replaceAll(RegExp(r'\[(.*?)\]\(.*?\)'), r'$1');
+    // Remove blocos de código
+    texto = texto.replaceAll(RegExp(r'```[\s\S]*?```', multiLine: true), '');
     
-    result = result.replaceAll(RegExp(r'^[\s]*[-*+]\s+', multiLine: true), '');
+    // Remove citações
+    texto = texto.replaceAll(RegExp(r'^>\s*', multiLine: true), '');
     
-    result = result.replaceAll(RegExp(r'^>\s*', multiLine: true), '');
+    // Remove múltiplas quebras de linha
+    texto = texto.replaceAll(RegExp(r'\n{3,}'), '\n\n');
     
-    result = result.replaceAll(RegExp(r'\n{3,}'), '\n\n');
-    
-    _conteudoSemFormatacao = result.trim();
+    return texto.trim();
   }
 
+  /// Atualiza o conteúdo sem formatação
+  void atualizarConteudoSemFormatacao() {
+    _conteudoSemFormatacao = _removerFormatacaoMarkdown(_markdownContent ?? '');
+    notifyListeners();
+  }
 
+  /// Atualiza o diagnóstico do paciente
   Future<void> atualizarDiagnostico({
     required BuildContext context,
     required String idProfissional,
@@ -187,23 +134,19 @@ class ConsultaDetalhesController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final consultasProvider = Provider.of<ConsultasProvider>(
-        context,
-        listen: false,
-      );
-
-      await consultasProvider.atualizarDiagnostico(
+      await _consultasProvider.atualizarDiagnostico(
         idConsulta: _idConsulta!,
         diagnostico: novoDiagnostico,
       );
 
+      // Recarrega os detalhes da consulta após a atualização
       await carregarDetalhesConsulta(
         idProfissional: idProfissional,
         idPaciente: idPaciente,
         idConsulta: _idConsulta,
       );
     } catch (e) {
-      _errorMessage = 'Erro ao atualizar diagnóstico: $e';
+      _errorMessage = 'Erro ao atualizar o diagnóstico: $e';
       rethrow;
     } finally {
       _isLoading = false;

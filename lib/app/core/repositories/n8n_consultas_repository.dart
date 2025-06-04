@@ -15,6 +15,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   final String _endpointUpdateConsulta = '/atualizarConsulta';
   final String _endpointDeleteConsulta = '/cancelarConsulta';
   final String _endpointConsultaProfissionalPaciente = '/consultasProfissionalPaciente';
+  final String _endpointAtualizarDiagnostico = '/atualizaDiagnostico';
   final String _endpointplaceholder = '/placeholder';
 
   N8nConsultasRepository(this._httpClient);
@@ -107,9 +108,26 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     try {
       await _httpClient.delete('$_endpointDeleteConsulta/$id');
     } catch (e) {
-      throw Exception('Erro ao remover consulta: $e');
+      throw Exception('Erro ao deletar consulta: $e');
     }
   }
+
+  /// Atualiza o diagnóstico de uma consulta
+  Future<void> atualizarDiagnostico({
+    required String idConsulta,
+    required String diagnostico,
+  }) async {
+    try {
+      final url = '$_endpointAtualizarDiagnostico?idConsulta=$idConsulta';
+      await _httpClient.put(
+        url,
+        data: {'diagnostico': diagnostico},
+      );
+    } catch (e) {
+      throw Exception('Erro ao atualizar diagnóstico: $e');
+    }
+  }
+
   // ESSA É A MANEIRA CORRETA PARA MIM FAZER 
   Future<List<ConsultaModel>> fetchConsultasAgendadas() => getAll();
 

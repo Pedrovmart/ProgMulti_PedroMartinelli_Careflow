@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
-import 'package:careflow_app/app/features/profissional/controllers/consulta_detalhes_controller.dart';
-import 'package:careflow_app/app/features/profissional/widgets/consulta_detalhes/consulta_detalhes_widgets.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_controller.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/consulta_content_widget.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/empty_state_widget.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/error_widget.dart';
+import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/loading_widget.dart';
 
 class ConsultaDetalhesPage extends StatelessWidget {
   final String idProfissional;
   final String idPaciente;
   final String nomePaciente;
+  final String? idConsulta;
 
   const ConsultaDetalhesPage({
     super.key,
     required this.idProfissional,
     required this.idPaciente,
     required this.nomePaciente,
+    this.idConsulta,
   });
 
   static const String route = '/profissional/consulta-detalhes';
@@ -26,6 +31,7 @@ class ConsultaDetalhesPage extends StatelessWidget {
       )..carregarDetalhesConsulta(
           idProfissional: idProfissional,
           idPaciente: idPaciente,
+          idConsulta: idConsulta,
         ),
       child: _ConsultaDetalhesView(
         idProfissional: idProfissional,
@@ -50,40 +56,36 @@ class _ConsultaDetalhesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ConsultaDetalhesController>();
-    final theme = Theme.of(context);
-
+    
     return Scaffold(
-      body: _buildBody(context, controller, theme),
+      body: _buildBody(controller, context),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    ConsultaDetalhesController controller,
-    ThemeData theme,
-  ) {
-    if (controller.isLoading) {
-      return LoadingWidget(controller: controller);
+  Widget _buildBody(ConsultaDetalhesController controller, BuildContext context) {
+    if (controller.isLoading && controller.detalhesConsulta == null) {
+      return const ConsultaLoadingWidget();
     }
 
     if (controller.errorMessage != null) {
       return ConsultaErrorWidget(
-        controller: controller,
-        idProfissional: idProfissional,
-        idPaciente: idPaciente,
-        nomePaciente: nomePaciente,
+        errorMessage: controller.errorMessage!,
+        onRetry: () => controller.carregarDetalhesConsulta(
+          idProfissional: idProfissional,
+          idPaciente: idPaciente,
+        ),
       );
     }
 
-    if (controller.markdownContent == null) {
-      return EmptyStateWidget(
-        idProfissional: idProfissional,
-        idPaciente: idPaciente,
-        nomePaciente: nomePaciente,
-        controller: controller,
-      );
+    if (controller.detalhesConsulta == null) {
+      return const ConsultaEmptyStateWidget();
     }
 
-    return ConsultaContentWidget(controller: controller);
+    return ConsultaContentWidget(
+      controller: controller,
+      idProfissional: idProfissional,
+      idPaciente: idPaciente,
+      idConsulta: controller.idConsulta ?? '',
+    );
   }
 }

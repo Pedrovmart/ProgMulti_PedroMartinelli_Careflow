@@ -48,12 +48,11 @@ class ConsultaModel {
     
     log('ConsultaModel.fromMap - Data original: $data, Hora: $hora');
     
-    // Se a data estiver vazia, usa a data atual local
     if (data.isEmpty) {
       data = DateFormat('dd/MM/yyyy').format(DateTime.now().toLocal());
       log('Data vazia, usando data atual: $data');
     } 
-    // Se a data estiver em formato ISO (vindo do servidor)
+    
     else if (data.contains('-') && data.contains('T')) {
       try {
         final dateTime = DateTime.parse(data).toLocal();
@@ -63,21 +62,20 @@ class ConsultaModel {
         log('Erro ao converter data ISO: $e');
       }
     }
-    // Se já estiver no formato dd/MM/yyyy, mantém como está
+    
     else if (data.contains('/') && data.split('/').length == 3) {
       log('Data já está no formato brasileiro: $data');
     }
     
-    // Processa a hora se existir
+    
     if (hora.isNotEmpty) {
       try {
-        // Se a hora estiver no formato ISO (com T e Z)
         if (hora.contains('T')) {
           final dateTime = DateTime.parse('${data}T$hora').toLocal();
           hora = DateFormat('HH:mm').format(dateTime);
           log('Hora convertida para local: $hora');
         }
-        // Se já estiver no formato HH:mm, mantém como está
+        
         else if (hora.contains(':')) {
           log('Hora já está no formato HH:mm: $hora');
         }

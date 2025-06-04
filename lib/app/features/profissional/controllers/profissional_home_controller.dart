@@ -140,6 +140,7 @@ class ProfissionalHomeController extends ChangeNotifier {
         }
       }
       
+      // TODO: REVER POIS NAO ESTA OK
       // Se não for hoje, verifica se a data é futura
       final isFutura = dataConsulta.isAfter(hojeInicioDia) || 
                       dataConsulta.isAtSameMomentAs(hojeInicioDia);
@@ -165,7 +166,9 @@ class ProfissionalHomeController extends ChangeNotifier {
       final horaInicio = consulta.hora;
       final horaFim = _calcularHoraFim(horaInicio);
       
-      final horario = consulta.data == hoje 
+      final dataConsulta = _parseData(consulta.data);
+      final horario = (dataConsulta != null && dataConsulta.year == hoje.year && 
+                     dataConsulta.month == hoje.month && dataConsulta.day == hoje.day)
           ? '$horaInicio - $horaFim' 
           : '$horaInicio - $horaFim (${consulta.data})';
       
@@ -255,19 +258,16 @@ class ProfissionalHomeController extends ChangeNotifier {
     }
   }
   
-  // Converte uma string de data 'dd/MM/yyyy' para DateTime
   DateTime? _parseData(String dataStr) {
     try {
       if (dataStr.isEmpty) return null;
       
-      // Se a data já estiver em formato ISO (vindo da API)
       if (dataStr.contains('-')) {
         final date = DateTime.parse(dataStr).toLocal();
         log('Data ISO convertida: $dataStr -> ${date.toString()}');
         return date;
       }
       
-      // Se estiver no formato dd/MM/yyyy
       final partes = dataStr.split('/');
       if (partes.length != 3) return null;
       
@@ -288,18 +288,15 @@ class ProfissionalHomeController extends ChangeNotifier {
     }
   }
   
-  // Converte uma string de hora 'HH:mm' para TimeOfDay
   TimeOfDay? _parseHora(String horaStr) {
     try {
       if (horaStr.isEmpty) return null;
       
-      // Se a hora já estiver em formato ISO (com timezone)
       if (horaStr.contains('T')) {
         final dateTime = DateTime.parse(horaStr).toLocal();
         return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
       }
       
-      // Se estiver no formato HH:mm
       final partes = horaStr.split(':');
       if (partes.length < 2) return null;
       

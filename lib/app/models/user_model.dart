@@ -2,7 +2,7 @@ class UserModel {
   final String id;
   final String nome;
   final String email;
-  final String userType; // 'paciente' ou 'profissional'
+  final String userType; 
 
   UserModel({
     required this.id,
