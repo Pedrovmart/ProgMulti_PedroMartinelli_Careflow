@@ -150,7 +150,7 @@ class ProfissionalHomeController extends ChangeNotifier {
     
     log('Consultas futuras: ${consultasFuturas.length}');
     
-    final consultasTotal = consultasValidas.length.toString();
+    final consultasTotal = consultasFuturas.length.toString();
     
     final pacientesUnicos = <String>{};
     for (var consulta in consultasFuturas) {
