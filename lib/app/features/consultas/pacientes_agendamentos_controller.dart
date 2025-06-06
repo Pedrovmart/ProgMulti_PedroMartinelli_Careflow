@@ -160,20 +160,17 @@ class PacientesAgendamentosController extends ChangeNotifier {
   }
 
   List<ConsultaModel> getEventsForDay(DateTime day) {
-    // Garantir que estamos usando a data local
-    final localDay = day.toLocal();
-    final formattedDate = DateFormat('dd/MM/yyyy').format(localDay);
+    // Normaliza a data para garantir que estamos comparando apenas dia, mês e ano
+    final normalizedDay = DateTime(day.year, day.month, day.day);
+    final formattedDate = DateFormat('dd/MM/yyyy').format(normalizedDay);
 
     log(
-      'getEventsForDay - Data: ${localDay.toString()}, formatada: $formattedDate',
+      'getEventsForDay - Data: ${normalizedDay.toString()}, formatada: $formattedDate',
     );
     log('getEventsForDay - Chaves disponíveis: ${events.keys.join(', ')}');
 
-    final matchingEvents =
-        events.entries
-            .where((entry) => entry.key.trim() == formattedDate.trim())
-            .expand((entry) => entry.value)
-            .toList();
+    // Busca eventos para a data formatada
+    final matchingEvents = events[formattedDate] ?? [];
 
     log(
       'getEventsForDay - Eventos encontrados para $formattedDate: ${matchingEvents.length}',
@@ -187,20 +184,21 @@ class PacientesAgendamentosController extends ChangeNotifier {
       }
     }
 
-    return matchingEvents;
+    return List<ConsultaModel>.from(matchingEvents);
   }
 
   void onDaySelected(DateTime day) {
-    final localDay = day.toLocal();
-    selectedDay = localDay;
+    // Normaliza a data para garantir que não haja problemas com horário
+    final normalizedDay = DateTime(day.year, day.month, day.day);
+    selectedDay = normalizedDay;
 
-    dataController.text = DateFormat('dd/MM/yyyy').format(localDay);
+    dataController.text = DateFormat('dd/MM/yyyy').format(normalizedDay);
 
     log(
-      'Dia selecionado: ${localDay.toString()}, formatado como: ${dataController.text}',
+      'Dia selecionado: ${normalizedDay.toString()}, formatado como: ${dataController.text}',
     );
 
-    final eventsForDay = getEventsForDay(localDay);
+    final eventsForDay = getEventsForDay(normalizedDay);
     log('Número de eventos no dia selecionado: ${eventsForDay.length}');
 
     notifyListeners();

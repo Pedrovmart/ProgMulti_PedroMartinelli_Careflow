@@ -96,7 +96,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                             child: const Icon(Icons.calendar_today, color: AppColors.accentDark),
                           ),
                           title: Text(
-                            event.descricao,
+                            'Médico: ${event.nome}',
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           subtitle: Text('Horário: ${event.hora}', style: Theme.of(context).textTheme.bodyMedium),
@@ -106,7 +106,6 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Médico: ${event.nome}'),
                                   Text('Data: ${event.data}'),
                                   if (event.queixaPaciente.isNotEmpty)
                                     Text('Queixa: ${event.queixaPaciente}'),
