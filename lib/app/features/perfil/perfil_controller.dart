@@ -35,7 +35,6 @@ class PerfilController extends ChangeNotifier {
     if (imageUrl.isNotEmpty) {
       _profileImageUrl = imageUrl;
       notifyListeners();
-      log('✅ URL da imagem de perfil atualizada para: $imageUrl');
     }
   }
 
@@ -52,7 +51,7 @@ class PerfilController extends ChangeNotifier {
   }
 
   void _setLoading(bool loading) {
-    if (_isLoading == loading) return; // Evita notificações desnecessárias
+    if (_isLoading == loading) return; 
     _isLoading = loading;
     notifyListeners();
   }
@@ -62,112 +61,77 @@ class PerfilController extends ChangeNotifier {
     try {
       final firebaseUser = _authProvider.currentUser;
       if (firebaseUser == null) {
-        log('Nenhum usuário autenticado encontrado');
         _setLoading(false);
         return;
       }
 
       final userId = firebaseUser.uid;
-      _userType = _authProvider.userType; 
-      log('Carregando dados para o tipo de usuário: $_userType com ID: $userId');
+      _userType = _authProvider.userType;
 
       if (_userType == 'paciente') {
         final paciente = await _pacienteProvider.getPacienteById(userId);
         if (paciente != null) {
           _user = paciente;
-          log('Dados do paciente carregados: ${paciente.nome}');
           await _loadProfileImageForPaciente(userId);
-        } else {
-          log('Nenhum dado de paciente encontrado para o ID: $userId');
         }
       } else if (_userType == 'profissional') {
         final profissional = await _profissionalProvider.getProfissionalById(userId);
         if (profissional != null) {
           _user = profissional;
-          log('Dados do profissional carregados: ${profissional.nome}');
           await _loadProfileImageForProfissional(userId);
-        } else {
-          log('Nenhum dado de profissional encontrado para o ID: $userId');
         }
-      } else {
-        log('Tipo de usuário desconhecido: $_userType');
       }
     } catch (e) {
-      log('Erro ao carregar dados do usuário: $e');
+      debugPrint('Erro ao carregar dados do usuário: $e');
     } finally {
       _setLoading(false);
     }
   }
 
   Future<void> _loadProfileImageForPaciente(String userId) async {
-    if (_userType != 'paciente') {
-      log('Tipo de usuário não é paciente, ignorando carregamento de imagem');
-      return;
-    }
-    
-    log('🔄 Carregando imagem de perfil para o paciente: $userId');
+    if (_userType != 'paciente') return;
     
     try {
-      log('🔍 Buscando URL da imagem de perfil...');
       final url = await _pacienteProvider.getProfileImageUrl(userId);
       
       if (url != null) {
-        log('✅ URL da imagem encontrada: $url');
         _profileImageUrl = url;
         
         // Verifica se a URL é acessível
         try {
-          log('🔗 Verificando acessibilidade da URL...');
-          final response = await Dio().head(url);
-          log('✅ URL acessível - Status: ${response.statusCode}');
+          await Dio().head(url);
         } catch (e) {
-          log('⚠️ Aviso: Não foi possível acessar a URL da imagem: $e');
-          log('A URL pode estar correta, mas o arquivo não está acessível publicamente');
+          debugPrint('Aviso: Não foi possível acessar a URL da imagem: $e');
         }
-        
       } else {
         _profileImageUrl = null;
-        log('ℹ️ Nenhuma URL de imagem de perfil encontrada para o paciente $userId');
       }
       
       notifyListeners();
       
-    } catch (e, stackTrace) {
+    } catch (e) {
       _profileImageUrl = null;
-      log('❌ Erro ao carregar imagem de perfil do paciente: $e');
-      log('Stack trace: $stackTrace');
       notifyListeners();
       
       // Tenta novamente após um curto atraso
       await Future.delayed(const Duration(seconds: 2));
       if (_userType == 'paciente' && _user?.id == userId) {
-        log('🔄 Tentando carregar a imagem novamente...');
         await _loadProfileImageForPaciente(userId);
       }
     }
   }
   
   Future<void> _loadProfileImageForProfissional(String userId) async {
-    if (_userType != 'profissional') {
-      log('Tipo de usuário não é profissional, ignorando carregamento de imagem');
-      return;
-    }
-    
-    log('🔄 Carregando imagem de perfil para o profissional: $userId');
+    if (_userType != 'profissional') return;
     
     try {
-      log('🔍 Buscando URL da imagem de perfil...');
       final url = await _profissionalProvider.getProfileImageUrl(userId);
       
       if (url != null) {
-        log('✅ URL da imagem encontrada: $url');
         _profileImageUrl = url;
         
-        // Verifica se a URL é acessível
         try {
-          log('🔗 Verificando acessibilidade da URL...');
-          final response = await Dio().head(url);
-          log('✅ URL acessível - Status: ${response.statusCode}');
+          await Dio().head(url);
           
           // Atualiza o usuário com a URL da imagem
           if (_user is Profissional) {
@@ -185,21 +149,16 @@ class PerfilController extends ChangeNotifier {
             );
           }
         } catch (e) {
-          log('⚠️ Aviso: Não foi possível acessar a URL da imagem: $e');
-          log('A URL pode estar correta, mas o arquivo não está acessível publicamente');
+          debugPrint('Aviso: Não foi possível acessar a URL da imagem: $e');
         }
-        
       } else {
         _profileImageUrl = null;
-        log('ℹ️ Nenhuma URL de imagem de perfil encontrada para o profissional $userId');
       }
       
       notifyListeners();
       
-    } catch (e, stackTrace) {
+    } catch (e) {
       _profileImageUrl = null;
-      log('❌ Erro ao carregar imagem de perfil do profissional: $e');
-      log('Stack trace: $stackTrace');
       notifyListeners();
       
       // Tenta novamente após um curto atraso
