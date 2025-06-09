@@ -7,7 +7,7 @@ import 'package:careflow_app/app/widgets/nav_bar/nav_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:careflow_app/app/features/auth/login/login_page.dart'; 
+import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_home_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_page.dart';
@@ -38,10 +38,15 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
 
   Future<void> _loadProfissionalData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profissionalProvider = Provider.of<ProfissionalProvider>(context, listen: false);
-    
+    final profissionalProvider = Provider.of<ProfissionalProvider>(
+      context,
+      listen: false,
+    );
+
     if (authProvider.currentUser != null) {
-      final profissional = await profissionalProvider.getProfissionalById(authProvider.currentUser!.uid);
+      final profissional = await profissionalProvider.getProfissionalById(
+        authProvider.currentUser!.uid,
+      );
       if (mounted) {
         setState(() {
           _profissional = profissional;
@@ -75,20 +80,21 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sair'),
-        content: const Text('Tem certeza que deseja sair da sua conta?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Sair'),
+            content: const Text('Tem certeza que deseja sair da sua conta?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Sair'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Sair'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -103,28 +109,10 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
   Widget build(BuildContext context) {
     final String location = widget.state.uri.toString();
     final isPerfilPage = location.startsWith('/profissional/perfil');
-    final profissionalProvider = Provider.of<ProfissionalProvider>(context);
-    final currentUser = Provider.of<AuthProvider>(context).currentUser;
-
-    // Atualiza o profissional sempre que o provider for atualizado
-    if (currentUser != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        profissionalProvider.getProfissionalById(currentUser.uid).then((profissional) {
-          if (mounted && profissional != _profissional) {
-            setState(() {
-              _profissional = profissional;
-            });
-          }
-        });
-      });
-    }
+    Provider.of<ProfissionalProvider>(context);
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -139,9 +127,8 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
         onNotificationPressed: () {
           // TODO: Implementar navegação para notificações
         },
-        onProfilePressed: isPerfilPage 
-            ? null 
-            : () => context.go('/profissional/perfil'),
+        onProfilePressed:
+            isPerfilPage ? null : () => context.go('/profissional/perfil'),
       ),
       body: Stack(
         children: [
@@ -159,7 +146,10 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
               onTap: (index) {
                 context.go(_routes[index]);
               },
-              selectedIndex: _routes.indexWhere((route) => location.startsWith(route.split('/').take(3).join('/'))),
+              selectedIndex: _routes.indexWhere(
+                (route) =>
+                    location.startsWith(route.split('/').take(3).join('/')),
+              ),
               items: _navItems,
             ),
           ),

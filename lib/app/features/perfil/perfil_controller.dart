@@ -7,7 +7,7 @@ import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/models/paciente_model.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
-import 'package:careflow_app/app/models/user_model.dart'; 
+import 'package:careflow_app/app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,7 +27,7 @@ class PerfilController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get profileImageUrl => _profileImageUrl;
   File? get imageFile => _imageFile;
-  String get userType => _userType; 
+  String get userType => _userType;
   bool get canEditProfileImage => _userType == 'paciente';
 
   /// Atualiza a URL da imagem de perfil e notifica os ouvintes
@@ -51,7 +51,7 @@ class PerfilController extends ChangeNotifier {
   }
 
   void _setLoading(bool loading) {
-    if (_isLoading == loading) return; 
+    if (_isLoading == loading) return;
     _isLoading = loading;
     notifyListeners();
   }
@@ -75,7 +75,9 @@ class PerfilController extends ChangeNotifier {
           await _loadProfileImageForPaciente(userId);
         }
       } else if (_userType == 'profissional') {
-        final profissional = await _profissionalProvider.getProfissionalById(userId);
+        final profissional = await _profissionalProvider.getProfissionalById(
+          userId,
+        );
         if (profissional != null) {
           _user = profissional;
           await _loadProfileImageForProfissional(userId);
@@ -90,83 +92,74 @@ class PerfilController extends ChangeNotifier {
 
   Future<void> _loadProfileImageForPaciente(String userId) async {
     if (_userType != 'paciente') return;
-    
+
     try {
       final url = await _pacienteProvider.getProfileImageUrl(userId);
-      
+
       if (url != null) {
         _profileImageUrl = url;
-        
-        // Verifica se a URL é acessível
+
         try {
-          await Dio().head(url);
-        } catch (e) {
-          debugPrint('Aviso: Não foi possível acessar a URL da imagem: $e');
-        }
-      } else {
-        _profileImageUrl = null;
-      }
-      
-      notifyListeners();
-      
-    } catch (e) {
-      _profileImageUrl = null;
-      notifyListeners();
-      
-      // Tenta novamente após um curto atraso
-      await Future.delayed(const Duration(seconds: 2));
-      if (_userType == 'paciente' && _user?.id == userId) {
-        await _loadProfileImageForPaciente(userId);
-      }
-    }
-  }
-  
-  Future<void> _loadProfileImageForProfissional(String userId) async {
-    if (_userType != 'profissional') return;
-    
-    try {
-      final url = await _profissionalProvider.getProfileImageUrl(userId);
-      
-      if (url != null) {
-        _profileImageUrl = url;
-        
-        try {
-          await Dio().head(url);
-          
-          // Atualiza o usuário com a URL da imagem
-          if (_user is Profissional) {
-            final profissional = _user as Profissional;
-            _user = Profissional(
-              id: profissional.id,
-              nome: profissional.nome,
-              email: profissional.email,
-              especialidade: profissional.especialidade,
-              numeroRegistro: profissional.numeroRegistro,
-              idEmpresa: profissional.idEmpresa,
-              dataNascimento: profissional.dataNascimento,
-              telefone: profissional.telefone,
-              profileUrlImage: url,
-            );
+          final response = await Dio().head(url);
+          if (response.statusCode == 200) {
+            notifyListeners();
           }
         } catch (e) {
           debugPrint('Aviso: Não foi possível acessar a URL da imagem: $e');
+          _profileImageUrl = null;
         }
       } else {
         _profileImageUrl = null;
+        notifyListeners();
       }
-      
-      notifyListeners();
-      
     } catch (e) {
       _profileImageUrl = null;
       notifyListeners();
-      
-      // Tenta novamente após um curto atraso
-      await Future.delayed(const Duration(seconds: 2));
-      if (_userType == 'profissional' && _user?.id == userId) {
-        log('🔄 Tentando carregar a imagem novamente...');
-        await _loadProfileImageForProfissional(userId);
+      debugPrint('Erro ao carregar imagem do paciente: $e');
+    }
+  }
+
+  Future<void> _loadProfileImageForProfissional(String userId) async {
+    if (_userType != 'profissional') return;
+
+    try {
+      final url = await _profissionalProvider.getProfileImageUrl(userId);
+
+      if (url != null) {
+        _profileImageUrl = url;
+
+        try {
+          final response = await Dio().head(url);
+          if (response.statusCode == 200) {
+            // Atualiza o usuário com a URL da imagem
+            if (_user is Profissional) {
+              final profissional = _user as Profissional;
+              _user = Profissional(
+                id: profissional.id,
+                nome: profissional.nome,
+                email: profissional.email,
+                especialidade: profissional.especialidade,
+                numeroRegistro: profissional.numeroRegistro,
+                idEmpresa: profissional.idEmpresa,
+                dataNascimento: profissional.dataNascimento,
+                telefone: profissional.telefone,
+                profileUrlImage: url,
+              );
+            }
+            notifyListeners();
+          }
+        } catch (e) {
+          debugPrint('Aviso: Não foi possível acessar a URL da imagem: $e');
+          _profileImageUrl = null;
+        }
+      } else {
+        _profileImageUrl = null;
+        notifyListeners();
       }
+    } catch (e) {
+      _profileImageUrl = null;
+      notifyListeners();
+      debugPrint('Erro ao carregar imagem do profissional: $e');
     }
   }
 
@@ -183,9 +176,9 @@ class PerfilController extends ChangeNotifier {
     if (pickedFile != null) {
       _imageFile = File(pickedFile.path);
       notifyListeners();
-      
+
       final userId = _authProvider.currentUser!.uid;
-      
+
       if (_userType == 'paciente') {
         await _uploadImageForPaciente(userId);
       } else if (_userType == 'profissional') {
@@ -199,11 +192,14 @@ class PerfilController extends ChangeNotifier {
 
     try {
       _setLoading(true);
-      final url = await _pacienteProvider.uploadProfileImage(userId, _imageFile!);
+      final url = await _pacienteProvider.uploadProfileImage(
+        userId,
+        _imageFile!,
+      );
       if (url != null) {
         _profileImageUrl = url;
         _imageFile = null;
-        
+
         // Atualiza o usuário local com a nova URL da imagem
         if (_user is Paciente) {
           final paciente = _user as Paciente;
@@ -217,11 +213,11 @@ class PerfilController extends ChangeNotifier {
             endereco: paciente.endereco,
             profileUrlImage: url,
           );
-          
+
           // Força a atualização do paciente no provider
           await _pacienteProvider.getPacienteById(userId);
         }
-        
+
         notifyListeners();
       } else {
         log('Falha ao enviar imagem do paciente: URL não retornada');
@@ -233,17 +229,20 @@ class PerfilController extends ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   Future<void> _uploadImageForProfissional(String userId) async {
     if (_imageFile == null || _userType != 'profissional') return;
 
     try {
       _setLoading(true);
-      final url = await _profissionalProvider.uploadProfileImage(userId, _imageFile!);
+      final url = await _profissionalProvider.uploadProfileImage(
+        userId,
+        _imageFile!,
+      );
       if (url != null) {
         _profileImageUrl = url;
         _imageFile = null;
-        
+
         // Atualiza o usuário local com a nova URL da imagem
         if (_user is Profissional) {
           final profissional = _user as Profissional;
@@ -258,11 +257,11 @@ class PerfilController extends ChangeNotifier {
             telefone: profissional.telefone,
             profileUrlImage: url,
           );
-          
+
           // Força a atualização do profissional no provider
           await _profissionalProvider.getProfissionalById(userId);
         }
-        
+
         notifyListeners();
       } else {
         log('Falha ao enviar imagem do profissional: URL não retornada');
@@ -295,9 +294,9 @@ class PerfilController extends ChangeNotifier {
         final updatedPaciente = Paciente(
           id: currentPaciente.id,
           nome: updatedData['nome'] ?? currentPaciente.nome,
-          email: currentPaciente.email, 
-          cpf: currentPaciente.cpf, 
-          dataNascimento: currentPaciente.dataNascimento, 
+          email: currentPaciente.email,
+          cpf: currentPaciente.cpf,
+          dataNascimento: currentPaciente.dataNascimento,
           telefone: updatedData['telefone'] ?? currentPaciente.telefone,
           endereco: updatedData['endereco'] ?? currentPaciente.endereco,
           createdAt: currentPaciente.createdAt, // Preserve createdAt
@@ -309,11 +308,16 @@ class PerfilController extends ChangeNotifier {
         final updatedProfissional = Profissional(
           id: currentProfissional.id,
           nome: updatedData['nome'] ?? currentProfissional.nome,
-          email: currentProfissional.email, 
-          especialidade: updatedData['especialidade'] ?? currentProfissional.especialidade,
-          numeroRegistro: updatedData['numeroRegistro'] ?? currentProfissional.numeroRegistro,
-          idEmpresa: currentProfissional.idEmpresa, 
-          dataNascimento: updatedData['dataNascimento'] ?? currentProfissional.dataNascimento,
+          email: currentProfissional.email,
+          especialidade:
+              updatedData['especialidade'] ?? currentProfissional.especialidade,
+          numeroRegistro:
+              updatedData['numeroRegistro'] ??
+              currentProfissional.numeroRegistro,
+          idEmpresa: currentProfissional.idEmpresa,
+          dataNascimento:
+              updatedData['dataNascimento'] ??
+              currentProfissional.dataNascimento,
           telefone: updatedData['telefone'] ?? currentProfissional.telefone,
         );
         await _profissionalProvider.updateProfissional(updatedProfissional);
@@ -340,7 +344,8 @@ class PerfilController extends ChangeNotifier {
         'Telefone': paciente.telefone,
         'Endereço': paciente.endereco,
         'CPF': paciente.cpf,
-        'Data de Nascimento': '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
+        'Data de Nascimento':
+            '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
       };
     } else if (_userType == 'profissional' && _user is Profissional) {
       final profissional = _user as Profissional;
@@ -354,7 +359,6 @@ class PerfilController extends ChangeNotifier {
     }
     return {};
   }
-
 
   Map<String, dynamic> getEditModalData() {
     if (_user == null) return {};
@@ -371,7 +375,8 @@ class PerfilController extends ChangeNotifier {
         'telefone': paciente.telefone,
         'endereco': paciente.endereco,
         'cpf': paciente.cpf,
-        'dataNascimento': '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
+        'dataNascimento':
+            '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
       };
       editableFields = ['nome', 'telefone', 'endereco'];
       readOnlyFields = ['email', 'cpf', 'dataNascimento'];
@@ -404,5 +409,4 @@ class PerfilController extends ChangeNotifier {
     _setLoading(false);
     notifyListeners();
   }
-
 }

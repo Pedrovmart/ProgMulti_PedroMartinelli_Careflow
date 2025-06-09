@@ -17,6 +17,7 @@ class PerfilPage extends StatefulWidget {
 
 class _PerfilPageState extends State<PerfilPage> {
   late PerfilController _controller;
+  bool _initialized = false;
 
   @override
   void initState() {
@@ -25,6 +26,8 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   void _initController() {
+    if (_initialized) return;
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final pacienteProvider = Provider.of<PacienteProvider>(
       context,
@@ -41,6 +44,7 @@ class _PerfilPageState extends State<PerfilPage> {
       profissionalProvider,
     );
 
+    _initialized = true;
     _controller.init();
   }
 
@@ -91,43 +95,43 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: _controller,
       builder: (context, _) {
         return Scaffold(
-          body: _controller.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _controller.user == null
+          body:
+              _controller.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _controller.user == null
                   ? Center(
-                      child: Text(
-                        'Nenhum usuário encontrado ou erro ao carregar.',
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          ProfileHeaderWidget(
-                            profileImageUrl: _controller.profileImageUrl,
-                            imageFile: _controller.imageFile,
-                            userName: _controller.user?.nome ?? '',
-                            userEmail: _controller.user?.email ?? '',
-                            onImageTap: _controller.canEditProfileImage
-                                ? _controller.pickImage
-                                : () {},
-                          ),
-                          if (_controller.user != null)
-                            ProfileInfoWidget(
-                              userInfo: _controller.getUserInfoMap(),
-                              onEditTap: _showEditProfileModal,
-                            ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+                    child: Text(
+                      'Nenhum usuário encontrado ou erro ao carregar.',
                     ),
+                  )
+                  : SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ProfileHeaderWidget(
+                          profileImageUrl: _controller.profileImageUrl,
+                          imageFile: _controller.imageFile,
+                          userName: _controller.user?.nome ?? '',
+                          userEmail: _controller.user?.email ?? '',
+                          onImageTap:
+                              _controller.canEditProfileImage
+                                  ? _controller.pickImage
+                                  : () {},
+                        ),
+                        if (_controller.user != null)
+                          ProfileInfoWidget(
+                            userInfo: _controller.getUserInfoMap(),
+                            onEditTap: _showEditProfileModal,
+                          ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
         );
       },
     );

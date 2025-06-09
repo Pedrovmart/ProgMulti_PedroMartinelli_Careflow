@@ -26,8 +26,15 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   void initState() {
     super.initState();
     _loadPacienteData();
+    // Mover a inicialização do PerfilController para depois do carregamento dos dados
+    _initPerfilController();
+  }
+
+  void _initPerfilController() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<PerfilController>(context, listen: false).init();
+      if (mounted) {
+        Provider.of<PerfilController>(context, listen: false).init();
+      }
     });
   }
 
@@ -104,26 +111,6 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   Widget build(BuildContext context) {
     final String location = widget.state.uri.toString();
     final isPerfilPage = location.startsWith('/paciente/perfil');
-    final pacienteProvider = Provider.of<PacienteProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
-    final perfilController = Provider.of<PerfilController>(context);
-
-    // Atualiza o paciente sempre que o provider for atualizado
-    if (authProvider.currentUser != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        pacienteProvider.getPacienteById(authProvider.currentUser!.uid).then((paciente) {
-          if (mounted && paciente != _paciente) {
-            setState(() {
-              _paciente = paciente;
-              // Atualiza a imagem de perfil no PerfilController
-              if (paciente?.profileUrlImage != null) {
-                perfilController.updateProfileImage(paciente!.profileUrlImage!);
-              }
-            });
-          }
-        });
-      });
-    }
 
     return Consumer<PerfilController>(
       builder: (context, perfilController, _) {
