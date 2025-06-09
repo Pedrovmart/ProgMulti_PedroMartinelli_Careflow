@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_controller.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/consulta_content_widget.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/empty_state_widget.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/error_widget.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/loading_widget.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_controller.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/widgets/consulta_content_widget.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/widgets/empty_state_widget.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/widgets/error_widget.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/widgets/loading_widget.dart';
 
 class ConsultaDetalhesPage extends StatelessWidget {
   final String idProfissional;
@@ -26,13 +26,14 @@ class ConsultaDetalhesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => ConsultaDetalhesController(
-        Provider.of<ConsultasProvider>(context, listen: false),
-      )..carregarDetalhesConsulta(
-          idProfissional: idProfissional,
-          idPaciente: idPaciente,
-          idConsulta: idConsulta,
-        ),
+      create:
+          (context) => ConsultaDetalhesController(
+            Provider.of<ConsultasProvider>(context, listen: false),
+          )..carregarDetalhesConsulta(
+            idProfissional: idProfissional,
+            idPaciente: idPaciente,
+            idConsulta: idConsulta,
+          ),
       child: _ConsultaDetalhesView(
         idProfissional: idProfissional,
         idPaciente: idPaciente,
@@ -46,7 +47,7 @@ class _ConsultaDetalhesView extends StatelessWidget {
   final String idProfissional;
   final String idPaciente;
   final String nomePaciente;
-  
+
   const _ConsultaDetalhesView({
     required this.idProfissional,
     required this.idPaciente,
@@ -56,13 +57,14 @@ class _ConsultaDetalhesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<ConsultaDetalhesController>();
-    
-    return Scaffold(
-      body: _buildBody(controller, context),
-    );
+
+    return Scaffold(body: _buildBody(controller, context));
   }
 
-  Widget _buildBody(ConsultaDetalhesController controller, BuildContext context) {
+  Widget _buildBody(
+    ConsultaDetalhesController controller,
+    BuildContext context,
+  ) {
     if (controller.isLoading && controller.detalhesConsulta == null) {
       return const ConsultaLoadingWidget();
     }
@@ -70,10 +72,11 @@ class _ConsultaDetalhesView extends StatelessWidget {
     if (controller.errorMessage != null) {
       return ConsultaErrorWidget(
         errorMessage: controller.errorMessage!,
-        onRetry: () => controller.carregarDetalhesConsulta(
-          idProfissional: idProfissional,
-          idPaciente: idPaciente,
-        ),
+        onRetry:
+            () => controller.carregarDetalhesConsulta(
+              idProfissional: idProfissional,
+              idPaciente: idPaciente,
+            ),
       );
     }
 

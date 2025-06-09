@@ -1,38 +1,39 @@
-import 'dart:io';
 import 'dart:developer';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/base_repository.dart';
+import 'package:careflow_app/app/core/services/storage_service.dart';
 import 'package:careflow_app/app/models/paciente_model.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 
 class N8nPacienteRepository implements BaseRepository<Paciente> {
   final N8nHttpClient _httpClient;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final StorageService _storageService;
 
   final String _endpointGetAll = '/pacientes';
   final String _endpointGetById = '/paciente';
   final String _endpointCreate = '/novoPaciente';
   final String _endpointUpdate = '/atualizarPaciente';
   final String _endpointDelete = '/excluirPaciente';
-  final String _endpointPerfilPaciente = '/perfilPaciente';
 
-  N8nPacienteRepository(this._httpClient);
+  N8nPacienteRepository(this._httpClient, {StorageService? storageService})
+    : _storageService = storageService ?? StorageService();
 
   @override
   Future<List<Paciente>> getAll() async {
     try {
       final response = await _httpClient.get(_endpointGetAll);
-      
+
       if (response.data == null) {
         return [];
       }
-      
+
       if (response.data is Map<String, dynamic>) {
         final paciente = Paciente.fromJson(response.data);
         return [paciente];
       }
-      
+
       if (response.data is List) {
         final List<dynamic> data = response.data;
         return data
@@ -40,14 +41,13 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
             .map((item) => Paciente.fromJson(item))
             .toList();
       }
-      
+
       return [];
     } catch (e) {
       log('Erro ao buscar todos os pacientes: $e');
       return [];
     }
   }
-
 
   @override
   Future<Paciente?> getById(String id) async {
@@ -56,18 +56,19 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
         _endpointGetById,
         queryParameters: {'id': id},
       );
-      
+
       if (response.data == null) {
         log('Resposta vazia ao buscar paciente');
         return null;
       }
-      
+
       log('Dados recebidos: ${response.data}');
-      
-      final responseData = response.data is Map<String, dynamic> 
-          ? response.data 
-          : Map<String, dynamic>.from(response.data);
-          
+
+      final responseData =
+          response.data is Map<String, dynamic>
+              ? response.data
+              : Map<String, dynamic>.from(response.data);
+
       return Paciente.fromJson(responseData);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
@@ -89,10 +90,10 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   Future<Paciente> create(Paciente paciente) async {
     try {
       final response = await _httpClient.post(
-        _endpointCreate, 
+        _endpointCreate,
         data: _toRequestData(paciente),
       );
-      
+
       return Paciente.fromJson(response.data);
     } catch (e) {
       throw Exception('Erro ao criar paciente: $e');
@@ -103,7 +104,7 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   Future<void> update(String id, Paciente paciente) async {
     try {
       await _httpClient.put(
-        '$_endpointUpdate/$id', 
+        '$_endpointUpdate/$id',
         data: _toRequestData(paciente),
       );
     } catch (e) {
@@ -123,10 +124,10 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   /// Converte um objeto Paciente para o formato esperado pela API
   Map<String, dynamic> _toRequestData(Paciente paciente) {
     final data = paciente.toJson();
-    
+
     // Remover campos que não devem ser enviados ou que são gerenciados pelo servidor
     data.remove('userType');
-    
+
     // Garantir que campos obrigatórios estejam presentes
     data['id'] = paciente.id;
     data['nome'] = paciente.nome;
@@ -135,87 +136,75 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
     data['dataNascimento'] = paciente.dataNascimento.toIso8601String();
     data['telefone'] = paciente.telefone;
     data['endereco'] = paciente.endereco;
-    
+
+    // Adicionar campo de imagem de perfil se existir
+    if (paciente.profileUrlImage != null) {
+      data['profileUrlImage'] = paciente.profileUrlImage;
+    }
+
     return data;
   }
 
-  // Métodos específicos para o perfil do paciente
-  
-  /// Busca o perfil completo do paciente
-  Future<Paciente?> getPerfil(String pacienteId) async {
-    try {
-      final response = await _httpClient.get(
-        '$_endpointPerfilPaciente/$pacienteId'
-      );
-      
-      if (response.statusCode == 404) {
-        log('Perfil do paciente não encontrado com ID: $pacienteId');
-        return null;
-      }
-      
-      return Paciente.fromJson(response.data);
-    } catch (e) {
-      log('Erro ao buscar perfil do paciente: $e');
-      throw Exception('Erro ao buscar perfil do paciente: $e');
-    }
-  }
-
-  /// Atualiza o perfil do paciente
-  Future<void> atualizarPerfil(Paciente paciente) async {
-    try {
-      await _httpClient.put(
-        '$_endpointPerfilPaciente/${paciente.id}',
-        data: _toRequestData(paciente),
-      );
-    } catch (e) {
-      throw Exception('Erro ao atualizar perfil do paciente: $e');
-    }
-  }
-
   // Métodos para gerenciamento de imagens de perfil
-  
-  /// Upload da imagem de perfil do paciente
-  Future<String?> uploadProfileImage(String pacienteId, File imageFile) async {
+
+  /// Faz upload ou atualiza a imagem de perfil do paciente
+  ///
+  /// [pacienteId] - ID do paciente
+  /// [imageFile] - Arquivo de imagem a ser enviado
+  /// Retorna a URL da imagem após o upload
+  Future<String> uploadProfileImage(String pacienteId, File imageFile) async {
     try {
-      // Usamos o Firebase Storage para armazenar as imagens
-      final ref = _storage.ref().child('profile_images').child('$pacienteId.jpg');
-      await ref.putFile(imageFile);
-      final url = await ref.getDownloadURL();
-      
-      // Atualiza a URL da imagem no perfil do paciente via n8n
-      await _httpClient.put(
-        '$_endpointPerfilPaciente/$pacienteId/imagem',
-        data: {'profileImageUrl': url},
+      log('Iniciando upload da imagem de perfil para o paciente $pacienteId');
+
+      // Garante que a extensão esteja em minúsculas
+      final fileExtension = path.extension(imageFile.path).toLowerCase();
+      final fileName = 'paciente_$pacienteId$fileExtension';
+
+      log('Nome do arquivo a ser salvo: $fileName');
+
+      // Faz upload da imagem para o Firebase Storage
+      final imageUrl = await _storageService.uploadFile(
+        file: imageFile,
+        folder: 'users_images',
+        fileName: fileName,
       );
-      
-      return url;
-    } catch (e) {
-      throw Exception('Erro ao fazer upload da imagem: $e');
+
+      log('Imagem enviada com sucesso para: $imageUrl');
+
+      try {
+        log('Atualizando perfil do paciente com a nova URL da imagem');
+        // Atualiza o perfil do paciente com a nova URL da imagem
+        await _httpClient.put(
+          '/atualizaImagemUser',
+          queryParameters: {'idUser': pacienteId},
+          data: {'profileImageUrl': imageUrl, 'userType': 'pacientes'},
+        );
+        log('Perfil do paciente atualizado com sucesso');
+      } catch (e) {
+        log('Erro ao atualizar perfil do paciente: $e');
+        // Não interrompe o fluxo, pois o upload da imagem já foi bem-sucedido
+      }
+
+      return imageUrl;
+    } catch (e, stackTrace) {
+      log('Erro ao fazer upload da imagem de perfil: $e');
+      log('Stack trace: $stackTrace');
+      throw Exception('Não foi possível fazer upload da imagem de perfil: $e');
     }
   }
 
-  /// Obter URL da imagem de perfil do paciente
   Future<String?> getProfileImageUrl(String pacienteId) async {
     try {
-      // Primeiro tentamos buscar do n8n
-      try {
-        final response = await _httpClient.get(
-          '$_endpointPerfilPaciente/$pacienteId/imagem',
-        );
-        
-        if (response.data is Map<String, dynamic> && 
-            response.data.containsKey('profileImageUrl')) {
-          return response.data['profileImageUrl'];
-        }
-      } catch (_) {
-        // Se falhar, tentamos diretamente do Firebase Storage
+      final paciente = await getById(pacienteId);
+
+      if (paciente?.profileUrlImage?.isNotEmpty ?? false) {
+        String url = paciente!.profileUrlImage!;
+        return url;
       }
-      
-      // Tentativa direta do Firebase Storage
-      final ref = _storage.ref().child('profile_images').child('$pacienteId.jpg');
-      return await ref.getDownloadURL();
+
+      return null;
     } catch (e) {
-      // Imagem não existe, não é um erro
+      log('Erro ao obter URL da imagem de perfil: $e');
       return null;
     }
   }

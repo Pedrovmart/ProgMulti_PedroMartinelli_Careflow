@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
@@ -6,10 +9,10 @@ import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 class ProfissionalProvider extends ChangeNotifier {
   // Repositório n8n para operações CRUD
   late final N8nProfissionalRepository _n8nRepository;
+  final N8nHttpClient _n8nClient;
   
-  ProfissionalProvider() {
-    final n8nClient = N8nHttpClient();
-    _n8nRepository = N8nProfissionalRepository(n8nClient);
+  ProfissionalProvider() : _n8nClient = N8nHttpClient() {
+    _n8nRepository = N8nProfissionalRepository(_n8nClient);
   }
 
   List<Profissional> _profissionais = [];
@@ -105,6 +108,54 @@ class ProfissionalProvider extends ChangeNotifier {
       return await _n8nRepository.getByEmpresa(empresaId);
     } catch (e) {
       throw Exception("Erro ao buscar profissionais por empresa: ${e.toString()}");
+    }
+  }
+
+  /// Faz upload de uma nova imagem de perfil para o profissional
+  /// 
+  /// [profissionalId] - ID do profissional
+  /// [imageFile] - Arquivo de imagem a ser enviado
+  /// Retorna a URL da imagem após o upload
+  Future<String?> uploadProfileImage(String profissionalId, File imageFile) async {
+    try {
+      final imageUrl = await _n8nRepository.uploadProfileImage(profissionalId, imageFile);
+      
+      // Atualiza a lista local se o profissional estiver nela
+      final index = _profissionais.indexWhere((p) => p.id == profissionalId);
+      if (index != -1) {
+        final profissional = _profissionais[index];
+        final updatedProfissional = Profissional(
+          id: profissional.id,
+          nome: profissional.nome,
+          email: profissional.email,
+          especialidade: profissional.especialidade,
+          numeroRegistro: profissional.numeroRegistro,
+          idEmpresa: profissional.idEmpresa,
+          dataNascimento: profissional.dataNascimento,
+          telefone: profissional.telefone,
+          profileUrlImage: imageUrl,
+        );
+        _profissionais[index] = updatedProfissional;
+        notifyListeners();
+      }
+      
+      return imageUrl;
+    } catch (e) {
+      log('Erro ao fazer upload da imagem de perfil: $e');
+      rethrow;
+    }
+  }
+  
+  /// Obtém a URL da imagem de perfil do profissional
+  /// 
+  /// [profissionalId] - ID do profissional
+  /// Retorna a URL da imagem ou null se não houver imagem
+  Future<String?> getProfileImageUrl(String profissionalId) async {
+    try {
+      return await _n8nRepository.getProfileImageUrl(profissionalId);
+    } catch (e) {
+      log('Erro ao obter URL da imagem de perfil: $e');
+      return null;
     }
   }
 }

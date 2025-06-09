@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_controller.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_controller.dart';
 
 class ConsultaLoadingWidget extends StatelessWidget {
   const ConsultaLoadingWidget({super.key});
@@ -36,18 +36,25 @@ class ConsultaLoadingWidget extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Image.asset(
                       'assets/loading_animation.gif',
-                      height: 120, 
+                      height: 120,
                       width: 120,
-                      fit: BoxFit.contain, 
-                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      fit: BoxFit.contain,
+                      frameBuilder: (
+                        context,
+                        child,
+                        frame,
+                        wasSynchronouslyLoaded,
+                      ) {
                         if (frame == null) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         return child;
                       },
-                      cacheWidth: 240, 
-                      cacheHeight: 240, 
-                      filterQuality: FilterQuality.low, 
+                      cacheWidth: 240,
+                      cacheHeight: 240,
+                      filterQuality: FilterQuality.low,
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -63,16 +70,15 @@ class ConsultaLoadingWidget extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     ConsultaDetalhesController.mensagemProcessando,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   const LinearProgressIndicator(
                     backgroundColor: AppColors.primaryLight,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
                     minHeight: 6,
                     borderRadius: BorderRadius.all(Radius.circular(3)),
                   ),

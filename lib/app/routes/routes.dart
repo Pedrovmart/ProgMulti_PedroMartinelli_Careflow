@@ -9,8 +9,9 @@ import 'package:careflow_app/app/features/auth/login/login_page.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_page.dart';
 import 'package:careflow_app/app/features/paciente/paciente_main_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_main_page.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_page.dart' show ConsultaDetalhesPage;
-import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart'; 
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_page.dart'
+    show ConsultaDetalhesPage;
+import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart';
 import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_page.dart';
@@ -21,32 +22,33 @@ sealed class Routes {
   static const String signupName = 'signup';
   static const String homePacienteName = 'homePaciente';
   static const String pacienteBuscaName = 'pacienteBusca';
-  static const String perfilPublicoProfissionalName = 'perfilPublicoProfissional';
+  static const String perfilPublicoProfissionalName =
+      'perfilPublicoProfissional';
   static const String calendarioName = 'calendario';
   static const String perfilPacienteName = 'perfilPaciente';
   static const String homeProfissionalName = 'homeProfissional';
   static const String profissionalAgendamentosName = 'profissionalAgendamentos';
   static const String profissionalRoadmapName = 'profissionalRoadmap';
-  static const String profissionalConsultaDetalhesName = 'profissionalConsultaDetalhes';
+  static const String profissionalConsultaDetalhesName =
+      'profissionalConsultaDetalhes';
   static const String perfilProfissionalName = 'perfilProfissional';
-
 
   static GoRouter createRouter({
     String? initialLocation,
     required AuthProvider authProvider,
   }) {
     return GoRouter(
-      initialLocation: initialLocation ?? LoginPage.route, 
+      initialLocation: initialLocation ?? LoginPage.route,
       refreshListenable: authProvider,
       routes: [
         GoRoute(
-          path: LoginPage.route, 
+          path: LoginPage.route,
           name: loginName,
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          path: SignUpPage.route, 
-          name: signupName, 
+          path: SignUpPage.route,
+          name: signupName,
           builder: (context, state) => const SignUpPage(),
         ),
         ShellRoute(
@@ -55,8 +57,8 @@ sealed class Routes {
                   PacienteMainPage(state: state, child: child),
           routes: [
             GoRoute(
-              path: PacienteHomePage.route, 
-              name: homePacienteName, 
+              path: PacienteHomePage.route,
+              name: homePacienteName,
               builder: (context, state) => PacienteHomePage(),
             ),
             GoRoute(
@@ -106,8 +108,8 @@ sealed class Routes {
               builder: (context, state) => const ProfissionalRoadmapPage(),
             ),
             GoRoute(
-              path: '/profissional/perfil', 
-              name: perfilProfissionalName, 
+              path: '/profissional/perfil',
+              name: perfilProfissionalName,
               builder: (context, state) => const PerfilPage(),
             ),
             GoRoute(
@@ -126,23 +128,21 @@ sealed class Routes {
         ),
       ],
       redirect: (context, state) {
-
         if (!authProvider.initialized) {
-          return null; 
+          return null;
         }
-        
+
         final user = authProvider.currentUser;
         final location = state.uri.toString();
 
-       
         if (user == null &&
             location != LoginPage.route &&
             location != SignUpPage.route) {
           return LoginPage.route;
         }
 
-       
-        if (user != null && (location == LoginPage.route || location == SignUpPage.route)) {
+        if (user != null &&
+            (location == LoginPage.route || location == SignUpPage.route)) {
           if (authProvider.userType == 'paciente') {
             return PacienteHomePage.route;
           } else if (authProvider.userType == 'profissional') {

@@ -41,6 +41,8 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
+    final currentImageUrl = userImageUrl;
 
     return Material(
       color: Colors.transparent,
@@ -98,32 +100,37 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                               child: CircleAvatar(
                                 backgroundColor: theme.cardColor,
                                 child:
-                                    userImageUrl != null
+                                    currentImageUrl != null
                                         ? ClipOval(
-                                          child: Image.network(
-                                            userImageUrl!,
-                                            width: 36,
-                                            height: 36,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Icon(
-                                                      Icons.person,
-                                                      size: 24,
-                                                      color:
-                                                          theme
-                                                              .textTheme
-                                                              .bodyLarge
-                                                              ?.color,
-                                                    ),
-                                          ),
-                                        )
+                                            child: Image.network(
+                                              currentImageUrl,
+                                              width: 36,
+                                              height: 36,
+                                              fit: BoxFit.cover,
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                if (loadingProgress == null) return child;
+                                                return Center(
+                                                  child: CircularProgressIndicator(
+                                                    value: loadingProgress.expectedTotalBytes != null
+                                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                        : null,
+                                                    strokeWidth: 2,
+                                                  ),
+                                                );
+                                              },
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  Icon(
+                                                    Icons.person,
+                                                    size: 24,
+                                                    color: theme.textTheme.bodyLarge?.color,
+                                                  ),
+                                            ),
+                                          )
                                         : Icon(
-                                          Icons.person,
-                                          size: 24,
-                                          color:
-                                              theme.textTheme.bodyLarge?.color,
-                                        ),
+                                            Icons.person,
+                                            size: 24,
+                                            color: theme.textTheme.bodyLarge?.color,
+                                          ),
                               ),
                             ),
 

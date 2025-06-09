@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_controller.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_controller.dart';
 
 class ConsultaEmptyStateWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
-  const ConsultaEmptyStateWidget({
-    super.key,
-    this.onRetry,
-  });
+  const ConsultaEmptyStateWidget({super.key, this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +15,7 @@ class ConsultaEmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.info_outline,
-              size: 60,
-              color: Colors.grey,
-            ),
+            const Icon(Icons.info_outline, size: 60, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
               ConsultaDetalhesController.mensagemSemConteudo,
@@ -56,10 +49,7 @@ class ConsultaEmptyStateWidget extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
               child: const Text(
                 'Voltar',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: AppColors.primary, fontSize: 16),
               ),
             ),
           ],

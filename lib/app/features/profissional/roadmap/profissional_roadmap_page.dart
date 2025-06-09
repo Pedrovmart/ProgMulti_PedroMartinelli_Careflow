@@ -6,7 +6,7 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_page.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_page.dart';
 import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_controller.dart';
 
 class ProfissionalRoadmapPage extends StatelessWidget {
@@ -19,10 +19,14 @@ class ProfissionalRoadmapPage extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<ProfissionalRoadmapController>(
-          create: (context) => ProfissionalRoadmapController(
-            consultasProvider: Provider.of<ConsultasProvider>(context, listen: false),
-            authProvider: Provider.of<AuthProvider>(context, listen: false),
-          ),
+          create:
+              (context) => ProfissionalRoadmapController(
+                consultasProvider: Provider.of<ConsultasProvider>(
+                  context,
+                  listen: false,
+                ),
+                authProvider: Provider.of<AuthProvider>(context, listen: false),
+              ),
         ),
       ],
       child: const _ProfissionalRoadmapView(),
@@ -45,19 +49,22 @@ class _ProfissionalRoadmapView extends StatelessWidget {
           children: [
             Text(
               'Consultas Agendadas para Hoje:',
-              style: AppTextStyles.titleMedium.copyWith(color: AppColors.primaryDark),
+              style: AppTextStyles.titleMedium.copyWith(
+                color: AppColors.primaryDark,
+              ),
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: _buildBodyContent(context, controller),
-            ),
+            Expanded(child: _buildBodyContent(context, controller)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBodyContent(BuildContext context, ProfissionalRoadmapController controller) {
+  Widget _buildBodyContent(
+    BuildContext context,
+    ProfissionalRoadmapController controller,
+  ) {
     if (controller.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -86,28 +93,31 @@ class _ProfissionalRoadmapView extends StatelessWidget {
       itemBuilder: (context, index) {
         final consulta = controller.consultasDoDia[index];
         final horaFormatada = _formatarHora(consulta.hora);
-        final nomePaciente = consulta.nome.isNotEmpty 
-            ? consulta.nome 
-            : 'Paciente ${index + 1}';
-            
+        final nomePaciente =
+            consulta.nome.isNotEmpty ? consulta.nome : 'Paciente ${index + 1}';
+
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
           elevation: 2.0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
-            side: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.5), width: 1.0),
+            side: BorderSide(
+              color: AppColors.primaryLight.withValues(alpha: 0.5),
+              width: 1.0,
+            ),
           ),
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ConsultaDetalhesPage(
-                    idProfissional: consulta.idMedico,
-                    idPaciente: consulta.idPaciente,
-                    nomePaciente: nomePaciente,
-                    idConsulta: consulta.id,
-                  ),
+                  builder:
+                      (context) => ConsultaDetalhesPage(
+                        idProfissional: consulta.idMedico,
+                        idPaciente: consulta.idPaciente,
+                        nomePaciente: nomePaciente,
+                        idConsulta: consulta.id,
+                      ),
                 ),
               );
             },
@@ -167,10 +177,7 @@ class _ProfissionalRoadmapView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.primary,
-                  ),
+                  const Icon(Icons.chevron_right, color: AppColors.primary),
                 ],
               ),
             ),
@@ -179,7 +186,7 @@ class _ProfissionalRoadmapView extends StatelessWidget {
       },
     );
   }
-  
+
   String _formatarHora(String hora) {
     try {
       final partes = hora.split(':');

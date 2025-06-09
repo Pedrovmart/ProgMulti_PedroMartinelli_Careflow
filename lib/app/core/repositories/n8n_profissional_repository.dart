@@ -1,10 +1,16 @@
+import 'dart:io';
+import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/base_repository.dart';
-import 'package:dio/dio.dart';
+import 'package:careflow_app/app/core/services/storage_service.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 
 class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final N8nHttpClient _httpClient;
+  final StorageService _storageService;
 
   // Endpoints específicos para profissionais
   final String _endpointBase = '/profissionais';
@@ -14,7 +20,8 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final String _endpointUpdate = '/atualizarProfissional';
   final String _endpointDelete = '/excluirProfissional';
 
-  N8nProfissionalRepository(this._httpClient);
+  N8nProfissionalRepository(this._httpClient, {StorageService? storageService}) 
+      : _storageService = storageService ?? StorageService();
 
   @override
   Future<List<Profissional>> getAll() async {
@@ -129,7 +136,81 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       data['telefone'] = profissional.telefone;
     }
 
+    // Adicionar campo de imagem de perfil se existir
+    if (profissional.profileUrlImage != null) {
+      data['profileUrlImage'] = profissional.profileUrlImage;
+    }
+    
     return data;
+  }
+
+  // Métodos para gerenciamento de imagens de perfil
+  
+  /// Faz upload ou atualiza a imagem de perfil do profissional
+  /// 
+  /// [profissionalId] - ID do profissional
+  /// [imageFile] - Arquivo de imagem a ser enviado
+  /// Retorna a URL da imagem após o upload
+  Future<String> uploadProfileImage(String profissionalId, File imageFile) async {
+    try {
+      // Faz upload da imagem para o Firebase Storage
+      final imageUrl = await _storageService.uploadFile(
+        file: imageFile,
+        folder: 'users_images',
+        fileName: 'profissional_$profissionalId${path.extension(imageFile.path)}',
+      );
+
+      // Atualiza o perfil do profissional com a nova URL da imagem
+      await _httpClient.post(
+        '/atualizaImagemUser?idUser=$profissionalId',
+        data: {
+          'profileImageUrl': imageUrl,
+          'userType': 'profissionais',
+        },
+      );
+      
+      return imageUrl;
+    } catch (e) {
+      log('Erro ao fazer upload da imagem de perfil: $e');
+      throw Exception('Não foi possível fazer upload da imagem de perfil: $e');
+    }
+  }
+
+  /// Obtém a URL da imagem de perfil do profissional
+  /// 
+  /// [profissionalId] - ID do profissional
+  /// Retorna a URL da imagem ou null se não houver imagem
+  Future<String?> getProfileImageUrl(String profissionalId) async {
+    try {
+      // Tenta obter do perfil do profissional
+      final profissional = await getById(profissionalId);
+      if (profissional?.profileUrlImage != null && profissional!.profileUrlImage!.isNotEmpty) {
+        return profissional.profileUrlImage;
+      }
+      
+      // Se não encontrar no perfil, tenta buscar diretamente do storage
+      try {
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('users_images')
+            .child('profissional_$profissionalId');
+            
+        // Lista todos os arquivos do profissional (pode ter extensões diferentes)
+        final result = await ref.listAll();
+        
+        // Retorna a primeira imagem encontrada
+        if (result.items.isNotEmpty) {
+          return await result.items.first.getDownloadURL();
+        }
+      } catch (e) {
+        log('Imagem não encontrada no storage: $e');
+      }
+      
+      return null;
+    } catch (e) {
+      log('Erro ao obter URL da imagem de perfil: $e');
+      return null;
+    }
   }
 
   // Métodos específicos do domínio de profissionais

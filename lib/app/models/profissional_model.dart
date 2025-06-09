@@ -6,6 +6,7 @@ class Profissional extends UserModel {
   final String idEmpresa;
   final String? dataNascimento;
   final String? telefone;
+  final String? profileUrlImage;
 
   Profissional({
     required super.id,
@@ -16,7 +17,11 @@ class Profissional extends UserModel {
     required this.idEmpresa,
     this.dataNascimento,
     this.telefone,
-  }) : super(userType: 'profissional');
+    this.profileUrlImage,
+  }) : super(
+          userType: 'profissional',
+          profileUrlImage: profileUrlImage,
+        );
 
   factory Profissional.fromJson(Map<String, dynamic> json) {
     return Profissional(
@@ -28,6 +33,7 @@ class Profissional extends UserModel {
       idEmpresa: json['idEmpresa'] ?? '',
       dataNascimento: json['dataNascimento'],
       telefone: json['telefone'],
+      profileUrlImage: json['profileUrlImage'],
     );
   }
 

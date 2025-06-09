@@ -1,5 +1,6 @@
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
+import 'package:careflow_app/app/features/perfil/perfil_controller.dart';
 import 'package:careflow_app/app/models/paciente_model.dart';
 import 'package:careflow_app/app/widgets/app_bars/default_app_bar_widget.dart';
 import 'package:careflow_app/app/widgets/nav_bar/nav_bar_item.dart';
@@ -25,6 +26,9 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   void initState() {
     super.initState();
     _loadPacienteData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PerfilController>(context, listen: false).init();
+    });
   }
 
   Future<void> _loadPacienteData() async {
@@ -100,51 +104,79 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   Widget build(BuildContext context) {
     final String location = widget.state.uri.toString();
     final isPerfilPage = location.startsWith('/paciente/perfil');
+    final pacienteProvider = Provider.of<PacienteProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
+    final perfilController = Provider.of<PerfilController>(context);
 
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    // Atualiza o paciente sempre que o provider for atualizado
+    if (authProvider.currentUser != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        pacienteProvider.getPacienteById(authProvider.currentUser!.uid).then((paciente) {
+          if (mounted && paciente != _paciente) {
+            setState(() {
+              _paciente = paciente;
+              // Atualiza a imagem de perfil no PerfilController
+              if (paciente?.profileUrlImage != null) {
+                perfilController.updateProfileImage(paciente!.profileUrlImage!);
+              }
+            });
+          }
+        });
+      });
     }
 
-    return Scaffold(
-      appBar: DefaultAppBar(
-        title: isPerfilPage ? 'Perfil' : 'Paciente',
-        userName: _paciente?.nome ?? 'Paciente',
-        userImageUrl:
-            'https://via.placeholder.com/150', // TODO: Implementar URL da imagem do paciente
-        userRole: 'Paciente',
-        showNotificationIcon: !isPerfilPage,
-        showLogoutButton: isPerfilPage,
-        onLogoutPressed: _handleLogout,
-        onNotificationPressed: () {
-          // TODO: Implementar navegação para notificações
-        },
-        onProfilePressed:
-            isPerfilPage ? null : () => context.go('/paciente/perfil'),
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 76),
-              child: widget.child,
-            ),
+    return Consumer<PerfilController>(
+      builder: (context, perfilController, _) {
+        if (_isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // Usa a imagem do perfil do controlador
+        final imageUrl = perfilController.profileImageUrl;
+
+        return Scaffold(
+          appBar: DefaultAppBar(
+            title: isPerfilPage ? 'Perfil' : 'Paciente',
+            userName: _paciente?.nome ?? 'Paciente',
+            userImageUrl: imageUrl,
+            userRole: 'Paciente',
+            showNotificationIcon: !isPerfilPage,
+            showLogoutButton: isPerfilPage,
+            onLogoutPressed: _handleLogout,
+            onNotificationPressed: () {
+              // TODO: Implementar navegação para notificações
+            },
+            onProfilePressed:
+                isPerfilPage ? null : () => context.go('/paciente/perfil'),
           ),
-          Positioned(
-            bottom: 15,
-            left: 15,
-            right: 15,
-            child: NavBarWidget(
-              onTap: (index) {
-                context.go(_routes[index]);
-              },
-              selectedIndex: _routes.indexWhere(
-                (route) => location.startsWith(route),
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 76),
+                  child: widget.child,
+                ),
               ),
-              items: _navItems,
-            ),
+              Positioned(
+                bottom: 15,
+                left: 15,
+                right: 15,
+                child: NavBarWidget(
+                  onTap: (index) {
+                    context.go(_routes[index]);
+                  },
+                  selectedIndex: _routes.indexWhere(
+                    (route) => location.startsWith(route),
+                  ),
+                  items: _navItems,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

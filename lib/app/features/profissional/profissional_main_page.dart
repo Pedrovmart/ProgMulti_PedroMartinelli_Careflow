@@ -103,6 +103,21 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
   Widget build(BuildContext context) {
     final String location = widget.state.uri.toString();
     final isPerfilPage = location.startsWith('/profissional/perfil');
+    final profissionalProvider = Provider.of<ProfissionalProvider>(context);
+    final currentUser = Provider.of<AuthProvider>(context).currentUser;
+
+    // Atualiza o profissional sempre que o provider for atualizado
+    if (currentUser != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        profissionalProvider.getProfissionalById(currentUser.uid).then((profissional) {
+          if (mounted && profissional != _profissional) {
+            setState(() {
+              _profissional = profissional;
+            });
+          }
+        });
+      });
+    }
 
     if (_isLoading) {
       return const Scaffold(
@@ -116,7 +131,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
       appBar: DefaultAppBar(
         title: isPerfilPage ? 'Perfil' : 'Agendamentos',
         userName: _profissional?.nome ?? 'Profissional',
-        userImageUrl: 'https://via.placeholder.com/150',
+        userImageUrl: _profissional?.profileUrlImage,
         userRole: _profissional?.especialidade ?? 'Profissional',
         showNotificationIcon: !isPerfilPage,
         showLogoutButton: isPerfilPage,
@@ -126,7 +141,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
         },
         onProfilePressed: isPerfilPage 
             ? null 
-            : () => context.go('/profissional/perfil'), // This specific string is fine as it's unique to this context
+            : () => context.go('/profissional/perfil'),
       ),
       body: Stack(
         children: [

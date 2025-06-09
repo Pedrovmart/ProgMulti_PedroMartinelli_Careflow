@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as md;
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/consulta_detalhes_controller.dart';
-import 'package:careflow_app/app/features/profissional/consulta_detalhes/widgets/atualizar_diagnostico_dialog.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/consulta_detalhes_controller.dart';
+import 'package:careflow_app/app/features/profissional/roadmap/consulta_detalhes/widgets/atualizar_diagnostico_dialog.dart';
 import 'package:provider/provider.dart';
 
 class ConsultaContentWidget extends StatelessWidget {
@@ -43,7 +43,11 @@ class ConsultaContentWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              const Divider(height: 1, thickness: 1, color: AppColors.primaryLight),
+              const Divider(
+                height: 1,
+                thickness: 1,
+                color: AppColors.primaryLight,
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: Card(
@@ -85,13 +89,14 @@ class ConsultaContentWidget extends StatelessWidget {
               const SizedBox(height: 8),
               Center(
                 child: ElevatedButton(
-                  onPressed: () => _showUpdateDiagnosticoDialog(
-                    context, 
-                    controller,
-                    idProfissional: idProfissional,
-                    idPaciente: idPaciente,
-                    idConsulta: idConsulta,
-                  ),
+                  onPressed:
+                      () => _showUpdateDiagnosticoDialog(
+                        context,
+                        controller,
+                        idProfissional: idProfissional,
+                        idPaciente: idPaciente,
+                        idConsulta: idConsulta,
+                      ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -106,7 +111,7 @@ class ConsultaContentWidget extends StatelessWidget {
                   child: const Text('Atualizar Diagnóstico'),
                 ),
               ),
-              const SizedBox(height: 8)
+              const SizedBox(height: 8),
             ],
           ),
         );
@@ -136,52 +141,53 @@ class ConsultaContentWidget extends StatelessWidget {
     try {
       bool? success = await showDialog<bool>(
         context: context,
-        builder: (dialogContext) => AtualizarDiagnosticoDialog(
-          diagnosticoInicial: '',
-          isLoading: controller.isLoading,
-          onConfirmar: (novoDiagnostico) async {
-            try {
-              try {
-                await controller.atualizarDiagnostico(
-                  context: dialogContext,
-                  idProfissional: idProfissional,
-                  idPaciente: idPaciente,
-                  novoDiagnostico: novoDiagnostico,
-                );
-                
-                controller.atualizarConteudoSemFormatacao();
-                
-                if (dialogContext.mounted) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(
-                      content: Text('Diagnóstico atualizado com sucesso!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+        builder:
+            (dialogContext) => AtualizarDiagnosticoDialog(
+              diagnosticoInicial: '',
+              isLoading: controller.isLoading,
+              onConfirmar: (novoDiagnostico) async {
+                try {
+                  try {
+                    await controller.atualizarDiagnostico(
+                      context: dialogContext,
+                      idProfissional: idProfissional,
+                      idPaciente: idPaciente,
+                      novoDiagnostico: novoDiagnostico,
+                    );
+
+                    controller.atualizarConteudoSemFormatacao();
+
+                    if (dialogContext.mounted) {
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        const SnackBar(
+                          content: Text('Diagnóstico atualizado com sucesso!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+
+                    if (dialogContext.mounted) {
+                      Navigator.of(dialogContext).pop(true);
+                    }
+                    return true;
+                  } catch (e) {
+                    rethrow;
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Erro ao atualizar diagnóstico: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                  return false;
                 }
-                
-                if (dialogContext.mounted) {
-                  Navigator.of(dialogContext).pop(true);
-                }
-                return true;
-              } catch (e) {
-                rethrow;
-              }
-            } catch (e) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Erro ao atualizar diagnóstico: $e'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-              return false;
-            }
-          },
-        ),
+              },
+            ),
       );
-      
+
       if (success == true) {
         return;
       }
