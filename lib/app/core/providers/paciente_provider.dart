@@ -6,8 +6,9 @@ import 'package:careflow_app/app/core/repositories/repository_manager.dart';
 
 class PacienteProvider extends ChangeNotifier {
   final N8nPacienteRepository _pacienteRepository;
-  
-  PacienteProvider() : _pacienteRepository = RepositoryManager().getPacienteRepository();
+
+  PacienteProvider()
+    : _pacienteRepository = RepositoryManager().getPacienteRepository();
 
   List<Paciente> _pacientes = [];
 
@@ -67,19 +68,46 @@ class PacienteProvider extends ChangeNotifier {
       throw Exception("Erro ao buscar paciente por ID: ${e.toString()}");
     }
   }
-  
+
+  String? _currentProfileImage;
+
+  String? get currentProfileImage => _currentProfileImage;
+
   Future<String?> uploadProfileImage(String pacienteId, File imageFile) async {
     try {
-      return await _pacienteRepository.uploadProfileImage(pacienteId, imageFile);
+      final imageUrl = await _pacienteRepository.uploadProfileImage(
+        pacienteId,
+        imageFile,
+      );
+
+      _currentProfileImage = imageUrl;
+      notifyListeners();
+
+      // Update local list if patient exists
+      final index = _pacientes.indexWhere((p) => p.id == pacienteId);
+      if (index != -1) {
+        final paciente = _pacientes[index];
+        final updatedPaciente = paciente.copyWith(profileUrlImage: imageUrl);
+        _pacientes[index] = updatedPaciente;
+      }
+
+      return imageUrl;
     } catch (e) {
-      throw Exception("Erro ao fazer upload da imagem: ${e.toString()}");
+      debugPrint('Erro ao fazer upload da imagem de perfil: $e');
+      rethrow;
     }
   }
-  
+
   Future<String?> getProfileImageUrl(String pacienteId) async {
     try {
-      return await _pacienteRepository.getProfileImageUrl(pacienteId);
+      final imageUrl = await _pacienteRepository.getProfileImageUrl(pacienteId);
+      if (imageUrl != null) {
+        _currentProfileImage = imageUrl;
+        notifyListeners();
+      }
+      return imageUrl;
     } catch (e) {
+      debugPrint('Erro ao obter URL da imagem: $e');
       return null;
     }
   }

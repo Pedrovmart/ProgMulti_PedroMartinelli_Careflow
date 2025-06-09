@@ -179,10 +179,27 @@ class PerfilController extends ChangeNotifier {
 
       final userId = _authProvider.currentUser!.uid;
 
-      if (_userType == 'paciente') {
-        await _uploadImageForPaciente(userId);
-      } else if (_userType == 'profissional') {
-        await _uploadImageForProfissional(userId);
+      try {
+        String? imageUrl;
+        if (_userType == 'paciente') {
+          imageUrl = await _pacienteProvider.uploadProfileImage(
+            userId,
+            _imageFile!,
+          );
+        } else if (_userType == 'profissional') {
+          imageUrl = await _profissionalProvider.uploadProfileImage(
+            userId,
+            _imageFile!,
+          );
+        }
+
+        if (imageUrl != null) {
+          _profileImageUrl = imageUrl;
+          notifyListeners();
+        }
+      } catch (e) {
+        debugPrint('Erro ao fazer upload da imagem: $e');
+        // Tratar erro aqui
       }
     }
   }
@@ -224,50 +241,6 @@ class PerfilController extends ChangeNotifier {
       }
     } catch (e) {
       log('Erro ao enviar imagem do paciente: $e');
-      rethrow;
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> _uploadImageForProfissional(String userId) async {
-    if (_imageFile == null || _userType != 'profissional') return;
-
-    try {
-      _setLoading(true);
-      final url = await _profissionalProvider.uploadProfileImage(
-        userId,
-        _imageFile!,
-      );
-      if (url != null) {
-        _profileImageUrl = url;
-        _imageFile = null;
-
-        // Atualiza o usuário local com a nova URL da imagem
-        if (_user is Profissional) {
-          final profissional = _user as Profissional;
-          _user = Profissional(
-            id: profissional.id,
-            nome: profissional.nome,
-            email: profissional.email,
-            especialidade: profissional.especialidade,
-            numeroRegistro: profissional.numeroRegistro,
-            idEmpresa: profissional.idEmpresa,
-            dataNascimento: profissional.dataNascimento,
-            telefone: profissional.telefone,
-            profileUrlImage: url,
-          );
-
-          // Força a atualização do profissional no provider
-          await _profissionalProvider.getProfissionalById(userId);
-        }
-
-        notifyListeners();
-      } else {
-        log('Falha ao enviar imagem do profissional: URL não retornada');
-      }
-    } catch (e) {
-      log('Erro ao enviar imagem do profissional: $e');
       rethrow;
     } finally {
       _setLoading(false);

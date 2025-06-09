@@ -7,7 +7,7 @@ import 'app/app.dart';
 import 'app/core/dependency_injection.dart';
 import 'app/core/ui/app_theme.dart';
 
-void main() { 
+void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
     if (kDebugMode) {
@@ -16,7 +16,7 @@ void main() {
     }
   };
   Future<void> initializeApp() async {
-    WidgetsFlutterBinding.ensureInitialized();   
+    WidgetsFlutterBinding.ensureInitialized();
     try {
       debugPrint('Iniciando inicialização do aplicativo...');
       await dotenv.load(fileName: ".env");
@@ -57,12 +57,9 @@ void main() {
     }
   }
 
-  runZonedGuarded<Future<void>>(
-    () => initializeApp(),
-    (error, stackTrace) {
-      debugPrint('ERRO NÃO TRATADO:');
-      debugPrint('Erro: $error');
-      debugPrint('Stack trace: $stackTrace');
-    },
-  );
+  runZonedGuarded<Future<void>>(() => initializeApp(), (error, stackTrace) {
+    debugPrint('ERRO NÃO TRATADO:');
+    debugPrint('Erro: $error');
+    debugPrint('Stack trace: $stackTrace');
+  });
 }

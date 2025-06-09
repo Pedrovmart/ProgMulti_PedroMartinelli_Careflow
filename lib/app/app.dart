@@ -1,3 +1,4 @@
+import 'package:careflow_app/app/features/perfil/perfil_controller.dart';
 import 'package:careflow_app/app/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
@@ -5,8 +6,6 @@ import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:provider/provider.dart';
-
-import 'features/perfil/perfil_controller.dart';
 
 class App extends StatelessWidget {
   final ThemeData? theme;
@@ -20,13 +19,21 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfissionalProvider()),
         ChangeNotifierProvider(create: (_) => PacienteProvider()),
         ChangeNotifierProvider(create: (_) => ConsultasProvider()),
-        ChangeNotifierProvider(
+        ChangeNotifierProxyProvider3<
+          AuthProvider,
+          PacienteProvider,
+          ProfissionalProvider,
+          PerfilController
+        >(
           create:
               (context) => PerfilController(
-                Provider.of<AuthProvider>(context, listen: false),
-                Provider.of<PacienteProvider>(context, listen: false),
-                Provider.of<ProfissionalProvider>(context, listen: false),
+                context.read<AuthProvider>(),
+                context.read<PacienteProvider>(),
+                context.read<ProfissionalProvider>(),
               ),
+          update:
+              (context, auth, paciente, profissional, previous) =>
+                  PerfilController(auth, paciente, profissional),
         ),
       ],
       child: Consumer<AuthProvider>(

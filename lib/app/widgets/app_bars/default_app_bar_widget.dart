@@ -1,4 +1,8 @@
+import 'package:careflow_app/app/core/providers/paciente_provider.dart';
+import 'package:careflow_app/app/core/providers/profissional_provider.dart';
+import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
@@ -41,8 +45,19 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    final currentImageUrl = userImageUrl;
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    String? currentImageUrl;
+
+    if (authProvider.userType == 'paciente') {
+      currentImageUrl =
+          Provider.of<PacienteProvider>(context).currentProfileImage ??
+          userImageUrl;
+    } else if (authProvider.userType == 'profissional') {
+      currentImageUrl =
+          Provider.of<ProfissionalProvider>(context).currentProfileImage ??
+          userImageUrl;
+    }
 
     return Material(
       color: Colors.transparent,
@@ -102,35 +117,53 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 child:
                                     currentImageUrl != null
                                         ? ClipOval(
-                                            child: Image.network(
-                                              currentImageUrl,
-                                              width: 36,
-                                              height: 36,
-                                              fit: BoxFit.cover,
-                                              loadingBuilder: (context, child, loadingProgress) {
-                                                if (loadingProgress == null) return child;
-                                                return Center(
-                                                  child: CircularProgressIndicator(
-                                                    value: loadingProgress.expectedTotalBytes != null
-                                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                        : null,
-                                                    strokeWidth: 2,
-                                                  ),
-                                                );
-                                              },
-                                              errorBuilder: (context, error, stackTrace) =>
-                                                  Icon(
-                                                    Icons.person,
-                                                    size: 24,
-                                                    color: theme.textTheme.bodyLarge?.color,
-                                                  ),
-                                            ),
-                                          )
-                                        : Icon(
-                                            Icons.person,
-                                            size: 24,
-                                            color: theme.textTheme.bodyLarge?.color,
+                                          child: Image.network(
+                                            currentImageUrl,
+                                            width: 36,
+                                            height: 36,
+                                            fit: BoxFit.cover,
+                                            loadingBuilder: (
+                                              context,
+                                              child,
+                                              loadingProgress,
+                                            ) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child: CircularProgressIndicator(
+                                                  value:
+                                                      loadingProgress
+                                                                  .expectedTotalBytes !=
+                                                              null
+                                                          ? loadingProgress
+                                                                  .cumulativeBytesLoaded /
+                                                              loadingProgress
+                                                                  .expectedTotalBytes!
+                                                          : null,
+                                                  strokeWidth: 2,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Icon(
+                                                      Icons.person,
+                                                      size: 24,
+                                                      color:
+                                                          theme
+                                                              .textTheme
+                                                              .bodyLarge
+                                                              ?.color,
+                                                    ),
                                           ),
+                                        )
+                                        : Icon(
+                                          Icons.person,
+                                          size: 24,
+                                          color:
+                                              theme.textTheme.bodyLarge?.color,
+                                        ),
                               ),
                             ),
 
@@ -159,8 +192,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                                       fontSize: 16,
                                       height: 1.2,
                                       fontWeight: FontWeight.w700,
-                                      color:
-                                          theme.primaryColorLight,
+                                      color: theme.primaryColorLight,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -237,9 +269,7 @@ Widget _buildIconButton({
     height: 40,
     child: IconButton(
       icon: Icon(icon, size: 20),
-      color: Theme.of(
-        context,
-      ).primaryColorLight,
+      color: Theme.of(context).primaryColorLight,
       onPressed: onPressed,
       tooltip: tooltip,
       padding: EdgeInsets.zero,
