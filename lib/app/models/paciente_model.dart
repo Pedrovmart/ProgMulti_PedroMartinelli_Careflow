@@ -1,7 +1,6 @@
 import 'user_model.dart';
 
 class Paciente extends UserModel {
-  final String? profileUrlImage;
   final String cpf;
   final DateTime dataNascimento;
   final String telefone;
@@ -12,18 +11,18 @@ class Paciente extends UserModel {
     required super.id,
     required super.nome,
     required super.email,
+    super.profileUrlImage,
     String? cpf,
     DateTime? dataNascimento,
     String? telefone,
     String? endereco,
     DateTime? createdAt,
-    this.profileUrlImage,
   }) : cpf = cpf ?? '',
        dataNascimento = dataNascimento ?? DateTime(1900),
        telefone = telefone ?? '',
        endereco = endereco ?? '',
        createdAt = createdAt ?? DateTime.now(),
-       super(userType: 'paciente', profileUrlImage: profileUrlImage);
+       super(userType: 'paciente');
 
   factory Paciente.fromJson(Map<String, dynamic> json) {
     return Paciente(

@@ -51,3 +51,5 @@ android/app/google-services.json
 
 # Ignore Windsurf rules
 .windsurf
+
+.github/instructions/careflow_instructions.instructions.md

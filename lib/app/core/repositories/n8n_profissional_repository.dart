@@ -17,11 +17,11 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final String _endpointGetAll = '/profissionais';
   final String _endpointGetById = '/profissional';
   final String _endpointCreate = '/novoProfissional';
-  final String _endpointUpdate = '/atualizarProfissional';
+  final String _endpointUpdate = '/atualizaUser';
   final String _endpointDelete = '/excluirProfissional';
 
-  N8nProfissionalRepository(this._httpClient, {StorageService? storageService}) 
-      : _storageService = storageService ?? StorageService();
+  N8nProfissionalRepository(this._httpClient, {StorageService? storageService})
+    : _storageService = storageService ?? StorageService();
 
   @override
   Future<List<Profissional>> getAll() async {
@@ -40,8 +40,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
 
   //TODO: VERIFICAR SE VAI SER NECESSARIA IMPLEMENTAÇÃO
   Future<List<Profissional>> getByPacienteId(String pacienteId) async {
-    // Se não houver um endpoint específico para buscar profissionais por paciente,
-    // podemos retornar todos e filtrar localmente ou lançar uma exceção
     return getAll();
   }
 
@@ -67,19 +65,25 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       } else if (response.data is Map<String, dynamic>) {
         return Profissional.fromJson(response.data as Map<String, dynamic>);
       } else {
-        throw Exception('Formato de dados inesperado recebido da API para profissional ID: $id');
+        throw Exception(
+          'Formato de dados inesperado recebido da API para profissional ID: $id',
+        );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         return null;
       }
-      throw Exception('Erro de comunicação ao buscar profissional por ID: $id. Detalhes: ${e.message}');
+      throw Exception(
+        'Erro de comunicação ao buscar profissional por ID: $id. Detalhes: ${e.message}',
+      );
     } catch (e) {
-      throw Exception('Erro inesperado ao buscar profissional por ID: $id. Detalhes: $e');
+      throw Exception(
+        'Erro inesperado ao buscar profissional por ID: $id. Detalhes: $e',
+      );
     }
   }
 
-  @override //Atualmente feito pelo auth do FB
+  @override
   Future<Profissional> create(Profissional profissional) async {
     try {
       final response = await _httpClient.post(
@@ -96,11 +100,16 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   @override
   Future<void> update(String id, Profissional profissional) async {
     try {
+      final data = _toRequestData(profissional);
+      data['userType'] = 'profissionais';
+
       await _httpClient.put(
-        '$_endpointUpdate/$id',
-        data: _toRequestData(profissional),
+        _endpointUpdate,
+        queryParameters: {'idUser': id},
+        data: data,
       );
     } catch (e) {
+      log('Erro ao atualizar profissional: $e');
       throw Exception('Erro ao atualizar profissional: $e');
     }
   }
@@ -126,7 +135,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     data['email'] = profissional.email;
     data['especialidade'] = profissional.especialidade;
     data['numRegistro'] = profissional.numeroRegistro;
-    data['idEmpresa'] = profissional.idEmpresa;
 
     if (profissional.dataNascimento != null) {
       data['dataNascimento'] = profissional.dataNascimento;
@@ -140,35 +148,29 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     if (profissional.profileUrlImage != null) {
       data['profileUrlImage'] = profissional.profileUrlImage;
     }
-    
+
     return data;
   }
 
-  // Métodos para gerenciamento de imagens de perfil
-  
-  /// Faz upload ou atualiza a imagem de perfil do profissional
-  /// 
-  /// [profissionalId] - ID do profissional
-  /// [imageFile] - Arquivo de imagem a ser enviado
-  /// Retorna a URL da imagem após o upload
-  Future<String> uploadProfileImage(String profissionalId, File imageFile) async {
+  Future<String> uploadProfileImage(
+    String profissionalId,
+    File imageFile,
+  ) async {
     try {
       // Faz upload da imagem para o Firebase Storage
       final imageUrl = await _storageService.uploadFile(
         file: imageFile,
         folder: 'users_images',
-        fileName: 'profissional_$profissionalId${path.extension(imageFile.path)}',
+        fileName:
+            'profissional_$profissionalId${path.extension(imageFile.path)}',
       );
 
       // Atualiza o perfil do profissional com a nova URL da imagem
       await _httpClient.post(
         '/atualizaImagemUser?idUser=$profissionalId',
-        data: {
-          'profileImageUrl': imageUrl,
-          'userType': 'profissionais',
-        },
+        data: {'profileImageUrl': imageUrl, 'userType': 'profissionais'},
       );
-      
+
       return imageUrl;
     } catch (e) {
       log('Erro ao fazer upload da imagem de perfil: $e');
@@ -177,27 +179,28 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   }
 
   /// Obtém a URL da imagem de perfil do profissional
-  /// 
+  ///
   /// [profissionalId] - ID do profissional
   /// Retorna a URL da imagem ou null se não houver imagem
   Future<String?> getProfileImageUrl(String profissionalId) async {
     try {
       // Tenta obter do perfil do profissional
       final profissional = await getById(profissionalId);
-      if (profissional?.profileUrlImage != null && profissional!.profileUrlImage!.isNotEmpty) {
+      if (profissional?.profileUrlImage != null &&
+          profissional!.profileUrlImage!.isNotEmpty) {
         return profissional.profileUrlImage;
       }
-      
+
       // Se não encontrar no perfil, tenta buscar diretamente do storage
       try {
         final ref = FirebaseStorage.instance
             .ref()
             .child('users_images')
             .child('profissional_$profissionalId');
-            
+
         // Lista todos os arquivos do profissional (pode ter extensões diferentes)
         final result = await ref.listAll();
-        
+
         // Retorna a primeira imagem encontrada
         if (result.items.isNotEmpty) {
           return await result.items.first.getDownloadURL();
@@ -205,7 +208,7 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       } catch (e) {
         log('Imagem não encontrada no storage: $e');
       }
-      
+
       return null;
     } catch (e) {
       log('Erro ao obter URL da imagem de perfil: $e');

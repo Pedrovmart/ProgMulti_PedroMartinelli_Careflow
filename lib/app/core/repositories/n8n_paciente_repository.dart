@@ -14,7 +14,7 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   final String _endpointGetAll = '/pacientes';
   final String _endpointGetById = '/paciente';
   final String _endpointCreate = '/novoPaciente';
-  final String _endpointUpdate = '/atualizarPaciente';
+  final String _endpointUpdate = '/atualizaUser';
   final String _endpointDelete = '/excluirPaciente';
 
   N8nPacienteRepository(this._httpClient, {StorageService? storageService})
@@ -103,11 +103,16 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   @override
   Future<void> update(String id, Paciente paciente) async {
     try {
+      final data = _toRequestData(paciente);
+      data['userType'] = 'pacientes';
+
       await _httpClient.put(
-        '$_endpointUpdate/$id',
-        data: _toRequestData(paciente),
+        _endpointUpdate,
+        queryParameters: {'idUser': id},
+        data: data,
       );
     } catch (e) {
+      log('Erro ao atualizar paciente: $e');
       throw Exception('Erro ao atualizar paciente: $e');
     }
   }
@@ -121,14 +126,11 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
     }
   }
 
-  /// Converte um objeto Paciente para o formato esperado pela API
   Map<String, dynamic> _toRequestData(Paciente paciente) {
     final data = paciente.toJson();
 
-    // Remover campos que não devem ser enviados ou que são gerenciados pelo servidor
     data.remove('userType');
 
-    // Garantir que campos obrigatórios estejam presentes
     data['id'] = paciente.id;
     data['nome'] = paciente.nome;
     data['email'] = paciente.email;
@@ -137,7 +139,6 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
     data['telefone'] = paciente.telefone;
     data['endereco'] = paciente.endereco;
 
-    // Adicionar campo de imagem de perfil se existir
     if (paciente.profileUrlImage != null) {
       data['profileUrlImage'] = paciente.profileUrlImage;
     }
@@ -145,51 +146,31 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
     return data;
   }
 
-  // Métodos para gerenciamento de imagens de perfil
-
-  /// Faz upload ou atualiza a imagem de perfil do paciente
-  ///
-  /// [pacienteId] - ID do paciente
-  /// [imageFile] - Arquivo de imagem a ser enviado
-  /// Retorna a URL da imagem após o upload
   Future<String> uploadProfileImage(String pacienteId, File imageFile) async {
     try {
-      log('Iniciando upload da imagem de perfil para o paciente $pacienteId');
-
-      // Garante que a extensão esteja em minúsculas
       final fileExtension = path.extension(imageFile.path).toLowerCase();
       final fileName = 'paciente_$pacienteId$fileExtension';
 
-      log('Nome do arquivo a ser salvo: $fileName');
-
-      // Faz upload da imagem para o Firebase Storage
       final imageUrl = await _storageService.uploadFile(
         file: imageFile,
         folder: 'users_images',
         fileName: fileName,
       );
 
-      log('Imagem enviada com sucesso para: $imageUrl');
-
       try {
-        log('Atualizando perfil do paciente com a nova URL da imagem');
-        // Atualiza o perfil do paciente com a nova URL da imagem
         await _httpClient.put(
           '/atualizaImagemUser',
           queryParameters: {'idUser': pacienteId},
           data: {'profileImageUrl': imageUrl, 'userType': 'pacientes'},
         );
-        log('Perfil do paciente atualizado com sucesso');
       } catch (e) {
         log('Erro ao atualizar perfil do paciente: $e');
-        // Não interrompe o fluxo, pois o upload da imagem já foi bem-sucedido
       }
 
       return imageUrl;
-    } catch (e, stackTrace) {
+    } catch (e) {
       log('Erro ao fazer upload da imagem de perfil: $e');
-      log('Stack trace: $stackTrace');
-      throw Exception('Não foi possível fazer upload da imagem de perfil: $e');
+      throw Exception('Falha ao fazer upload da imagem de perfil: $e');
     }
   }
 

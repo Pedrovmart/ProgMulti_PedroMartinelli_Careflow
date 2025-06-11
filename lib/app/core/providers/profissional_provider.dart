@@ -154,7 +154,6 @@ class ProfissionalProvider extends ChangeNotifier {
           email: profissional.email,
           especialidade: profissional.especialidade,
           numeroRegistro: profissional.numeroRegistro,
-          idEmpresa: profissional.idEmpresa,
           dataNascimento: profissional.dataNascimento,
           telefone: profissional.telefone,
           profileUrlImage: imageUrl,
@@ -179,6 +178,19 @@ class ProfissionalProvider extends ChangeNotifier {
     } catch (e) {
       log('Erro ao obter URL da imagem de perfil: $e');
       return null;
+    }
+  }
+
+  updateFields(String userId, Map<String, dynamic> updateFields) {}
+
+  Future<void> update(String id, Profissional profissional) async {
+    try {
+      await _n8nRepository.update(id, profissional);
+      await getProfissionalById(id); // Recarregar dados após atualização
+      notifyListeners();
+    } catch (e) {
+      log('Erro ao atualizar profissional: $e');
+      rethrow;
     }
   }
 }

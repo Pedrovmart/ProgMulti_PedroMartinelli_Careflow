@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/models/paciente_model.dart';
@@ -109,6 +110,17 @@ class PacienteProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro ao obter URL da imagem: $e');
       return null;
+    }
+  }
+
+  Future<void> update(String id, Paciente paciente) async {
+    try {
+      await _pacienteRepository.update(id, paciente);
+      await getPacienteById(id); // Recarregar dados após atualização
+      notifyListeners();
+    } catch (e) {
+      log('Erro ao atualizar paciente: $e');
+      rethrow;
     }
   }
 }

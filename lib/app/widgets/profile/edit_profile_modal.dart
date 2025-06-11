@@ -1,3 +1,4 @@
+import 'package:careflow_app/app/core/utils/input_formatters.dart';
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 
@@ -8,12 +9,12 @@ class EditProfileModal extends StatefulWidget {
   final Function(Map<String, String>) onSave;
 
   const EditProfileModal({
-    Key? key,
+    super.key,
     required this.initialData,
     required this.editableFields,
     this.readOnlyFields = const [],
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   State<EditProfileModal> createState() => _EditProfileModalState();
@@ -28,14 +29,14 @@ class _EditProfileModalState extends State<EditProfileModal> {
   void initState() {
     super.initState();
     _controllers = {};
-    
+
     // Inicializar controllers para campos editáveis
     for (final field in widget.editableFields) {
       _controllers[field] = TextEditingController(
         text: widget.initialData[field] ?? '',
       );
     }
-    
+
     // Inicializar controllers para campos somente leitura
     for (final field in widget.readOnlyFields) {
       _controllers[field] = TextEditingController(
@@ -77,14 +78,16 @@ class _EditProfileModalState extends State<EditProfileModal> {
 
       // Chamar callback de salvamento
       await widget.onSave(updatedData);
-      
+
       if (mounted) {
         Navigator.of(context).pop();
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao salvar alterações: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao salvar alterações: ${e.toString()}')),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -124,20 +127,21 @@ class _EditProfileModalState extends State<EditProfileModal> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Campos somente leitura
-                ...widget.readOnlyFields.map((field) => _buildTextField(
-                  field,
-                  _controllers[field]!,
-                  readOnly: true,
-                )),
-                
+                ...widget.readOnlyFields.map(
+                  (field) => _buildTextField(
+                    field,
+                    _controllers[field]!,
+                    readOnly: true,
+                  ),
+                ),
+
                 // Campos editáveis
-                ...widget.editableFields.map((field) => _buildTextField(
-                  field,
-                  _controllers[field]!,
-                )),
-                
+                ...widget.editableFields.map(
+                  (field) => _buildTextField(field, _controllers[field]!),
+                ),
+
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
@@ -151,9 +155,12 @@ class _EditProfileModalState extends State<EditProfileModal> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: _isSaving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Salvar Alterações'),
+                    child:
+                        _isSaving
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text('Salvar Alterações'),
                   ),
                 ),
               ],
@@ -169,33 +176,85 @@ class _EditProfileModalState extends State<EditProfileModal> {
     TextEditingController controller, {
     bool readOnly = false,
   }) {
-    // Converter o nome do campo para um formato mais amigável para exibição
-    final label = field.replaceFirst(field[0], field[0].toUpperCase())
-        .replaceAllMapped(
-          RegExp(r'([A-Z])'),
-          (match) => ' ${match.group(0)}',
-        );
+    // Tornar o campo de email sempre somente leitura
+    final isEmailField = field.toLowerCase() == 'email';
+    final isReadOnly = readOnly || isEmailField;
+
+    final inputFormatter = switch (field.toLowerCase()) {
+      'cpf' => InputFormatters.cpfFormatter,
+      'telefone' => InputFormatters.phoneFormatter,
+      'datanascimento' => InputFormatters.dateFormatter,
+      _ => null,
+    };
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
-        readOnly: readOnly,
+        readOnly: isReadOnly,
+        inputFormatters: inputFormatter != null ? [inputFormatter] : null,
         decoration: InputDecoration(
-          labelText: label,
+          labelText: _getFieldLabel(field),
           border: const OutlineInputBorder(),
-          filled: readOnly,
-          fillColor: readOnly ? Colors.grey[200] : null,
+          filled: isReadOnly,
+          fillColor: isReadOnly ? Colors.grey[200] : null,
+          suffixIcon:
+              isReadOnly
+                  ? const Icon(Icons.lock_outline, color: Colors.grey)
+                  : null,
         ),
-        validator: readOnly
-            ? null
-            : (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor, preencha este campo';
-                }
-                return null;
-              },
+        validator: _getValidator(field),
       ),
     );
   }
+}
+
+String _getFieldLabel(String field) {
+  return switch (field.toLowerCase()) {
+    'cpf' => 'CPF',
+    'telefone' => 'Telefone',
+    'datanascimento' => 'Data de Nascimento',
+    _ => field
+        .replaceFirst(field[0], field[0].toUpperCase())
+        .replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match.group(0)}'),
+  };
+}
+
+String? Function(String?)? _getValidator(String field) {
+  return (String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor, preencha este campo';
+    }
+
+    switch (field.toLowerCase()) {
+      case 'cpf':
+        if (value.replaceAll(RegExp(r'[^0-9]'), '').length != 11) {
+          return 'CPF inválido';
+        }
+        break;
+      case 'telefone':
+        if (value.replaceAll(RegExp(r'[^0-9]'), '').length < 10) {
+          return 'Telefone inválido';
+        }
+        break;
+      case 'datanascimento':
+        final parts = value.split('/');
+        if (parts.length != 3) return 'Data inválida';
+
+        try {
+          final date = DateTime(
+            int.parse(parts[2]),
+            int.parse(parts[1]),
+            int.parse(parts[0]),
+          );
+          if (date.isAfter(DateTime.now())) {
+            return 'Data não pode ser futura';
+          }
+        } catch (e) {
+          return 'Data inválida';
+        }
+        break;
+    }
+    return null;
+  };
 }

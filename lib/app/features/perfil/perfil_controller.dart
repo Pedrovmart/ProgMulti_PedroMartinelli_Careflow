@@ -140,7 +140,6 @@ class PerfilController extends ChangeNotifier {
                 email: profissional.email,
                 especialidade: profissional.especialidade,
                 numeroRegistro: profissional.numeroRegistro,
-                idEmpresa: profissional.idEmpresa,
                 dataNascimento: profissional.dataNascimento,
                 telefone: profissional.telefone,
                 profileUrlImage: url,
@@ -253,49 +252,62 @@ class PerfilController extends ChangeNotifier {
 
     try {
       final userId = _authProvider.currentUser?.uid;
-      if (userId == null) {
-        log('Usuário não autenticado para salvar perfil');
-        _setLoading(false);
-        return;
+      if (userId == null) throw Exception('Usuário não autenticado');
+
+      // Upload de imagem se necessário
+      if (_imageFile != null && canEditProfileImage) {
+        await _uploadImageForPaciente(userId);
       }
 
+      // Atualizar dados do usuário
       if (_userType == 'paciente' && _user is Paciente) {
-        if (_imageFile != null && canEditProfileImage) {
-          await _uploadImageForPaciente(userId);
+        final paciente = _user as Paciente;
+
+        DateTime? newDate;
+        if (updatedData['dataNascimento'] != null) {
+          final dateParts = updatedData['dataNascimento']!.split('/');
+          if (dateParts.length == 3) {
+            try {
+              newDate = DateTime(
+                int.parse(dateParts[2]), // ano
+                int.parse(dateParts[1]), // mês
+                int.parse(dateParts[0]), // dia
+              );
+            } catch (e) {
+              log('Erro ao converter data: $e');
+            }
+          }
         }
-        final currentPaciente = _user as Paciente;
         final updatedPaciente = Paciente(
-          id: currentPaciente.id,
-          nome: updatedData['nome'] ?? currentPaciente.nome,
-          email: currentPaciente.email,
-          cpf: currentPaciente.cpf,
-          dataNascimento: currentPaciente.dataNascimento,
-          telefone: updatedData['telefone'] ?? currentPaciente.telefone,
-          endereco: updatedData['endereco'] ?? currentPaciente.endereco,
-          createdAt: currentPaciente.createdAt, // Preserve createdAt
+          id: paciente.id,
+          nome: updatedData['nome'] ?? paciente.nome,
+          email: paciente.email,
+          telefone: updatedData['telefone'] ?? paciente.telefone,
+          endereco: updatedData['endereco'] ?? paciente.endereco,
+          cpf: updatedData['cpf'] ?? paciente.cpf,
+          dataNascimento: newDate ?? paciente.dataNascimento,
+          profileUrlImage: paciente.profileUrlImage,
         );
-        await _pacienteProvider.updatePaciente(updatedPaciente);
-        _user = updatedPaciente;
+
+        await _pacienteProvider.update(userId, updatedPaciente);
       } else if (_userType == 'profissional' && _user is Profissional) {
-        final currentProfissional = _user as Profissional;
+        final profissional = _user as Profissional;
         final updatedProfissional = Profissional(
-          id: currentProfissional.id,
-          nome: updatedData['nome'] ?? currentProfissional.nome,
-          email: currentProfissional.email,
+          id: profissional.id,
+          nome: updatedData['nome'] ?? profissional.nome,
+          email: profissional.email,
+          telefone: updatedData['telefone'] ?? profissional.telefone,
           especialidade:
-              updatedData['especialidade'] ?? currentProfissional.especialidade,
-          numeroRegistro:
-              updatedData['numeroRegistro'] ??
-              currentProfissional.numeroRegistro,
-          idEmpresa: currentProfissional.idEmpresa,
-          dataNascimento:
-              updatedData['dataNascimento'] ??
-              currentProfissional.dataNascimento,
-          telefone: updatedData['telefone'] ?? currentProfissional.telefone,
+              updatedData['especialidade'] ?? profissional.especialidade,
+          numeroRegistro: profissional.numeroRegistro,
+          profileUrlImage: profissional.profileUrlImage,
         );
-        await _profissionalProvider.updateProfissional(updatedProfissional);
-        _user = updatedProfissional;
+
+        await _profissionalProvider.update(userId, updatedProfissional);
       }
+
+      // Recarregar dados do usuário
+      await loadUserData();
       notifyListeners();
     } catch (e) {
       log('Erro ao salvar dados do perfil: $e');
@@ -351,8 +363,14 @@ class PerfilController extends ChangeNotifier {
         'dataNascimento':
             '${paciente.dataNascimento.day}/${paciente.dataNascimento.month}/${paciente.dataNascimento.year}',
       };
-      editableFields = ['nome', 'telefone', 'endereco'];
-      readOnlyFields = ['email', 'cpf', 'dataNascimento'];
+      editableFields = [
+        'nome',
+        'telefone',
+        'endereco',
+        'cpf',
+        'dataNascimento',
+      ];
+      readOnlyFields = ['email'];
     } else if (_userType == 'profissional' && _user is Profissional) {
       final profissional = _user as Profissional;
       initialData = {
