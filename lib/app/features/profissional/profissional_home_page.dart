@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'dart:developer';
+
 import 'package:provider/provider.dart';
 
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/consultas_provider.dart';
-import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
 import '../../core/repositories/n8n_paciente_repository.dart'; // Changed import
 import '../../core/http/n8n_http_client.dart'; // Added import
 import 'controllers/profissional_home_controller.dart';
 import 'widgets/home_stats_cards.dart';
+import '../../widgets/shared/upcoming_appointments_list.dart';
+import '../../widgets/shared/upcoming_appointment_card.dart';
 
 class ProfissionalHomePage extends StatefulWidget {
   const ProfissionalHomePage({super.key});
@@ -97,127 +100,30 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
   }
 
   Widget _buildUpcomingAppointmentsSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(4.0, 0, 4.0, 12.0),
-          child: Text(
-            'Próximos compromissos',
-            style: AppTextStyles.headlineMedium,
-          ),
-        ),
-        if (_controller.isLoading)
-          const Center(child: Padding(
-            padding: EdgeInsets.all(20.0),
-            child: CircularProgressIndicator(),
-          ))
-        else if (_controller.proximosCompromissos.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 3.0,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.event_busy_outlined,
-                      size: 48,
-                      color: AppColors.primaryDark,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Sua agenda está livre hoje',
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Nenhum compromisso agendado para o dia',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else
-          ..._controller.proximosCompromissos.map((compromisso) {
-            return Column(
-              children: [
-                _buildAppointmentItem(
-                  context: context,
-                  imageUrl: compromisso["profileUrlImage"] as String? ?? 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(compromisso["nome"] as String? ?? 'N A')}&background=random',
-                  name: 'Consulta com ${compromisso["nome"]}',
-                  time: compromisso["horario"],
-                ),
-                const SizedBox(height: 12.0),
-              ],
-            );
-          }),
-      ],
-    );
-  }
+    final compromissosData = _controller.proximosCompromissos.map((compromisso) {
+      final nomePaciente = compromisso["nome"] as String? ?? 'Paciente';
+      return AppointmentCardData(
+        imageUrl: compromisso["profileUrlImage"] as String? ?? 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(nomePaciente)}&background=random&color=FFFFFF',
+        title: 'Consulta com $nomePaciente',
+        subtitle1: null, // Profissional view might not have a subtitle1 like specialty
+        subtitle2: compromisso["horario"] as String? ?? 'Horário indefinido',
+        onTap: () {
+          // TODO: Implement navigation to appointment details or patient profile
+          log('Tapped appointment with $nomePaciente');
+        },
+      );
+    }).toList();
 
-  Widget _buildAppointmentItem({
-    required BuildContext context,
-    required String imageUrl,
-    required String name,
-    required String time,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Theme.of(context).dividerColor, width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 3.0,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(radius: 24.0, backgroundImage: NetworkImage(imageUrl)),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: AppTextStyles.titleMedium),
-                Text(
-                  time,
-                  style: AppTextStyles.caption.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.chevron_right_outlined,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-      ),
+    return UpcomingAppointmentsList(
+      title: 'Próximos compromissos',
+      appointments: compromissosData,
+      isLoading: _controller.isLoading,
+      emptyListMessage: 'Sua agenda está livre.',
+      emptyListIcon: Icons.event_note_outlined, // More relevant icon
+      onSeeAll: () {
+        // TODO: Implement navigation to full schedule page
+        log('Tapped see all appointments');
+      },
     );
   }
 
