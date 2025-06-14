@@ -50,8 +50,8 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         color: AppColors.primaryDark,
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(24.0),
-          bottomRight: Radius.circular(24.0),
+          bottomLeft: Radius.circular(20.0),
+          bottomRight: Radius.circular(20.0),
         ),
         boxShadow: [
           BoxShadow(

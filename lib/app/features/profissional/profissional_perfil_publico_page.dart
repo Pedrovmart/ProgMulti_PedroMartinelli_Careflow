@@ -1,5 +1,6 @@
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 import 'package:flutter/material.dart';
+
 import 'package:careflow_app/app/models/profissional_model.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 
@@ -50,84 +51,60 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
 
   SliverToBoxAdapter _buildHeader(
       BuildContext context, Profissional profissional) {
+    final ThemeData theme = Theme.of(context);
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 280.0,
-        child: Stack(
-          fit: StackFit.expand,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildProfileImage(profissional),
-            _buildGradientOverlay(),
-            _buildHeaderText(context, profissional),
+            _buildCircleAvatar(profissional),
+            const SizedBox(height: 16.0),
+            Text(
+              profissional.nome,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.headlineSmall.copyWith(
+                color: theme.colorScheme.onBackground, // Cor do texto adaptada ao fundo
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              profissional.especialidade,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.titleMedium.copyWith(
+                color: theme.colorScheme.onBackground.withOpacity(0.8), // Cor do texto adaptada
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileImage(Profissional profissional) {
-    if (profissional.profileUrlImage != null &&
-        profissional.profileUrlImage!.isNotEmpty) {
-      return Image.network(
-        profissional.profileUrlImage!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholderImage(),
-      );
-    }
-    return _buildPlaceholderImage();
-  }
+  // _buildProfileImageBackground não é mais necessário
 
-  Widget _buildPlaceholderImage() {
-    return Container(
-      color: AppColors.primary.withOpacity(0.6),
-      child: const Icon(Icons.person, size: 120, color: AppColors.light),
+  Widget _buildCircleAvatar(Profissional profissional) {
+    return CircleAvatar(
+      radius: 64, // Tamanho do avatar ligeiramente aumentado
+      backgroundColor: AppColors.light.withOpacity(0.2), // Fundo sutil para o avatar
+      backgroundImage: (profissional.profileUrlImage != null &&
+              profissional.profileUrlImage!.isNotEmpty)
+          ? NetworkImage(profissional.profileUrlImage!)
+          : null,
+      child: (profissional.profileUrlImage == null ||
+              profissional.profileUrlImage!.isEmpty)
+          ? Icon(
+              Icons.person_rounded,
+              size: 70,
+              color: AppColors.primary.withOpacity(0.8),
+            )
+          : null,
     );
   }
 
-  Widget _buildGradientOverlay() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.black.withOpacity(0.6),
-            Colors.transparent,
-            Colors.black.withOpacity(0.8)
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: const [0.0, 0.5, 1.0],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderText(BuildContext context, Profissional profissional) {
-    return Positioned(
-      bottom: 20,
-      left: 20,
-      right: 20,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            profissional.nome,
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            profissional.especialidade,
-            style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.white.withOpacity(0.9),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // _buildGradientOverlay não é mais necessário
 
   SliverToBoxAdapter _buildBody(BuildContext context, Profissional profissional) {
     return SliverToBoxAdapter(
