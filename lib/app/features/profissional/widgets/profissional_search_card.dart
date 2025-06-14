@@ -7,12 +7,14 @@ class ProfissionalSearchCard extends StatelessWidget {
   final String nome;
   final String especialidade;
   final String numeroRegistro;
+  final String? profileUrlImage; // Added profileUrlImage
 
   const ProfissionalSearchCard({
     super.key,
     required this.nome,
     required this.especialidade,
     required this.numeroRegistro,
+    this.profileUrlImage, // Added profileUrlImage to constructor
   });
 
   @override
@@ -29,7 +31,12 @@ class ProfissionalSearchCard extends StatelessWidget {
               child: CircleAvatar(
                 radius: 30,
                 backgroundColor: AppColors.accentLight.withOpacity(0.2),
-                child: const Icon(Icons.person, size: 40, color: AppColors.accent),
+                backgroundImage: (profileUrlImage != null && profileUrlImage!.isNotEmpty)
+                    ? NetworkImage(profileUrlImage!)
+                    : null,
+                child: (profileUrlImage == null || profileUrlImage!.isEmpty)
+                    ? const Icon(Icons.person, size: 40, color: AppColors.accent)
+                    : null,
               ),
             ),
             const SizedBox(width: 16),

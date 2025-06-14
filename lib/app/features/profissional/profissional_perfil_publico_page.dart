@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:careflow_app/app/core/ui/app_colors.dart'; // Added AppColors import
 
 class ProfissionalPerfilPublicoPage extends StatelessWidget {
   const ProfissionalPerfilPublicoPage({super.key});
@@ -28,17 +29,15 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: const Color.fromARGB(90, 0, 0, 0),
-                child: const Icon(Icons.person, size: 50, color: Colors.white),
-                //TODO: BLOCO PARA QUANDO USER TIVER IMAGEM
-                /*                 backgroundImage:
-                    profissional.fotoUrl != null
-                        ? NetworkImage(profissional.fotoUrl!)
-                        : null,
-                child:
-                    profissional.fotoUrl == null
-                        ? const Icon(Icons.person, size: 50)
-                        : null, */
+                backgroundColor: (profissional.profileUrlImage != null && profissional.profileUrlImage!.isNotEmpty)
+                    ? Colors.transparent 
+                    : AppColors.accentLight.withOpacity(0.2),
+                backgroundImage: (profissional.profileUrlImage != null && profissional.profileUrlImage!.isNotEmpty)
+                    ? NetworkImage(profissional.profileUrlImage!)
+                    : null,
+                child: (profissional.profileUrlImage == null || profissional.profileUrlImage!.isEmpty)
+                    ? const Icon(Icons.person, size: 50, color: AppColors.accent)
+                    : null,
               ),
             ),
             const SizedBox(height: 16),

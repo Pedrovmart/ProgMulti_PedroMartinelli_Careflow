@@ -100,6 +100,7 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                             nome: profissional.nome,
                             especialidade: profissional.especialidade,
                             numeroRegistro: profissional.numeroRegistro,
+                            profileUrlImage: profissional.profileUrlImage,
                           ),
                         );
                       },
