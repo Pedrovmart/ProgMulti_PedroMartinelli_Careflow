@@ -166,7 +166,7 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       );
 
       // Atualiza o perfil do profissional com a nova URL da imagem
-      await _httpClient.post(
+      await _httpClient.put(
         '/atualizaImagemUser?idUser=$profissionalId',
         data: {'profileImageUrl': imageUrl, 'userType': 'profissionais'},
       );

@@ -28,7 +28,7 @@ class PerfilController extends ChangeNotifier {
   String? get profileImageUrl => _profileImageUrl;
   File? get imageFile => _imageFile;
   String get userType => _userType;
-  bool get canEditProfileImage => _userType == 'paciente';
+  bool get canEditProfileImage => _userType == 'paciente' || _userType == 'profissional';
 
   /// Atualiza a URL da imagem de perfil e notifica os ouvintes
   void updateProfileImage(String imageUrl) {
@@ -246,6 +246,49 @@ class PerfilController extends ChangeNotifier {
     }
   }
 
+  Future<void> _uploadImageForProfissional(String userId) async {
+    if (_imageFile == null || _userType != 'profissional') return;
+
+    try {
+      _setLoading(true);
+      final url = await _profissionalProvider.uploadProfileImage(
+        userId,
+        _imageFile!,
+      );
+      if (url != null) {
+        _profileImageUrl = url;
+        _imageFile = null;
+
+        // Atualiza o usuário local com a nova URL da imagem
+        if (_user is Profissional) {
+          final profissional = _user as Profissional;
+          _user = Profissional(
+            id: profissional.id,
+            nome: profissional.nome,
+            email: profissional.email,
+            telefone: profissional.telefone,
+            especialidade: profissional.especialidade,
+            numeroRegistro: profissional.numeroRegistro,
+            dataNascimento: profissional.dataNascimento,
+            profileUrlImage: url,
+          );
+
+          // Força a atualização do profissional no provider
+          await _profissionalProvider.getProfissionalById(userId);
+        }
+
+        notifyListeners();
+      } else {
+        log('Falha ao enviar imagem do profissional: URL não retornada');
+      }
+    } catch (e) {
+      log('Erro ao enviar imagem do profissional: $e');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> saveProfileData(Map<String, String> updatedData) async {
     if (_user == null) return;
     _setLoading(true);
@@ -255,8 +298,12 @@ class PerfilController extends ChangeNotifier {
       if (userId == null) throw Exception('Usuário não autenticado');
 
       // Upload de imagem se necessário
-      if (_imageFile != null && canEditProfileImage) {
-        await _uploadImageForPaciente(userId);
+      if (_imageFile != null) {
+        if (_userType == 'paciente') {
+          await _uploadImageForPaciente(userId);
+        } else if (_userType == 'profissional') {
+          await _uploadImageForProfissional(userId);
+        }
       }
 
       // Atualizar dados do usuário
