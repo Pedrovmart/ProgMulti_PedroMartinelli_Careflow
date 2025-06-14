@@ -5,7 +5,11 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
 import '../../widgets/shared/upcoming_appointments_list.dart';
-import '../../widgets/shared/upcoming_appointment_card.dart';
+// import '../../widgets/shared/upcoming_appointment_card.dart'; // Unused import
+// import 'package:provider/provider.dart'; // Duplicate import, already imported above
+import '../../core/providers/consultas_provider.dart';
+import '../../core/repositories/n8n_profissional_repository.dart';
+import 'paciente_home_controller.dart';
 
 class PacienteHomePage extends StatefulWidget {
   const PacienteHomePage({super.key});
@@ -17,16 +21,24 @@ class PacienteHomePage extends StatefulWidget {
 }
 
 class _PacienteHomePageState extends State<PacienteHomePage> {
-  // late final PacienteHomeController _controller; // You can initialize this if needed
-  // bool _isInitialized = false;
+  // String _userName = 'Usuário'; // Unused field
+  late PacienteHomeController _controller;
+  bool _showAllAppointments = false;
 
   @override
   void initState() {
     super.initState();
-    // If you have a controller, initialize it here
-    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    // _controller = PacienteHomeController(authProvider: authProvider);
-    // _controller.carregarDados(); // Example method call
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    // _userName = authProvider.currentUser?.displayName ?? 'Usuário'; // User name is fetched directly in _buildWelcomeSection
+    
+    // Initialize controller here where context is available for providers
+    // Note: Repositories are typically provided or instantiated. Assuming N8nProfissionalRepository is available via Provider.
+    // If N8nProfissionalRepository is not provided, it might need to be instantiated directly or passed differently.
+    _controller = PacienteHomeController(
+      consultasProvider: Provider.of<ConsultasProvider>(context, listen: false),
+      profissionalRepository: Provider.of<N8nProfissionalRepository>(context, listen: false), // Assuming this is provided
+      pacienteId: authProvider.currentUser!.uid, // Assuming currentUser is not null here
+    );
   }
 
   @override
@@ -36,8 +48,9 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
+      body: ChangeNotifierProvider.value(
+        value: _controller, // Provide controller to the widget tree if needed by other descendants
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,46 +88,86 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
   }
 
   Widget _buildUpcomingAppointmentsSection(BuildContext context) {
-    // Placeholder: Replace with actual appointment data and logic from a controller
-    bool isLoading = false; // Example state, should come from controller
-    List<Map<String, String>> placeholderAppointments = [
-      {
-        'imageUrl': 'https://via.placeholder.com/150/011936/FFFFFF?Text=Dr.A',
-        'name': 'Dr. Carlos Andrade',
-        'specialty': 'Cardiologista',
-        'time': 'Amanhã, 10:00',
-      },
-      {
-        'imageUrl': 'https://via.placeholder.com/150/465362/FFFFFF?Text=Dr.B',
-        'name': 'Dra. Ana Paula',
-        'specialty': 'Dermatologista',
-        'time': '20/07, 14:30',
-      },
-    ];
+    return ChangeNotifierProvider.value(
+      value: _controller,
+      child: Consumer<PacienteHomeController>(
+        builder: (context, controller, child) {
+          if (controller.error != null) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Text(
+                  'Erro ao carregar consultas: ${controller.error}\nPor favor, tente novamente mais tarde.',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyLarge.copyWith(color: AppColors.accentDark), // Using accentDark as error color
+                ),
+              ),
+            );
+          }
 
-    final appointmentsData = placeholderAppointments.map((appt) {
-      return AppointmentCardData(
-        imageUrl: appt['imageUrl']!,
-        title: appt['name']!,
-        subtitle1: appt['specialty']!,
-        subtitle2: appt['time']!,
-        onTap: () {
-          // TODO: Implement navigation to appointment details or professional profile
-          // log('Tapped appointment with ${appt['name']}');
+          final appointmentsToShow = _showAllAppointments
+              ? controller.upcomingAppointments
+              : controller.upcomingAppointments.take(3).toList();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              UpcomingAppointmentsList(
+                title: 'Próximas Consultas',
+                appointments: appointmentsToShow,
+                isLoading: controller.isLoading,
+                emptyListMessage: 'Você não possui consultas agendadas.',
+                emptyListIcon: Icons.calendar_today_outlined,
+                onSeeAll: null, 
+              ),
+              if (!_showAllAppointments && controller.hasMoreUpcomingAppointments)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _showAllAppointments = true;
+                        });
+                      },
+                      child: Text(
+                        'Ver mais',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (_showAllAppointments && controller.hasMoreUpcomingAppointments)
+                 Padding(
+                  padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _showAllAppointments = false;
+                        });
+                      },
+                      child: Text(
+                        'Ver menos',
+                         style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                          decoration: TextDecoration.underline,
+                          decorationColor: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
         },
-      );
-    }).toList();
-
-    return UpcomingAppointmentsList(
-      title: 'Próximas Consultas',
-      appointments: appointmentsData,
-      isLoading: isLoading, // This should come from a PacienteHomeController
-      emptyListMessage: 'Você não possui consultas agendadas.',
-      emptyListIcon: Icons.calendar_today_outlined,
-      onSeeAll: () {
-        // TODO: Implement navigation to full appointments list for patient
-        // log('Tapped see all patient appointments');
-      },
+      ),
     );
   }
 
@@ -146,7 +199,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.light,
               onPressed: () {
-                // TODO: Implement navigation
+                // TODO: Implement navigation for 'Buscar Profissionais'
               },
             ),
             _buildQuickActionButton(
@@ -156,7 +209,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               backgroundColor: AppColors.accent,
               foregroundColor: Colors.white,
               onPressed: () {
-                // TODO: Implement navigation
+                _controller.navigateToAgendarConsulta(context);
               },
             ),
             _buildQuickActionButton(
@@ -166,8 +219,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               backgroundColor: AppColors.success,
               foregroundColor: Colors.white,
               onPressed: () {
-                // final PacienteHomeController controller = PacienteHomeController();
-                // controller.navigateToHistoricoMedico(context);
+                _controller.navigateToHistoricoMedico(context);
               },
             ),
             _buildQuickActionButton(
@@ -177,8 +229,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               backgroundColor: AppColors.primaryDark,
               foregroundColor: AppColors.light,
               onPressed: () {
-                // final PacienteHomeController controller = PacienteHomeController();
-                // controller.navigateToPerfil(context);
+                _controller.navigateToPerfil(context);
               },
             ),
           ],

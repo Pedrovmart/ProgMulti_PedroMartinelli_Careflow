@@ -5,6 +5,8 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
+import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart'; // Added import
+import 'package:careflow_app/app/core/dependency_injection.dart'; // Added import
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {
@@ -19,6 +21,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfissionalProvider()),
         ChangeNotifierProvider(create: (_) => PacienteProvider()),
         ChangeNotifierProvider(create: (_) => ConsultasProvider()),
+        Provider<N8nProfissionalRepository>(create: (_) => DependencyInjection.profissionalRepository), // Added N8nProfissionalRepository
         ChangeNotifierProxyProvider3<
           AuthProvider,
           PacienteProvider,
