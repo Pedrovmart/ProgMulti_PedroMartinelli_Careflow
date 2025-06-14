@@ -2,12 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
+import 'package:careflow_app/app/features/consultas/base_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 class EventsListWidget extends StatefulWidget {
-  final PacientesAgendamentosController controller;
+  final BaseAgendamentosController controller;
   
   const EventsListWidget({super.key, required this.controller});
 
@@ -153,7 +153,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   void _showEditDialog(BuildContext context, ConsultaModel consulta) {
     // Controladores para os campos de texto
     final descricaoController = TextEditingController(text: consulta.descricao);
-    final horaController = TextEditingController(text: consulta.hora);
+    final timeController = TextEditingController(text: consulta.hora);
     
     showDialog(
       context: context,
@@ -174,7 +174,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
               ),
               const SizedBox(height: 8),
               TextField(
-                controller: horaController,
+                controller: timeController,
                 decoration: const InputDecoration(
                   labelText: 'Horário',
                   labelStyle: TextStyle(color: AppColors.primary),
@@ -197,7 +197,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
               final consultaAtualizada = ConsultaModel(
                 id: consulta.id,
                 data: consulta.data,
-                hora: horaController.text,
+                hora: timeController.text,
                 descricao: descricaoController.text,
                 queixaPaciente: consulta.queixaPaciente,
                 idPaciente: consulta.idPaciente,

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
-import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:careflow_app/app/features/consultas/base_agendamentos_controller.dart';
 
 class FormWidget extends StatefulWidget {
-  final PacientesAgendamentosController controller;
+  final BaseAgendamentosController controller;
 
-  const FormWidget({super.key, required this.controller});
+  const FormWidget({
+    super.key,
+    required this.controller,
+  });
 
   @override
   State<FormWidget> createState() => _FormWidgetState();
@@ -105,7 +107,7 @@ class _FormWidgetState extends State<FormWidget> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: widget.controller.dataController,
+              controller: widget.controller.dateController,
               readOnly: true,
               decoration: InputDecoration(
                 labelText: 'Data Selecionada',
@@ -147,7 +149,7 @@ class _FormWidgetState extends State<FormWidget> {
                 ).then((time) {
                   if (time != null && currentContext.mounted) {
                     widget.controller.selectedTime = time;
-                    widget.controller.horaController.text = time.format(
+                    widget.controller.timeController.text = time.format(
                       currentContext,
                     );
                   }
@@ -155,7 +157,7 @@ class _FormWidgetState extends State<FormWidget> {
               },
               child: AbsorbPointer(
                 child: TextField(
-                  controller: widget.controller.horaController,
+                  controller: widget.controller.timeController,
                   decoration: InputDecoration(
                     labelText: 'Hora',
                     hintText: 'Selecione a hora',
@@ -265,16 +267,15 @@ class _FormWidgetState extends State<FormWidget> {
                               ),
                             ),
                           ]
-                          : widget.controller.profissionais.map((
-                            Profissional profissional,
-                          ) {
-                            return DropdownMenuItem<String>(
-                              value: profissional.id,
-                              child: Text(
-                                '${profissional.nome} - ${profissional.especialidade}',
-                              ),
-                            );
-                          }).toList(),
+                          : widget.controller.profissionais
+                              .map<DropdownMenuItem<String>>((profissional) {
+                                return DropdownMenuItem<String>(
+                                  value: profissional.id,
+                                  child: Text(
+                                    '${profissional.nome}${profissional.especialidade.isNotEmpty ? ' - ${profissional.especialidade}' : ''}',
+                                  ),
+                                );
+                              }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       widget.controller.selectedProfissionalId = newValue;
@@ -299,7 +300,7 @@ class _FormWidgetState extends State<FormWidget> {
                     }
 
                     widget.controller.queixaPacienteController.clear();
-                    widget.controller.horaController.clear();
+                    widget.controller.timeController.clear();
                     widget.controller.selectedProfissionalId = null;
                     widget.controller.selectedTime = null;
 
