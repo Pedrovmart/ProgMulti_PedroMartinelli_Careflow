@@ -140,16 +140,12 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
           ),
           body: Stack(
             children: [
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 76),
-                  child: widget.child,
-                ),
-              ),
-              Positioned(
-                bottom: 15,
-                left: 15,
-                right: 15,
+              // O conteúdo principal agora preenche toda a Stack.
+              widget.child,
+
+              // A NavBar é alinhada na parte inferior. A margem interna do próprio widget cuidará do espaçamento.
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: NavBarWidget(
                   onTap: (index) {
                     context.go(_routes[index]);
