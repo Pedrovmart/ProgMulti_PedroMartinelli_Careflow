@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/consultas_provider.dart';
 import '../../../models/consulta_model.dart';
+import '../../../core/repositories/n8n_paciente_repository.dart';
 
 class ProfissionalHomeController extends ChangeNotifier {
   final ConsultasProvider _consultasProvider;
   final AuthProvider _authProvider;
+  final N8nPacienteRepository _n8nPacienteRepository;
   
   String _pacientesHoje = '0';
   String _consultasTotal = '0';
@@ -30,8 +32,10 @@ class ProfissionalHomeController extends ChangeNotifier {
   ProfissionalHomeController({
     required ConsultasProvider consultasProvider,
     required AuthProvider authProvider,
+    required N8nPacienteRepository n8nPacienteRepository,
   }) : _consultasProvider = consultasProvider,
-       _authProvider = authProvider;
+       _authProvider = authProvider,
+       _n8nPacienteRepository = n8nPacienteRepository;
   
   Future<void> carregarDados() async {
     _isLoading = true;
@@ -48,7 +52,7 @@ class ProfissionalHomeController extends ChangeNotifier {
       await _consultasProvider.fetchConsultasPorProfissional(profissionalId);
       final consultas = _consultasProvider.consultas;
       
-      _processarDados(consultas);
+      await _processarDados(consultas);
     } catch (e) {
       _errorMessage = "Erro ao buscar dados: ${e.toString()}";
       log(_errorMessage!);
@@ -70,7 +74,7 @@ class ProfissionalHomeController extends ChangeNotifier {
     notifyListeners();
   }
   
-  void _processarDados(List<ConsultaModel> consultas) {
+  Future<void> _processarDados(List<ConsultaModel> consultas) async {
     log('Processando dados: ${consultas.length} consultas recebidas');
     log('Data/hora atual local: ${DateTime.now().toLocal()}');
     log('Data/hora atual UTC: ${DateTime.now().toUtc()}');
@@ -162,20 +166,33 @@ class ProfissionalHomeController extends ChangeNotifier {
     
     final proximosCompromissos = <Map<String, dynamic>>[];
     
+    // 'hoje' is already defined in the outer scope of _processarDados
     for (var consulta in consultasFuturas) {
       final horaInicio = consulta.hora;
       final horaFim = _calcularHoraFim(horaInicio);
-      
-      final dataConsulta = _parseData(consulta.data);
+      final dataConsulta = _parseData(consulta.data); // Parse dataConsulta inside the loop
+
       final horario = (dataConsulta != null && dataConsulta.year == hoje.year && 
                      dataConsulta.month == hoje.month && dataConsulta.day == hoje.day)
           ? '$horaInicio - $horaFim' 
           : '$horaInicio - $horaFim (${consulta.data})';
+
+      String? profileUrlImage;
+      if (consulta.idPaciente.isNotEmpty) {
+        try {
+          // Use N8nPacienteRepository to get the profile image URL
+          profileUrlImage = await _n8nPacienteRepository.getProfileImageUrl(consulta.idPaciente);
+          log('Imagem de perfil para ${consulta.idPaciente}: $profileUrlImage');
+        } catch (e) {
+          log('Erro ao buscar URL da imagem de perfil do paciente ${consulta.idPaciente}: $e');
+        }
+      }
       
       _todasAsConsultasFuturas.add({
-        'nome': consulta.nome,
+        'nome': consulta.nome, // Use dot notation
         'horario': horario,
-        'id': consulta.id ?? 'temp-${consulta.idPaciente}-${consulta.data}-${consulta.hora}',
+        'id': consulta.id ?? 'temp-${consulta.idPaciente}-${consulta.data}-${consulta.hora}', // Use dot notation
+        'profileUrlImage': profileUrlImage,
       });
     }
     

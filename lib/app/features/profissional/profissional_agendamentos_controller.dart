@@ -24,7 +24,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   TimeOfDay? selectedTime;
   
   // Events map for the calendar
-  @override
   final Map<String, List<ConsultaModel>> events = {};
   
   // Text editing controllers
