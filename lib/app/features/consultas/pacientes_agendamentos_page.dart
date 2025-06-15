@@ -39,7 +39,6 @@ class PacientesAgendamentosPage extends StatelessWidget {
             )..init();
           },
         ),
-        // Garante que o ProfissionalProvider está disponível para os filhos
         ProxyProvider<PacientesAgendamentosController, ProfissionalProvider>(
           update: (_, controller, __) => controller.profissionalProvider,
         ),
@@ -73,6 +72,7 @@ class _PacientesAgendamentosPageContentState
             EventsListWidget(controller: controller),
             const SizedBox(height: 20),
             FormWidget(controller: controller),
+            const SizedBox(height: 90.0), 
           ],
         ),
       ),

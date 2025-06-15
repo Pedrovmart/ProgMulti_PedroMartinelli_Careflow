@@ -5,8 +5,6 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
 import '../../widgets/shared/upcoming_appointments_list.dart';
-// import '../../widgets/shared/upcoming_appointment_card.dart'; // Unused import
-// import 'package:provider/provider.dart'; // Duplicate import, already imported above
 import '../../core/providers/consultas_provider.dart';
 import '../../core/repositories/n8n_profissional_repository.dart';
 import 'paciente_home_controller.dart';
@@ -21,7 +19,6 @@ class PacienteHomePage extends StatefulWidget {
 }
 
 class _PacienteHomePageState extends State<PacienteHomePage> {
-  // String _userName = 'Usuário'; // Unused field
   late PacienteHomeController _controller;
   bool _showAllAppointments = false;
 
@@ -29,15 +26,11 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
   void initState() {
     super.initState();
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    // _userName = authProvider.currentUser?.displayName ?? 'Usuário'; // User name is fetched directly in _buildWelcomeSection
     
-    // Initialize controller here where context is available for providers
-    // Note: Repositories are typically provided or instantiated. Assuming N8nProfissionalRepository is available via Provider.
-    // If N8nProfissionalRepository is not provided, it might need to be instantiated directly or passed differently.
     _controller = PacienteHomeController(
       consultasProvider: Provider.of<ConsultasProvider>(context, listen: false),
-      profissionalRepository: Provider.of<N8nProfissionalRepository>(context, listen: false), // Assuming this is provided
-      pacienteId: authProvider.currentUser!.uid, // Assuming currentUser is not null here
+      profissionalRepository: Provider.of<N8nProfissionalRepository>(context, listen: false), 
+      pacienteId: authProvider.currentUser!.uid, 
     );
   }
 
@@ -49,7 +42,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ChangeNotifierProvider.value(
-        value: _controller, // Provide controller to the widget tree if needed by other descendants
+        value: _controller, 
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -60,7 +53,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               _buildUpcomingAppointmentsSection(context),
               const SizedBox(height: 24.0),
               _buildQuickActionsSection(context),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 70.0),
             ],
           ),
         ),
@@ -190,24 +183,24 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
           crossAxisCount: 2,
           crossAxisSpacing: 12.0,
           mainAxisSpacing: 12.0,
-          childAspectRatio: 1.2, // Adjust as needed for button size
+          childAspectRatio: 1.2, 
           children: [
             _buildQuickActionButton(
               context: context,
               icon: Icons.search_rounded,
               label: 'Buscar Profissionais',
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.light,
+              backgroundColor: AppColors.light , 
+              foregroundColor: AppColors.primaryDark,
               onPressed: () {
-                // TODO: Implement navigation for 'Buscar Profissionais'
+                // TODO: Implementar navegação para 'Buscar Profissionais'
               },
             ),
             _buildQuickActionButton(
               context: context,
               icon: Icons.calendar_month_rounded,
               label: 'Agendar Consulta',
-              backgroundColor: AppColors.accent,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.light, 
+              foregroundColor: AppColors.primaryDark, 
               onPressed: () {
                 _controller.navigateToAgendarConsulta(context);
               },
@@ -216,8 +209,8 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               context: context,
               icon: Icons.receipt_long_rounded,
               label: 'Histórico Médico',
-              backgroundColor: AppColors.success,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.light, 
+              foregroundColor: AppColors.primaryDark, 
               onPressed: () {
                 _controller.navigateToHistoricoMedico(context);
               },
@@ -226,8 +219,8 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               context: context,
               icon: Icons.person_outline_rounded,
               label: 'Meu Perfil',
-              backgroundColor: AppColors.primaryDark,
-              foregroundColor: AppColors.light,
+              backgroundColor: AppColors.light,
+              foregroundColor: AppColors.primaryDark,
               onPressed: () {
                 _controller.navigateToPerfil(context);
               },
@@ -256,7 +249,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         elevation: 2.0,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

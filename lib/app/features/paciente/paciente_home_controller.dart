@@ -80,7 +80,7 @@ class PacienteHomeController with ChangeNotifier {
 
         appointmentsData.add(
           AppointmentCardData(
-            imageUrl: profissional?.profileUrlImage ?? 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(profissional?.nome ?? 'P')}&background=random&color=FFFFFF',
+            imageUrl: profissional?.profileUrlImage ?? '',
             title: profissional?.nome ?? 'Profissional não encontrado',
             subtitle1: profissional?.especialidade ?? 'Especialidade não informada',
             subtitle2: '${consulta.data} às ${consulta.hora}',

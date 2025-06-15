@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/ui/app_colors.dart';
+import '../../core/ui/ui_helpers.dart';
 import '../../core/ui/app_text_styles.dart';
 
 class AppointmentCardData {
@@ -34,12 +35,12 @@ class UpcomingAppointmentCard extends StatelessWidget {
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
-            color: Theme.of(context).dividerColor.withOpacity(0.5),
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
             width: 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8.0,
               offset: const Offset(0, 2),
             ),
@@ -47,11 +48,24 @@ class UpcomingAppointmentCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 28.0,
-              backgroundImage: NetworkImage(data.imageUrl),
-              backgroundColor: AppColors.light.withOpacity(0.5),
-            ),
+            (data.imageUrl.isNotEmpty)
+                ? CircleAvatar(
+                    radius: 28.0,
+                    backgroundImage: NetworkImage(data.imageUrl),
+                    backgroundColor: AppColors.light.withValues(alpha: 0.5), 
+                  )
+                : CircleAvatar(
+                    radius: 28.0,
+                    backgroundColor: UiHelpers.getAvatarBackgroundColor(data.title), 
+                    child: Text(
+                      UiHelpers.getInitials(data.title),
+                      style: TextStyle(
+                        color: UiHelpers.getInitialsTextColor(UiHelpers.getAvatarBackgroundColor(data.title)),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0, 
+                      ),
+                    ),
+                  ),
             const SizedBox(width: 16.0),
             Expanded(
               child: Column(
