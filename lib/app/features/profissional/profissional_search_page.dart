@@ -41,9 +41,6 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Buscar Profissionais', style: AppTextStyles.headlineSmall),
-      ),
       body: Column(
         children: [
           Padding(
