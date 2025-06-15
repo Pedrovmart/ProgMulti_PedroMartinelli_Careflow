@@ -171,24 +171,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Busca uma consulta específica pelo ID (alternativa usando o método base) REDUNDANTE??
-  Future<ConsultaModel?> getConsultaById(String consultaId) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    try {
-      final consulta = await _consultasRepository.getById(consultaId);
-      return consulta;
-    } catch (e) {
-      _error = "Erro ao buscar consulta pelo ID: ${e.toString()}";
-      rethrow;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-  
   Future<Map<String, dynamic>> getDetalhesConsultaProfissionalPaciente({
     required String idProfissional,
     required String idPaciente,

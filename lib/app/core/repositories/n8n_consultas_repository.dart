@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/base_repository.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
@@ -12,11 +12,10 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   final String _endpointConsultasProfissional = '/consultasProfissional';
   final String _endpointNovaConsulta = '/novaConsulta';
   final String _endpointGetConsultas = '/consultas';
-  final String _endpointUpdateConsulta = '/atualizarConsulta';
+  final String _endpointUpdateConsulta = '/atualizaConsulta';
   final String _endpointDeleteConsulta = '/cancelarConsulta';
   final String _endpointConsultaProfissionalPaciente = '/consultasProfissionalPaciente';
   final String _endpointAtualizarDiagnostico = '/atualizaDiagnostico';
-  final String _endpointplaceholder = '/placeholder';
 
   N8nConsultasRepository(this._httpClient);
 
@@ -71,20 +70,12 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override //TODO:nao é necessário
+  @override
   Future<ConsultaModel?> getById(String id) async {
-    try {
-      final response = await _httpClient.get('$_endpointplaceholder/$id');
-      return ConsultaModel.fromMap(response.data);
-    } catch (e) {
-      if (e is DioException && e.response?.statusCode == 404) {
-        return null;
-      }
-      throw Exception('Erro ao buscar consulta: $e');
-    }
+    throw UnimplementedError('Este método não é utilizado por este repositório.');
   }
 
-  @override //TODO: nao é necessario
+  @override
   Future<ConsultaModel> create(ConsultaModel item) async {
     try {
       final response = await _httpClient.post(_endpointNovaConsulta, data: item.toMap());
@@ -93,6 +84,8 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       throw Exception('Erro ao criar consulta: $e');
     }
   }
+
+
 
   @override
   Future<void> update(String id, ConsultaModel item) async {
@@ -103,14 +96,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  @override
-  Future<void> delete(String id) async {
-    try {
-      await _httpClient.delete('$_endpointDeleteConsulta/$id');
-    } catch (e) {
-      throw Exception('Erro ao deletar consulta: $e');
-    }
-  }
+  Future<void> atualizaConsulta(String consultaId, ConsultaModel item) => update(consultaId, item);
 
   /// Atualiza o diagnóstico de uma consulta
   Future<void> atualizarDiagnostico({
@@ -127,6 +113,18 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       throw Exception('Erro ao atualizar diagnóstico: $e');
     }
   }
+
+  @override
+  Future<void> delete(String id) async {
+    try {
+      await _httpClient.delete('$_endpointDeleteConsulta/$id');
+    } catch (e) {
+      throw Exception('Erro ao deletar consulta: $e');
+    }
+  }
+
+  Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
+
 
   // ESSA É A MANEIRA CORRETA PARA MIM FAZER 
   Future<List<ConsultaModel>> fetchConsultasAgendadas() => getAll();
@@ -146,7 +144,6 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
 
   Future<ConsultaModel?> fetchConsultaById(String consultaId) =>
       getById(consultaId);
@@ -173,4 +170,6 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       throw Exception('Erro ao buscar detalhes da consulta: $e');
     }
   }
+
+
 }
