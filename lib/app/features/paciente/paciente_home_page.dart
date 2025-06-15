@@ -192,7 +192,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
               backgroundColor: AppColors.light , 
               foregroundColor: AppColors.primaryDark,
               onPressed: () {
-                // TODO: Implementar navegação para 'Buscar Profissionais'
+                _controller.navigateToBuscarProfissionais(context);
               },
             ),
             _buildQuickActionButton(

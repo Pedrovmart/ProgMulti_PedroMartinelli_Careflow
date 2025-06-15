@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:careflow_app/app/routes/routes.dart';
 import 'package:intl/intl.dart';
 import '../../models/consulta_model.dart';
 import '../../models/profissional_model.dart';
@@ -55,7 +59,7 @@ class PacienteHomeController with ChangeNotifier {
             filteredConsultas.add(consulta);
           }
         } catch (e) {
-          print('Error parsing date for consulta ${consulta.id}: ${consulta.data} - $e');
+          log('Error parsing date for consulta ${consulta.id}: ${consulta.data} - $e');
         }
       }
 
@@ -75,7 +79,7 @@ class PacienteHomeController with ChangeNotifier {
         try {
           profissional = await _profissionalRepository.getById(consulta.idMedico);
         } catch (e) {
-          print('Error fetching professional ${consulta.idMedico} for consulta ${consulta.id}: $e');
+          log('Error fetching professional ${consulta.idMedico} for consulta ${consulta.id}: $e');
         }
 
         appointmentsData.add(
@@ -85,38 +89,33 @@ class PacienteHomeController with ChangeNotifier {
             subtitle1: profissional?.especialidade ?? 'Especialidade não informada',
             subtitle2: '${consulta.data} às ${consulta.hora}',
             onTap: () {
-              print('Tapped appointment with ${profissional?.nome} on ${consulta.data}');
+              log('Tapped appointment with ${profissional?.nome} on ${consulta.data}');
             },
           ),
         );
       }
       _upcomingAppointments = appointmentsData;
     } catch (e) {
-      _error = 'Erro ao buscar compromissos: ${e.toString()}';
-      print(_error);
+      log('Erro ao buscar compromissos: ${e.toString()}');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  void navigateToConsultas(BuildContext context) {
-    // Implementar a lógica de navegação para a página de consultas
-    Navigator.pushNamed(context, '/consultas');
-  }
-
   void navigateToHistoricoMedico(BuildContext context) {
-    // Implementar a lógica de navegação para a página de histórico médico
-    Navigator.pushNamed(context, '/historico_medico');
+    GoRouter.of(context).goNamed(Routes.perfilPacienteName);
   }
 
   void navigateToPerfil(BuildContext context) {
-    // Implementar a lógica de navegação para a página de perfil
-    Navigator.pushNamed(context, '/perfil');
+    GoRouter.of(context).goNamed(Routes.perfilPacienteName);
   }
 
   void navigateToAgendarConsulta(BuildContext context) {
-    // Implementar a lógica de navegação para a página de agendar consulta
-    Navigator.pushNamed(context, '/agendar_consulta');
+    GoRouter.of(context).goNamed(Routes.calendarioName);
+  }
+
+  void navigateToBuscarProfissionais(BuildContext context) {
+    GoRouter.of(context).goNamed(Routes.pacienteBuscaName);
   }
 }
