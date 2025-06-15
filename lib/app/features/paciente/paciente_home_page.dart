@@ -124,14 +124,8 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
                           _showAllAppointments = true;
                         });
                       },
-                      child: Text(
-                        'Ver mais',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.primary,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppColors.primary,
-                        ),
-                      ),
+                      style: AppTextStyles.seeMoreTextButtonStyle,
+                      child: const Text('Ver mais'),
                     ),
                   ),
                 ),
@@ -146,14 +140,8 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
                           _showAllAppointments = false;
                         });
                       },
-                      child: Text(
-                        'Ver menos',
-                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.primary,
-                          decoration: TextDecoration.underline,
-                          decorationColor: AppColors.primary,
-                        ),
-                      ),
+                      style: AppTextStyles.seeMoreTextButtonStyle,
+                      child: const Text('Ver menos'),
                     ),
                   ),
                 ),

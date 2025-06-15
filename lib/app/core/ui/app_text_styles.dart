@@ -93,4 +93,16 @@ class AppTextStyles {
   );
 
   // Adicione mais estilos conforme necessário
+
+  static ButtonStyle get seeMoreTextButtonStyle {
+    return TextButton.styleFrom(
+      foregroundColor: AppColors.primary, // Cor do texto
+      textStyle: AppTextStyles.bodyMedium.copyWith(
+        fontWeight: FontWeight.bold,
+      ),
+      padding: EdgeInsets.zero, // Remove padding extra do TextButton
+      minimumSize: Size.zero, // Permite que o botão seja tão pequeno quanto o texto
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Reduz a área de toque ao mínimo
+    );
+  }
 }
