@@ -2,6 +2,7 @@
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 import 'package:careflow_app/app/core/repositories/base_repository.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
+import 'dart:developer';
 
 
 class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
@@ -26,7 +27,10 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       final List<dynamic> data = response.data ?? []; 
       return data
           .whereType<Map<String, dynamic>>()
-          .map((item) => ConsultaModel.fromMap(item))
+          .map((item) {
+            log('N8nConsultasRepository.getAll - Raw item from API: $item');
+            return ConsultaModel.fromMap(item);
+          })
           .toList();
     } catch (e) {
       throw Exception('Erro ao buscar TODAS as consultas : $e');
@@ -45,7 +49,10 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
       return data
           .whereType<Map<String, dynamic>>()
-          .map((item) => ConsultaModel.fromMap(item))
+          .map((item) {
+            log('N8nConsultasRepository.getByPacienteId - Raw item from API: $item');
+            return ConsultaModel.fromMap(item);
+          })
           .toList();
     } catch (e) {
       throw Exception('Erro ao buscar consultas do paciente: $e');
@@ -63,7 +70,10 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
       return data
           .whereType<Map<String, dynamic>>()
-          .map((item) => ConsultaModel.fromMap(item))
+          .map((item) {
+            log('N8nConsultasRepository.getByProfissionalId - Raw item from API: $item');
+            return ConsultaModel.fromMap(item);
+          })
           .toList();
     } catch (e) {
       throw Exception('Erro ao buscar consultas do profissional: $e');
@@ -85,18 +95,28 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-
-
   @override
   Future<void> update(String id, ConsultaModel item) async {
     try {
-      await _httpClient.put('$_endpointUpdateConsulta/$id', data: item.toMap());
+      await _httpClient.put(
+        _endpointUpdateConsulta,
+       queryParameters: {'idConsulta': id},
+       data: item.toMap());
     } catch (e) {
       throw Exception('Erro ao atualizar consulta: $e');
     }
   }
 
-  Future<void> atualizaConsulta(String consultaId, ConsultaModel item) => update(consultaId, item);
+  Future<void> updatePartialFields(String consultaId, Map<String, dynamic> fieldsToUpdate) async {
+    try {
+      await _httpClient.put(
+        _endpointUpdateConsulta,
+       queryParameters: {'idConsulta': consultaId},
+       data: fieldsToUpdate);
+    } catch (e) {
+      throw Exception('Erro ao atualizar campos da consulta: $e');
+    }
+  }
 
   /// Atualiza o diagnóstico de uma consulta
   Future<void> atualizarDiagnostico({

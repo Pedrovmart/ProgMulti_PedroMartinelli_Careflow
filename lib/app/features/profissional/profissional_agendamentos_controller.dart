@@ -76,6 +76,12 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   
   // Data fetching
   @override
+  @override
+  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate) async {
+    // TODO: Implementar a lógica de atualização parcial para profissional, se necessário.
+    throw UnimplementedError('atualizarConsultaParcial não implementado para ProfissionalAgendamentosController');
+  }
+
   Future<void> fetchConsultations() async {
     try {
       final profissionalId = _authProvider.currentUser?.uid;

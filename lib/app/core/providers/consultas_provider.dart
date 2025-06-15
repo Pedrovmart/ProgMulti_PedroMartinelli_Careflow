@@ -137,6 +137,26 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
+
+  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _consultasRepository.updatePartialFields(consultaId, fieldsToUpdate);
+      // Após a atualização, é uma boa prática recarregar os dados para refletir as mudanças.
+      // Escolha o método de fetch mais apropriado aqui, por exemplo, fetchConsultasAgendadas ou um fetch específico se o ID do paciente/profissional estiver disponível.
+      await fetchConsultasAgendadas(); 
+    } catch (e) {
+      _error = "Erro ao atualizar parcialmente a consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> cancelarConsulta(String consultaId) async {
     _isLoading = true;
     _error = null;

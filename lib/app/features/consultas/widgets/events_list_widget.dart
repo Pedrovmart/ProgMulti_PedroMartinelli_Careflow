@@ -221,21 +221,43 @@ class _EventsListWidgetState extends State<EventsListWidget> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.light),
-            onPressed: () {
-              final consultaAtualizada = ConsultaModel(
-                id: consulta.id,
-                data: consulta.data,
-                hora: timeController.text,
-                descricao: consulta.descricao,
-                queixaPaciente: queixaController.text,
-                idPaciente: consulta.idPaciente,
-                idMedico: consulta.idMedico,
-                diagnostico: consulta.diagnostico,
-              );
+            onPressed: () async {
+              if (consulta.id == null) {
+                log('Erro: ID da consulta é nulo ao tentar atualizar parcialmente.');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Erro ao salvar: ID da consulta não encontrado.')),
+                );
+                return;
+              }
+
+              final fieldsToUpdate = {
+                'hora': timeController.text,
+                'queixaPaciente': queixaController.text,
+              };
               
-              widget.controller.atualizarConsulta(consultaAtualizada);
-              
-              Navigator.pop(context);
+              try {
+                await widget.controller.atualizarConsultaParcial(consulta.id!, fieldsToUpdate);
+                if (context.mounted) {
+                  Navigator.pop(context); // Fecha o diálogo primeiro
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Consulta atualizada com sucesso!'),
+                      backgroundColor: AppColors.success, // Usando a cor de sucesso do AppColors
+                    ),
+                  );
+                }
+              } catch (e) {
+                log('Erro ao atualizar consulta no _showEditDialog: $e');
+                if (context.mounted) {
+                  Navigator.pop(context); // Fecha o diálogo mesmo em caso de erro
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao atualizar consulta: ${e.toString().replaceFirst("Exception: ", "")}'),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+              }
             },
             child: const Text('Salvar'),
           ),

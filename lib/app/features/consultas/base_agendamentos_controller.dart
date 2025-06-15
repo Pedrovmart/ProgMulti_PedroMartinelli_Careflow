@@ -71,6 +71,9 @@ abstract class BaseAgendamentosController extends ChangeNotifier {
   
   /// Load consultations
   Future<void> fetchConsultations();
+
+  /// Update specific fields of a consultation
+  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate);
   
   // Helper methods
   
