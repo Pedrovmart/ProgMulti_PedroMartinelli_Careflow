@@ -95,7 +95,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: AppColors.primaryDark.withOpacity(0.06),
+          color: AppColors.primaryDark.withValues(alpha: 0.06),
           spreadRadius: 0.5,
           blurRadius: 4,
           offset: const Offset(0, 1),

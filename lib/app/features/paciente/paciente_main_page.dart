@@ -101,9 +101,8 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
 
     if (confirmed == true) {
       await authProvider.signOut();
-      if (context.mounted) {
-        context.go('/login');
-      }
+      if (!mounted) return;
+      context.go('/login');
     }
   }
 

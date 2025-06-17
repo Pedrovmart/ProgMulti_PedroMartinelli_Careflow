@@ -14,13 +14,17 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
   final ProfissionalProvider _profissionalProvider;
   final AuthProvider _authProvider;
 
-  final TextEditingController queixaPacienteController = TextEditingController();
+  @override
+  final TextEditingController queixaPacienteController =
+      TextEditingController();
   @override
   final TextEditingController dateController = TextEditingController();
   @override
   final TextEditingController timeController = TextEditingController();
   String? _selectedProfissionalId;
+  @override
   String? get selectedProfissionalId => _selectedProfissionalId;
+  @override
   set selectedProfissionalId(String? value) {
     _selectedProfissionalId = value;
     notifyListeners();
@@ -28,10 +32,10 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
 
   @override
   DateTime selectedDay;
-  
+
   @override
   TimeOfDay? selectedTime;
-  
+
   Map<String, List<ConsultaModel>> events = {};
 
   PacientesAgendamentosController(
@@ -44,6 +48,7 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     selectedProfissionalId = null;
   }
 
+  @override
   List<Profissional> get profissionais {
     final profs = _profissionalProvider.profissionais;
     return profs.isEmpty ? [] : profs;
@@ -67,16 +72,19 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     notifyListeners();
   }
 
+  @override
   DateTime get firstDay {
     final now = DateTime.now();
     return DateTime(now.year - 3, 1, 1);
   }
 
+  @override
   DateTime get lastDay {
     final now = DateTime.now();
     return DateTime(now.year + 3, 12, 31);
   }
 
+  @override
   DateTime getValidFocusedDay() {
     if (selectedDay.isAfter(lastDay)) {
       return lastDay;
@@ -89,6 +97,7 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     return selectedDay;
   }
 
+  @override
   Future<void> fetchConsultations() async {
     try {
       final userId = _authProvider.currentUser?.uid;
@@ -117,6 +126,7 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     }
   }
 
+  @override
   Future<void> fetchProfissionais() async {
     await _profissionalProvider.fetchProfissionais();
   }
@@ -165,6 +175,7 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     return groupedEvents;
   }
 
+  @override
   List<ConsultaModel> getEventsForDay(DateTime day) {
     // Normaliza a data para garantir que estamos comparando apenas dia, mês e ano
     final normalizedDay = DateTime(day.year, day.month, day.day);
@@ -213,13 +224,21 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
   }
 
   @override
-  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate) async {
+  Future<void> atualizarConsultaParcial(
+    String consultaId,
+    Map<String, dynamic> fieldsToUpdate,
+  ) async {
     try {
-      await _consultasProvider.atualizarConsultaParcial(consultaId, fieldsToUpdate);
+      await _consultasProvider.atualizarConsultaParcial(
+        consultaId,
+        fieldsToUpdate,
+      );
       await fetchConsultations(); // Recarrega as consultas para refletir a atualização
       notifyListeners();
     } catch (e) {
-      log('PacientesAgendamentosController - Erro ao atualizar consulta parcialmente: $e');
+      log(
+        'PacientesAgendamentosController - Erro ao atualizar consulta parcialmente: $e',
+      );
       rethrow;
     }
   }
@@ -245,11 +264,13 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
 
     if (picked != null) {
       selectedTime = picked;
-      timeController.text = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+      timeController.text =
+          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
       notifyListeners();
     }
   }
 
+  @override
   Future<void> agendarConsulta(BuildContext context) async {
     final pacienteId = _authProvider.currentUser?.uid;
     final profissionalId = selectedProfissionalId;

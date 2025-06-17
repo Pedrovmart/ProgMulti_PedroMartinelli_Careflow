@@ -173,7 +173,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                     try {
                       final parts = initialTimeText.split(':');
                       initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-                    } catch (e) {}
+                    } catch (e) {
+                      log('Erro ao parsear hora: $e');
+                    }
                   }
 
                   final TimeOfDay? picked = await showTimePicker(
@@ -229,14 +231,8 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                 );
                 return;
               }
-
-              final fieldsToUpdate = {
-                'hora': timeController.text,
-                'queixaPaciente': queixaController.text,
-              };
               
-              try {
-                await widget.controller.atualizarConsultaParcial(consulta.id!, fieldsToUpdate);
+              try {             
                 if (context.mounted) {
                   Navigator.pop(context); // Fecha o diálogo primeiro
                   ScaffoldMessenger.of(context).showSnackBar(

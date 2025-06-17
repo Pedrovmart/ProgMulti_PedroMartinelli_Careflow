@@ -50,8 +50,6 @@ abstract class BaseAgendamentosController extends ChangeNotifier {
   Future<void> agendarConsulta(BuildContext context);
   
   Future<void> fetchConsultations();
-
-  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate);
   
   
   String formatDate(DateTime date) {
