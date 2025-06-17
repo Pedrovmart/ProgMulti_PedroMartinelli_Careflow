@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/features/profissional/widgets/profissional_search_card.dart';
 import 'package:careflow_app/app/features/profissional/profissional_perfil_publico_page.dart';
+import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 
 class ProfissionalSearchPage extends StatefulWidget {
   const ProfissionalSearchPage({super.key});
@@ -47,6 +48,7 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
             child: TextField(
               decoration: InputDecoration(
                 labelText: 'Buscar por nome',
+                labelStyle: AppTextStyles.bodyMedium,
                 prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -74,9 +76,7 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                     ? Center(
                       child: Text(
                         'Nenhum profissional encontrado.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.primaryDark.withValues(alpha: 0.7),
-                            ),
+                        style: AppTextStyles.bodyLarge.copyWith(color: AppColors.primaryLight),
                       ),
                     )
                     : ListView.builder(
@@ -100,6 +100,7 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                             nome: profissional.nome,
                             especialidade: profissional.especialidade,
                             numeroRegistro: profissional.numeroRegistro,
+                            profileUrlImage: profissional.profileUrlImage,
                           ),
                         );
                       },

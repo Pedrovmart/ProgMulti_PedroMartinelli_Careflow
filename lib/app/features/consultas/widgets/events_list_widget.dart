@@ -2,12 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
+import 'package:careflow_app/app/features/consultas/base_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 class EventsListWidget extends StatefulWidget {
-  final PacientesAgendamentosController controller;
+  final BaseAgendamentosController controller;
   
   const EventsListWidget({super.key, required this.controller});
 
@@ -19,18 +19,14 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   @override
   void initState() {
     super.initState();
-    // Adiciona listener para atualizar a lista quando o dia selecionado mudar
     widget.controller.addListener(_updateList);
   }
 
   @override
   void dispose() {
-    // Remove o listener quando o widget for descartado
     widget.controller.removeListener(_updateList);
     super.dispose();
   }
-
-  // Força a atualização da lista quando o controller notificar mudanças
   void _updateList() {
     if (mounted) {
       setState(() {
@@ -48,10 +44,10 @@ class _EventsListWidgetState extends State<EventsListWidget> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16), // Ou cardTheme.shape
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryDark.withValues(alpha: 0.08), // Ou simular com cardTheme.elevation
+            color: AppColors.primaryDark.withValues(alpha: 0.08),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -68,7 +64,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
               child: Text(
                 'Consultas do Dia',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.primaryDark, // primaryDark é muito específico
+                  color: AppColors.primaryDark,
                 ),
               ),
             ),
@@ -119,7 +115,6 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                                         icon: const Icon(Icons.edit, color: AppColors.primary),
                                         label: const Text('Editar', style: TextStyle(color: AppColors.primary)),
                                         onPressed: () {
-                                          // Implementar edição de consulta
                                           _showEditDialog(context, event);
                                         },
                                       ),
@@ -128,7 +123,6 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                                         icon: const Icon(Icons.cancel, color: AppColors.accentDark),
                                         label: const Text('Cancelar', style: TextStyle(color: AppColors.accentDark)),
                                         onPressed: () {
-                                          // Implementar cancelamento de consulta
                                           _showCancelDialog(context, event);
                                         },
                                       ),
@@ -149,11 +143,9 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   }
 
 
-  // Mostra diálogo de edição de consulta
   void _showEditDialog(BuildContext context, ConsultaModel consulta) {
-    // Controladores para os campos de texto
-    final descricaoController = TextEditingController(text: consulta.descricao);
-    final horaController = TextEditingController(text: consulta.hora);
+    final queixaController = TextEditingController(text: consulta.queixaPaciente);
+    final timeController = TextEditingController(text: consulta.hora);
     
     showDialog(
       context: context,
@@ -164,22 +156,61 @@ class _EventsListWidgetState extends State<EventsListWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: descricaoController,
+                controller: queixaController,
                 decoration: const InputDecoration(
-                  labelText: 'Descrição',
+                  labelText: 'Queixa do Paciente',
                   labelStyle: TextStyle(color: AppColors.primary),
                   focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.accent)),
                   enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primaryLight)),
                 ),
               ),
               const SizedBox(height: 8),
-              TextField(
-                controller: horaController,
-                decoration: const InputDecoration(
-                  labelText: 'Horário',
-                  labelStyle: TextStyle(color: AppColors.primary),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.accent)),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primaryLight)),
+              InkWell(
+                onTap: () async {
+                  final initialTimeText = timeController.text;
+                  TimeOfDay initialTime = TimeOfDay.now();
+                  if (initialTimeText.isNotEmpty) {
+                    try {
+                      final parts = initialTimeText.split(':');
+                      initialTime = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+                    } catch (e) {
+                      log('Erro ao parsear hora: $e');
+                    }
+                  }
+
+                  final TimeOfDay? picked = await showTimePicker(
+                    context: context,
+                    initialTime: initialTime,
+                    builder: (context, child) {
+                      return MediaQuery(
+                        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                        child: child!,
+                      );
+                    }
+                  );
+                  if (picked != null) {
+                    if (context.mounted) {
+                      final formattedTime = MaterialLocalizations.of(context).formatTimeOfDay(picked, alwaysUse24HourFormat: true);
+                      timeController.text = formattedTime;
+                    }
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Horário',
+                    labelStyle: TextStyle(color: AppColors.primary),
+                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.accent)),
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primaryLight)),
+                  ),
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: timeController,
+                    builder: (context, value, child) {
+                      return Text(
+                        value.text.isEmpty ? 'Selecionar horário' : value.text,
+                        style: TextStyle(color: value.text.isEmpty ? Colors.grey : AppColors.primaryDark, fontSize: 16),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -192,24 +223,37 @@ class _EventsListWidgetState extends State<EventsListWidget> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: AppColors.light),
-            onPressed: () {
-              // Criar uma nova consulta com os dados atualizados
-              final consultaAtualizada = ConsultaModel(
-                id: consulta.id,
-                data: consulta.data,
-                hora: horaController.text,
-                descricao: descricaoController.text,
-                queixaPaciente: consulta.queixaPaciente,
-                idPaciente: consulta.idPaciente,
-                idMedico: consulta.idMedico,
-                diagnostico: consulta.diagnostico,
-              );
+            onPressed: () async {
+              if (consulta.id == null) {
+                log('Erro: ID da consulta é nulo ao tentar atualizar parcialmente.');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Erro ao salvar: ID da consulta não encontrado.')),
+                );
+                return;
+              }
               
-              // Atualizar a consulta no controller
-              widget.controller.atualizarConsulta(consultaAtualizada);
-              
-              // Fechar o diálogo
-              Navigator.pop(context);
+              try {             
+                if (context.mounted) {
+                  Navigator.pop(context); // Fecha o diálogo primeiro
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Consulta atualizada com sucesso!'),
+                      backgroundColor: AppColors.success, // Usando a cor de sucesso do AppColors
+                    ),
+                  );
+                }
+              } catch (e) {
+                log('Erro ao atualizar consulta no _showEditDialog: $e');
+                if (context.mounted) {
+                  Navigator.pop(context); // Fecha o diálogo mesmo em caso de erro
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao atualizar consulta: ${e.toString().replaceFirst("Exception: ", "")}'),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+              }
             },
             child: const Text('Salvar'),
           ),
@@ -218,7 +262,6 @@ class _EventsListWidgetState extends State<EventsListWidget> {
     );
   }
   
-  // Mostra diálogo de confirmação de cancelamento de consulta
   void _showCancelDialog(BuildContext context, ConsultaModel consulta) {
     showDialog(
       context: context,
@@ -233,12 +276,10 @@ class _EventsListWidgetState extends State<EventsListWidget> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
-              // Cancelar a consulta no controller
               if (consulta.id != null) {
                 widget.controller.cancelarConsulta(consulta.id!);
               }
               
-              // Fechar o diálogo
               Navigator.pop(context);
             },
             child: const Text('Sim, Cancelar', style: TextStyle(color: Colors.white)),

@@ -137,6 +137,26 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
+
+  Future<void> atualizarConsultaParcial(String consultaId, Map<String, dynamic> fieldsToUpdate) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _consultasRepository.updatePartialFields(consultaId, fieldsToUpdate);
+      // Após a atualização, é uma boa prática recarregar os dados para refletir as mudanças.
+      // Escolha o método de fetch mais apropriado aqui, por exemplo, fetchConsultasAgendadas ou um fetch específico se o ID do paciente/profissional estiver disponível.
+      await fetchConsultasAgendadas(); 
+    } catch (e) {
+      _error = "Erro ao atualizar parcialmente a consulta: ${e.toString()}";
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> cancelarConsulta(String consultaId) async {
     _isLoading = true;
     _error = null;
@@ -171,24 +191,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
-  // Busca uma consulta específica pelo ID (alternativa usando o método base) REDUNDANTE??
-  Future<ConsultaModel?> getConsultaById(String consultaId) async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    try {
-      final consulta = await _consultasRepository.getById(consultaId);
-      return consulta;
-    } catch (e) {
-      _error = "Erro ao buscar consulta pelo ID: ${e.toString()}";
-      rethrow;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-  
   Future<Map<String, dynamic>> getDetalhesConsultaProfissionalPaciente({
     required String idProfissional,
     required String idPaciente,

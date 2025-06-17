@@ -53,3 +53,8 @@ android/app/google-services.json
 .windsurf
 
 .github/instructions/careflow_instructions.instructions.md
+
+# Ignore Flutter build artifacts
+linux
+macos
+windows

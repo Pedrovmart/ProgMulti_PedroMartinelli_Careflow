@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
-import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
+import 'package:careflow_app/app/core/ui/app_text_styles.dart';
+import 'package:careflow_app/app/features/consultas/base_agendamentos_controller.dart';
 import 'package:careflow_app/app/models/consulta_model.dart';
 
 class CalendarWidget extends StatefulWidget {
-  final PacientesAgendamentosController controller;
+  final BaseAgendamentosController controller;
   
   const CalendarWidget({
     super.key, 
@@ -94,44 +95,73 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: AppColors.primaryDark.withValues(alpha: 0.08),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: const Offset(0, 2),
+          color: AppColors.primaryDark.withValues(alpha: 0.06),
+          spreadRadius: 0.5,
+          blurRadius: 4,
+          offset: const Offset(0, 1),
         ),
       ],
     );
   }
 
   CalendarStyle _buildCalendarStyle() {
+    final theme = Theme.of(context);
     return CalendarStyle(
       todayDecoration: BoxDecoration(
-        color: AppColors.accentLight,
+        color: AppColors.primary.withValues(alpha: 0.15), 
         shape: BoxShape.circle,
       ),
       selectedDecoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.accent,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.accent.withValues(alpha: 0.4),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          )
+        ]
+      ),
+      markerDecoration: BoxDecoration(
+        color: AppColors.primaryDark,
         shape: BoxShape.circle,
       ),
-      weekendTextStyle: const TextStyle(color: AppColors.primary),
-      defaultTextStyle: const TextStyle(color: AppColors.primaryDark),
-      todayTextStyle: const TextStyle(color: AppColors.primaryDark),
-      selectedTextStyle: const TextStyle(color: AppColors.light),
+      defaultTextStyle: AppTextStyles.caption.copyWith(color: theme.colorScheme.onSurface, fontSize: 13.0),
+      weekendTextStyle: AppTextStyles.caption.copyWith(color: theme.colorScheme.onSurface, fontSize: 13.0),
+      outsideTextStyle: AppTextStyles.caption.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+      todayTextStyle: AppTextStyles.caption.copyWith(color: AppColors.primaryDark, fontWeight: FontWeight.bold, fontSize: 13.0),
+      selectedTextStyle: AppTextStyles.caption.copyWith(color: AppColors.light, fontWeight: FontWeight.bold, fontSize: 13.0),
     );
   }
 
   HeaderStyle _buildHeaderStyle(BuildContext context) {
     return HeaderStyle(
-      titleTextStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
+      titleTextStyle: AppTextStyles.titleLarge.copyWith(
         color: AppColors.primaryDark,
+        fontWeight: FontWeight.bold,
       ),
-      formatButtonDecoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(8),
+      leftChevronIcon: Container(
+        padding: const EdgeInsets.all(4.0),
+        decoration: BoxDecoration(
+          color: AppColors.light.withValues(alpha: 0.7),
+          shape: BoxShape.circle,
+           boxShadow: [ BoxShadow( color: AppColors.primaryDark.withValues(alpha: 0.1), blurRadius: 2, offset: Offset(0,1))]
+        ),
+        child: Icon(Icons.chevron_left_rounded, color: AppColors.primaryDark, size: 20),
       ),
-      formatButtonTextStyle: const TextStyle(color: AppColors.light),
-      leftChevronIcon: const Icon(Icons.chevron_left, color: AppColors.primary),
-      rightChevronIcon: const Icon(Icons.chevron_right, color: AppColors.primary),
+      rightChevronIcon: Container(
+        padding: const EdgeInsets.all(4.0),
+        decoration: BoxDecoration(
+          color: AppColors.light.withValues(alpha: 0.7),
+          shape: BoxShape.circle,
+          boxShadow: [ BoxShadow( color: AppColors.primaryDark.withValues(alpha: 0.1), blurRadius: 2, offset: Offset(0,1))]
+        ),
+        child: Icon(Icons.chevron_right_rounded, color: AppColors.primaryDark, size: 20),
+      ),
+      leftChevronPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      rightChevronPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      headerPadding: const EdgeInsets.symmetric(vertical: 16.0),
       formatButtonVisible: false,
       titleCentered: true,
     );
@@ -146,12 +176,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           right: 1,
           bottom: 1,
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.accent,
+              color: AppColors.accent.withValues(alpha: 0.9),
             ),
-            width: 8,
-            height: 8,
+            width: 7,
+            height: 7,
           ),
         );
       },
@@ -167,16 +197,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         if (events.isNotEmpty) {
           return Container(
             margin: const EdgeInsets.all(4.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.accent, width: 1.5),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
             child: Center(
               child: Text(
                 '${day.day}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.primaryDark,
-                ),
+                style: AppTextStyles.caption.copyWith(color: Theme.of(context).colorScheme.onSurface, fontSize: 13.0),
               ),
             ),
           );
@@ -188,7 +212,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 }
 
 class CalendarControllerProvider extends InheritedWidget {
-  final PacientesAgendamentosController controller;
+  final BaseAgendamentosController controller;
 
   const CalendarControllerProvider({
     super.key,

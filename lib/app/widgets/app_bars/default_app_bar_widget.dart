@@ -8,22 +8,14 @@ import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-
+  final String title; // Title is not directly used in the current design, but kept for potential future use
   final String? userImageUrl;
-
   final String? userName;
-
   final String? userRole;
-
   final bool showNotificationIcon;
-
   final VoidCallback? onNotificationPressed;
-
   final VoidCallback? onProfilePressed;
-
   final bool showLogoutButton;
-
   final VoidCallback? onLogoutPressed;
 
   const DefaultAppBar({
@@ -40,217 +32,129 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight * 1.5);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight * 1.5); 
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    String? currentImageUrl;
-
+    String? currentImageUrl = userImageUrl;
     if (authProvider.userType == 'paciente') {
-      currentImageUrl =
-          Provider.of<PacienteProvider>(context).currentProfileImage ??
-          userImageUrl;
+      currentImageUrl = Provider.of<PacienteProvider>(context, listen: false).currentProfileImage ?? userImageUrl;
     } else if (authProvider.userType == 'profissional') {
-      currentImageUrl =
-          Provider.of<ProfissionalProvider>(context).currentProfileImage ??
-          userImageUrl;
+      currentImageUrl = Provider.of<ProfissionalProvider>(context, listen: false).currentProfileImage ?? userImageUrl;
     }
 
-    return Material(
-      color: Colors.transparent,
-      elevation: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.primaryColorDark,
-          borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(24.0),
-            bottomRight: Radius.circular(24.0),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 16.0,
-              offset: const Offset(0, 4),
-              spreadRadius: 0,
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.only(top: kToolbarHeight / 2.5), 
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20.0),
+          bottomRight: Radius.circular(20.0),
         ),
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: onProfilePressed,
-                        behavior: HitTestBehavior.opaque,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20.0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 12.0), 
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: onProfilePressed,
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 44, 
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.accent.withOpacity(0.7), width: 1.5),
+                        ),
+                        child: CircleAvatar(
+                          backgroundColor: AppColors.light.withOpacity(0.1),
+                          backgroundImage: (currentImageUrl != null && currentImageUrl.isNotEmpty)
+                              ? NetworkImage(currentImageUrl)
+                              : null,
+                          child: (currentImageUrl == null || currentImageUrl.isEmpty)
+                              ? const Icon(
+                                  Icons.person_outline_rounded,
+                                  size: 24,
+                                  color: AppColors.light,
+                                )
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.primaryLight,
-                                    AppColors.primaryDark,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                            Text(
+                              userName ?? 'Usuário',
+                              style: AppTextStyles.titleMedium.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.light,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (userRole != null && userRole!.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2, // Reduzido para corrigir pequeno overflow
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accent.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  userRole!,
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.accent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              child: CircleAvatar(
-                                backgroundColor: theme.cardColor,
-                                child:
-                                    currentImageUrl != null
-                                        ? ClipOval(
-                                          child: Image.network(
-                                            currentImageUrl,
-                                            width: 36,
-                                            height: 36,
-                                            fit: BoxFit.cover,
-                                            loadingBuilder: (
-                                              context,
-                                              child,
-                                              loadingProgress,
-                                            ) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child: CircularProgressIndicator(
-                                                  value:
-                                                      loadingProgress
-                                                                  .expectedTotalBytes !=
-                                                              null
-                                                          ? loadingProgress
-                                                                  .cumulativeBytesLoaded /
-                                                              loadingProgress
-                                                                  .expectedTotalBytes!
-                                                          : null,
-                                                  strokeWidth: 2,
-                                                ),
-                                              );
-                                            },
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Icon(
-                                                      Icons.person,
-                                                      size: 24,
-                                                      color:
-                                                          theme
-                                                              .textTheme
-                                                              .bodyLarge
-                                                              ?.color,
-                                                    ),
-                                          ),
-                                        )
-                                        : Icon(
-                                          Icons.person,
-                                          size: 24,
-                                          color:
-                                              theme.textTheme.bodyLarge?.color,
-                                        ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 12.0),
-
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Olá,',
-                                    style: AppTextStyles.bodyMedium.copyWith(
-                                      color: theme.primaryColorLight,
-                                      fontSize: 12,
-                                      height: 1.1,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    userName ?? 'Usuário',
-                                    style: AppTextStyles.headlineLarge.copyWith(
-                                      fontSize: 16,
-                                      height: 1.2,
-                                      fontWeight: FontWeight.w700,
-                                      color: theme.primaryColorLight,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  if (userRole != null) ...[
-                                    const SizedBox(height: 2),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        maxWidth: constraints.maxWidth * 0.6,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryLight
-                                            .withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        userRole!,
-                                        style: AppTextStyles.caption.copyWith(
-                                          color: AppColors.primaryLight,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 10,
-                                          height: 1.2,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       ),
-                    ),
-
-                    if (showLogoutButton)
-                      _buildIconButton(
-                        context: context,
-                        icon: Icons.logout_rounded,
-                        onPressed: onLogoutPressed,
-                        tooltip: 'Sair',
-                      )
-                    else if (showNotificationIcon)
-                      _buildIconButton(
-                        context: context,
-                        icon: Icons.notifications_none_rounded,
-                        onPressed: onNotificationPressed,
-                        tooltip: 'Notificações',
-                      ),
-                  ],
-                );
-              },
-            ),
+                    ],
+                  ),
+                ),
+              ),
+              if (showLogoutButton)
+                _buildActionIconButton(
+                  icon: Icons.logout_rounded,
+                  onPressed: onLogoutPressed,
+                  tooltip: 'Sair',
+                  iconColor: AppColors.light,
+                )
+              else if (showNotificationIcon)
+                _buildActionIconButton(
+                  icon: Icons.notifications_none_rounded,
+                  onPressed: onNotificationPressed,
+                  tooltip: 'Notificações',
+                  iconColor: AppColors.light,
+                ),
+            ],
           ),
         ),
       ),
@@ -258,22 +162,17 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-Widget _buildIconButton({
-  required BuildContext context,
+Widget _buildActionIconButton({
   required IconData icon,
   required VoidCallback? onPressed,
   required String tooltip,
+  required Color iconColor,
 }) {
-  return SizedBox(
-    width: 40,
-    height: 40,
-    child: IconButton(
-      icon: Icon(icon, size: 20),
-      color: Theme.of(context).primaryColorLight,
-      onPressed: onPressed,
-      tooltip: tooltip,
-      padding: EdgeInsets.zero,
-      splashRadius: 20,
-    ),
+  return IconButton(
+    icon: Icon(icon, size: 24), 
+    color: iconColor,
+    onPressed: onPressed,
+    tooltip: tooltip,
+    splashRadius: 24, 
   );
 }

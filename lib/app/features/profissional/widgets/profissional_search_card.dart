@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
+import 'package:careflow_app/app/core/ui/ui_helpers.dart';
 
-//TODO: Quando usuário tiver imagem remover placeholder
+
 
 class ProfissionalSearchCard extends StatelessWidget {
   final String nome;
   final String especialidade;
   final String numeroRegistro;
+  final String? profileUrlImage; // Added profileUrlImage
 
   const ProfissionalSearchCard({
     super.key,
     required this.nome,
     required this.especialidade,
     required this.numeroRegistro,
+    this.profileUrlImage, // Added profileUrlImage to constructor
   });
 
   @override
@@ -26,10 +29,28 @@ class ProfissionalSearchCard extends StatelessWidget {
             // Placeholder for the professional's image
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.accentLight.withOpacity(0.2),
-                child: const Icon(Icons.person, size: 40, color: AppColors.accent),
+              child: Builder(
+                builder: (context) {
+                  if (profileUrlImage != null && profileUrlImage!.isNotEmpty) {
+                    return CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(profileUrlImage!),
+                      backgroundColor: Colors.transparent, // Or a subtle placeholder color
+                    );
+                  } else {
+                    final String initials = UiHelpers.getInitials(nome);
+                    final Color avatarColor = UiHelpers.getAvatarBackgroundColor(nome);
+                    final Color initialsColor = UiHelpers.getInitialsTextColor(avatarColor);
+                    return CircleAvatar(
+                      radius: 30,
+                      backgroundColor: avatarColor,
+                      child: Text(
+                        initials,
+                        style: TextStyle(color: initialsColor, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }
+                },
               ),
             ),
             const SizedBox(width: 16),

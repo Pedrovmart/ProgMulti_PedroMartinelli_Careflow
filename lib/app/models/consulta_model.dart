@@ -85,13 +85,13 @@ class ConsultaModel {
     }
     
     return ConsultaModel(
-      id: map['id'],
+      id: map['id'] ?? map['_id'] ?? map['idConsulta'],
       data: data,
       hora: map['hora'] ?? '',
       queixaPaciente: map['queixaPaciente'] ?? 'Queixa não especificada.',
       idPaciente: map['idPaciente'] ?? '',
       idMedico: map['idMedico'] ?? '',
-      nome: map['nomeMedico'] ?? map['nomePaciente'],
+      nome: map['nomeMedico'] ?? map['nomePaciente'] ?? '', // Default para string vazia se ambos forem nulos
       descricao: map['descricao'] ?? '',
       diagnostico: map['diagnostico'] ?? 'Diagnóstico pendente.',
     );

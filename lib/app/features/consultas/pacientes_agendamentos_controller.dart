@@ -7,37 +7,48 @@ import 'package:careflow_app/app/core/providers/consultas_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:careflow_app/app/features/consultas/base_agendamentos_controller.dart';
 
-class PacientesAgendamentosController extends ChangeNotifier {
+class PacientesAgendamentosController extends BaseAgendamentosController {
   final ConsultasProvider _consultasProvider;
   final ProfissionalProvider _profissionalProvider;
   final AuthProvider _authProvider;
 
+  @override
   final TextEditingController queixaPacienteController =
       TextEditingController();
-  final TextEditingController dataController = TextEditingController();
-  final TextEditingController horaController = TextEditingController();
+  @override
+  final TextEditingController dateController = TextEditingController();
+  @override
+  final TextEditingController timeController = TextEditingController();
   String? _selectedProfissionalId;
+  @override
   String? get selectedProfissionalId => _selectedProfissionalId;
+  @override
   set selectedProfissionalId(String? value) {
     _selectedProfissionalId = value;
     notifyListeners();
   }
 
-  late DateTime selectedDay;
+  @override
+  DateTime selectedDay;
+
+  @override
   TimeOfDay? selectedTime;
+
   Map<String, List<ConsultaModel>> events = {};
 
   PacientesAgendamentosController(
     this._consultasProvider,
     this._profissionalProvider,
     this._authProvider,
-  ) {
+  ) : selectedDay = DateTime.now() {
     final now = DateTime.now();
-    selectedDay = DateTime(now.year, now.month, now.day);
+    dateController.text = DateFormat('dd/MM/yyyy').format(now);
     selectedProfissionalId = null;
   }
 
+  @override
   List<Profissional> get profissionais {
     final profs = _profissionalProvider.profissionais;
     return profs.isEmpty ? [] : profs;
@@ -48,10 +59,10 @@ class PacientesAgendamentosController extends ChangeNotifier {
   Future<void> init() async {
     // Garantir que a data selecionada esteja no fuso horário local
     selectedDay = DateTime.now().toLocal();
-    dataController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
+    dateController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
 
     log('init - Data selecionada inicializada: ${selectedDay.toString()}');
-    log('init - Data formatada: ${dataController.text}');
+    log('init - Data formatada: ${dateController.text}');
 
     // Carregar consultas e profissionais
     await fetchConsultations();
@@ -61,16 +72,19 @@ class PacientesAgendamentosController extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
   DateTime get firstDay {
     final now = DateTime.now();
     return DateTime(now.year - 3, 1, 1);
   }
 
+  @override
   DateTime get lastDay {
     final now = DateTime.now();
     return DateTime(now.year + 3, 12, 31);
   }
 
+  @override
   DateTime getValidFocusedDay() {
     if (selectedDay.isAfter(lastDay)) {
       return lastDay;
@@ -83,6 +97,7 @@ class PacientesAgendamentosController extends ChangeNotifier {
     return selectedDay;
   }
 
+  @override
   Future<void> fetchConsultations() async {
     try {
       final userId = _authProvider.currentUser?.uid;
@@ -111,6 +126,7 @@ class PacientesAgendamentosController extends ChangeNotifier {
     }
   }
 
+  @override
   Future<void> fetchProfissionais() async {
     await _profissionalProvider.fetchProfissionais();
   }
@@ -159,6 +175,7 @@ class PacientesAgendamentosController extends ChangeNotifier {
     return groupedEvents;
   }
 
+  @override
   List<ConsultaModel> getEventsForDay(DateTime day) {
     // Normaliza a data para garantir que estamos comparando apenas dia, mês e ano
     final normalizedDay = DateTime(day.year, day.month, day.day);
@@ -187,74 +204,78 @@ class PacientesAgendamentosController extends ChangeNotifier {
     return List<ConsultaModel>.from(matchingEvents);
   }
 
+  @override
   void onDaySelected(DateTime day) {
-    // Normaliza a data para garantir que não haja problemas com horário
-    final normalizedDay = DateTime(day.year, day.month, day.day);
-    selectedDay = normalizedDay;
-
-    dataController.text = DateFormat('dd/MM/yyyy').format(normalizedDay);
-
-    log(
-      'Dia selecionado: ${normalizedDay.toString()}, formatado como: ${dataController.text}',
-    );
-
-    final eventsForDay = getEventsForDay(normalizedDay);
-    log('Número de eventos no dia selecionado: ${eventsForDay.length}');
-
+    selectedDay = day;
+    dateController.text = DateFormat('dd/MM/yyyy').format(day);
     notifyListeners();
   }
 
-  Future<void> atualizarConsulta(ConsultaModel consulta) async {
+  @override
+  Future<void> updateAppointment(ConsultaModel consulta) async {
     try {
       await _consultasProvider.atualizarConsulta(consulta);
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
-      log('Erro ao atualizar consulta: $e');
+      debugPrint('Erro ao atualizar consulta: $e');
       rethrow;
     }
   }
 
-  Future<void> cancelarConsulta(String consultaId) async {
+  @override
+  Future<void> atualizarConsultaParcial(
+    String consultaId,
+    Map<String, dynamic> fieldsToUpdate,
+  ) async {
+    try {
+      await _consultasProvider.atualizarConsultaParcial(
+        consultaId,
+        fieldsToUpdate,
+      );
+      await fetchConsultations(); // Recarrega as consultas para refletir a atualização
+      notifyListeners();
+    } catch (e) {
+      log(
+        'PacientesAgendamentosController - Erro ao atualizar consulta parcialmente: $e',
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> cancelAppointment(String consultaId) async {
     try {
       await _consultasProvider.cancelarConsulta(consultaId);
       await fetchConsultations();
       notifyListeners();
     } catch (e) {
-      log('Erro ao cancelar consulta: $e');
+      debugPrint('Erro ao cancelar consulta: $e');
       rethrow;
     }
   }
 
+  @override
   Future<void> selectTime(BuildContext context) async {
-    final pickedTime = await showTimePicker(
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? TimeOfDay.now(),
-      builder:
-          (context, child) => Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: Colors.blue,
-                onPrimary: Colors.white,
-                onSurface: Colors.blue[900]!,
-              ),
-            ),
-            child: child!,
-          ),
     );
 
-    if (pickedTime != null && context.mounted) {
-      selectedTime = pickedTime;
-      horaController.text = selectedTime!.format(context);
+    if (picked != null) {
+      selectedTime = picked;
+      timeController.text =
+          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
       notifyListeners();
     }
   }
 
+  @override
   Future<void> agendarConsulta(BuildContext context) async {
     final pacienteId = _authProvider.currentUser?.uid;
     final profissionalId = selectedProfissionalId;
     final queixaPaciente = queixaPacienteController.text.trim();
-    final hora = horaController.text;
+    final hora = timeController.text;
 
     try {
       final novaConsulta = ConsultaModel(
@@ -273,7 +294,7 @@ class PacientesAgendamentosController extends ChangeNotifier {
       }
 
       queixaPacienteController.clear();
-      horaController.clear();
+      timeController.clear();
       selectedTime = null;
       selectedProfissionalId = null;
       notifyListeners();
@@ -290,8 +311,8 @@ class PacientesAgendamentosController extends ChangeNotifier {
   @override
   void dispose() {
     queixaPacienteController.dispose();
-    dataController.dispose();
-    horaController.dispose();
+    dateController.dispose();
+    timeController.dispose();
     super.dispose();
   }
 }

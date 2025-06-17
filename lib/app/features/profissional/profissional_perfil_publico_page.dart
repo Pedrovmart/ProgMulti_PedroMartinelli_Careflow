@@ -1,5 +1,8 @@
+import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 import 'package:flutter/material.dart';
+
 import 'package:careflow_app/app/models/profissional_model.dart';
+import 'package:careflow_app/app/core/ui/app_colors.dart';
 
 class ProfissionalPerfilPublicoPage extends StatelessWidget {
   const ProfissionalPerfilPublicoPage({super.key});
@@ -20,58 +23,179 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
     }
 
     return Scaffold(
-      body: Padding(
+      extendBodyBehindAppBar: true,
+      body: CustomScrollView(
+        slivers: [
+          _buildHeader(context, profissional),
+          _buildBody(context, profissional),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 72.0), // Space for NavBarWidget
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 56.0), // Adjust FAB position due to custom NavBar
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            // TODO: Implementar navegação para agendamento
+          },
+          label: const Text('Agendar Consulta'),
+          icon: const Icon(Icons.calendar_month_rounded), // Consistent icon
+          backgroundColor: AppColors.accent,
+          foregroundColor: AppColors.primaryDark,
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildHeader(
+      BuildContext context, Profissional profissional) {
+    final ThemeData theme = Theme.of(context);
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildCircleAvatar(profissional),
+            const SizedBox(height: 16.0),
+            Text(
+              profissional.nome,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.headlineSmall.copyWith(
+                color: theme.colorScheme.onBackground, // Cor do texto adaptada ao fundo
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4.0),
+            Text(
+              profissional.especialidade,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.titleMedium.copyWith(
+                color: theme.colorScheme.onBackground.withOpacity(0.8), // Cor do texto adaptada
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // _buildProfileImageBackground não é mais necessário
+
+  Widget _buildCircleAvatar(Profissional profissional) {
+    return CircleAvatar(
+      radius: 64, // Tamanho do avatar ligeiramente aumentado
+      backgroundColor: AppColors.light.withOpacity(0.2), // Fundo sutil para o avatar
+      backgroundImage: (profissional.profileUrlImage != null &&
+              profissional.profileUrlImage!.isNotEmpty)
+          ? NetworkImage(profissional.profileUrlImage!)
+          : null,
+      child: (profissional.profileUrlImage == null ||
+              profissional.profileUrlImage!.isEmpty)
+          ? Icon(
+              Icons.person_rounded,
+              size: 70,
+              color: AppColors.primary.withOpacity(0.8),
+            )
+          : null,
+    );
+  }
+
+  // _buildGradientOverlay não é mais necessário
+
+  SliverToBoxAdapter _buildBody(BuildContext context, Profissional profissional) {
+    return SliverToBoxAdapter(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: const Color.fromARGB(90, 0, 0, 0),
-                child: const Icon(Icons.person, size: 50, color: Colors.white),
-                //TODO: BLOCO PARA QUANDO USER TIVER IMAGEM
-                /*                 backgroundImage:
-                    profissional.fotoUrl != null
-                        ? NetworkImage(profissional.fotoUrl!)
-                        : null,
-                child:
-                    profissional.fotoUrl == null
-                        ? const Icon(Icons.person, size: 50)
-                        : null, */
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                profissional.nome,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Center(
-              child: Text(
-                profissional.especialidade,
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            ),
-            const Divider(height: 32),
-            Text('Contato:', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text('Email: ${profissional.email}'),
-            Text('Telefone: ${profissional.telefone ?? 'Não disponível'}'),
-            const SizedBox(height: 16),
-            Text('Sobre:', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text(
-              /* profissional.sobre ?? */ 'Informações não disponíveis',
-            ), //TODO: Quando tiver item soobre de profissional ajustar
+            _buildContactCard(context, profissional),
+            const SizedBox(height: 24),
+            _buildAboutCard(context, profissional),
+            const SizedBox(height: 80), // Space for FAB
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContactCard(BuildContext context, Profissional profissional) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Informações de Contato', style: AppTextStyles.titleLarge),
+            const SizedBox(height: 16),
+            _buildInfoTile(
+              icon: Icons.badge_outlined,
+              label: 'Nº de Registro',
+              value: profissional.numeroRegistro,
+            ),
+            const Divider(height: 24),
+            _buildInfoTile(
+              icon: Icons.email_outlined,
+              label: 'Email',
+              value: profissional.email,
+            ),
+            const Divider(height: 24),
+            _buildInfoTile(
+              icon: Icons.phone_outlined,
+              label: 'Telefone',
+              value: profissional.telefone ?? 'Não informado',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutCard(BuildContext context, Profissional profissional) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Sobre', style: AppTextStyles.titleLarge),
+            const SizedBox(height: 16),
+            Text(
+              'Mais informações sobre o profissional estarão disponíveis em breve.',
+              style: AppTextStyles.bodyLarge.copyWith(height: 1.5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile(
+      {required IconData icon, required String label, required String value}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: AppColors.primary, size: 24),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppTextStyles.bodyMedium),
+              const SizedBox(height: 2),
+              Text(value, style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
