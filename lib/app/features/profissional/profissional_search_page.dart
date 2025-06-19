@@ -106,6 +106,7 @@ class _ProfissionalSearchPageState extends State<ProfissionalSearchPage> {
                       },
                     ),
           ),
+          SizedBox(height: 50),
         ],
       ),
     );
