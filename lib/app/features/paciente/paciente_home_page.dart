@@ -171,7 +171,7 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
           crossAxisCount: 2,
           crossAxisSpacing: 12.0,
           mainAxisSpacing: 12.0,
-          childAspectRatio: 1.2, 
+          childAspectRatio: 1.5, 
           children: [
             _buildQuickActionButton(
               context: context,
@@ -227,33 +227,36 @@ class _PacienteHomePageState extends State<PacienteHomePage> {
     Color? foregroundColor,
     VoidCallback? onPressed,
   }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? AppColors.primary,
-        foregroundColor: foregroundColor ?? Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        elevation: 2.0,
-        shadowColor: Colors.black.withValues(alpha: 0.1),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 32.0),
-          const SizedBox(height: 8.0),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+    return SizedBox(
+      height: 112,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor ?? AppColors.primary,
+          foregroundColor: foregroundColor ?? Colors.white,
+          padding: const EdgeInsets.all(16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
           ),
-        ],
+          elevation: 2.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 20.0,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.titleMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
