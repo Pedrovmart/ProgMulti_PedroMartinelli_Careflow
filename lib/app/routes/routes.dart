@@ -78,7 +78,10 @@ sealed class Routes {
             GoRoute(
               path: PacientesAgendamentosPage.route,
               name: calendarioName,
-              builder: (context, state) => const PacientesAgendamentosPage(),
+              builder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>?;
+                return PacientesAgendamentosPage(profissionalSelecionado: extra?['profissional']);
+              },
             ),
             GoRoute(
               path: '/paciente/perfil',

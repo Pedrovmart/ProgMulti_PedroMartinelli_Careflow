@@ -42,10 +42,18 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     this._consultasProvider,
     this._profissionalProvider,
     this._authProvider,
+    {Profissional? profissionalSelecionado}
   ) : selectedDay = DateTime.now() {
     final now = DateTime.now();
     dateController.text = DateFormat('dd/MM/yyyy').format(now);
-    selectedProfissionalId = null;
+    
+    // Se um profissional foi pré-selecionado, use seu ID
+    if (profissionalSelecionado != null) {
+      selectedProfissionalId = profissionalSelecionado.id;
+      log('Profissional pré-selecionado: ${profissionalSelecionado.nome} (ID: ${profissionalSelecionado.id})');
+    } else {
+      selectedProfissionalId = null;
+    }
   }
 
   @override

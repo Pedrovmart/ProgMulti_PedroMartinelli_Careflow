@@ -1,8 +1,10 @@
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:careflow_app/app/models/profissional_model.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
+import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_page.dart';
 
 class ProfissionalPerfilPublicoPage extends StatelessWidget {
   const ProfissionalPerfilPublicoPage({super.key});
@@ -38,7 +40,11 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 56.0), // Adjust FAB position due to custom NavBar
         child: FloatingActionButton.extended(
           onPressed: () {
-            // TODO: Implementar navegação para agendamento
+            // Navega para a página de agendamento com o profissional selecionado
+            context.push(
+              PacientesAgendamentosPage.route,
+              extra: {'profissional': profissional},
+            );
           },
           label: const Text('Agendar Consulta'),
           icon: const Icon(Icons.calendar_month_rounded), // Consistent icon

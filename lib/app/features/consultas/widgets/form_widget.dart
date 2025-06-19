@@ -208,7 +208,10 @@ class _FormWidgetState extends State<FormWidget> {
                   ),
                 )
                 : DropdownButtonFormField<String>(
-                  value: widget.controller.selectedProfissionalId,
+                  value: widget.controller.profissionais.isEmpty ? null : 
+                         (widget.controller.selectedProfissionalId != null && 
+                          widget.controller.profissionais.any((p) => p.id == widget.controller.selectedProfissionalId) ? 
+                          widget.controller.selectedProfissionalId : null),
                   hint: const Text(
                     'Selecione o profissional',
                     style: TextStyle(color: AppColors.primary),

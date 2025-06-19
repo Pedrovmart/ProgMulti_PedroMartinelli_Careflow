@@ -53,7 +53,7 @@ class NavBarWidget extends StatelessWidget {
                 children: [
                   Icon(
                     item.icon,
-                    color: isSelected ? AppColors.primaryDark : AppColors.light.withOpacity(0.7),
+                    color: isSelected ? AppColors.primaryDark : AppColors.light.withValues(alpha: 0.7),
                     size: 24,
                   ),
                   if (isSelected) ...[

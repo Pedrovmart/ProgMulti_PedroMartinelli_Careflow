@@ -7,9 +7,12 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_controller.dart';
 import 'package:careflow_app/app/features/consultas/widgets/events_list_widget.dart';
 import 'package:careflow_app/app/features/consultas/widgets/form_widget.dart';
+import 'package:careflow_app/app/models/profissional_model.dart';
 
 class PacientesAgendamentosPage extends StatelessWidget {
-  const PacientesAgendamentosPage({super.key});
+  final Profissional? profissionalSelecionado;
+  
+  const PacientesAgendamentosPage({super.key, this.profissionalSelecionado});
 
   static const String route = '/paciente/calendario';
 
@@ -36,6 +39,7 @@ class PacientesAgendamentosPage extends StatelessWidget {
               consultasProvider,
               profissionalProvider,
               authProvider,
+              profissionalSelecionado: profissionalSelecionado,
             )..init();
           },
         ),

@@ -21,6 +21,7 @@ class PerfilController extends ChangeNotifier {
   String? _profileImageUrl;
   File? _imageFile;
   String _userType = '';
+  bool _isDisposed = false;
 
   // Getters
   UserModel? get user => _user;
@@ -32,7 +33,7 @@ class PerfilController extends ChangeNotifier {
 
   /// Atualiza a URL da imagem de perfil e notifica os ouvintes
   void updateProfileImage(String imageUrl) {
-    if (imageUrl.isNotEmpty) {
+    if (imageUrl.isNotEmpty && !_isDisposed) {
       _profileImageUrl = imageUrl;
       notifyListeners();
     }
@@ -51,16 +52,18 @@ class PerfilController extends ChangeNotifier {
   }
 
   void _setLoading(bool loading) {
-    if (_isLoading == loading) return;
+    if (_isLoading == loading || _isDisposed) return;
     _isLoading = loading;
     notifyListeners();
   }
 
   Future<void> loadUserData() async {
+    if (_isDisposed) return;
+    
     _setLoading(true);
     try {
       final firebaseUser = _authProvider.currentUser;
-      if (firebaseUser == null) {
+      if (firebaseUser == null || _isDisposed) {
         _setLoading(false);
         return;
       }
@@ -355,7 +358,9 @@ class PerfilController extends ChangeNotifier {
 
       // Recarregar dados do usuário
       await loadUserData();
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     } catch (e) {
       log('Erro ao salvar dados do perfil: $e');
       rethrow;
@@ -445,6 +450,14 @@ class PerfilController extends ChangeNotifier {
     _imageFile = null;
     _userType = '';
     _setLoading(false);
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
