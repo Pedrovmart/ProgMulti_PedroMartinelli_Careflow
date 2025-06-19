@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer';
 
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/consultas_provider.dart';
@@ -12,6 +13,7 @@ import 'controllers/profissional_home_controller.dart';
 import 'widgets/home_stats_cards.dart';
 import '../../widgets/shared/upcoming_appointments_list.dart';
 import '../../widgets/shared/upcoming_appointment_card.dart';
+import '../../routes/routes.dart';
 
 class ProfissionalHomePage extends StatefulWidget {
   const ProfissionalHomePage({super.key});
@@ -119,7 +121,7 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
       appointments: compromissosData,
       isLoading: _controller.isLoading,
       emptyListMessage: 'Sua agenda está livre.',
-      emptyListIcon: Icons.event_note_outlined, // More relevant icon
+      emptyListIcon: Icons.event_note_outlined,
       onSeeAll: () {
         // TODO: Implement navigation to full schedule page
         log('Tapped see all appointments');
@@ -140,22 +142,22 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
             Expanded(
               child: _buildQuickActionButton(
                 context: context,
-                icon: Icons.search_rounded,
-                label: 'Buscar paciente',
+                icon: Icons.route_rounded,
+                label: 'Roadmap Clínico',
                 backgroundColor: Theme.of(context).primaryColorDark,
                 foregroundColor: Colors.white,
-                onPressed: () {},
+                onPressed: () => context.goNamed(Routes.profissionalRoadmapName),
               ),
             ),
             const SizedBox(width: 12.0),
             Expanded(
               child: _buildQuickActionButton(
                 context: context,
-                icon: Icons.add_circle_outline_rounded,
-                label: 'Novo agendamento',
+                icon: Icons.calendar_today_rounded,
+                label: 'Agenda',
                 backgroundColor: Theme.of(context).primaryColorDark,
                 foregroundColor: Theme.of(context).primaryColorLight,
-                onPressed: () {},
+                onPressed: () => context.goNamed(Routes.profissionalAgendamentosName),
               ),
             ),
           ],

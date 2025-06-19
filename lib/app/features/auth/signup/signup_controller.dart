@@ -1,17 +1,32 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class SignupController extends ChangeNotifier {
   final AuthProvider _authProvider;
+  final ProfissionalProvider _profissionalProvider;
 
-  SignupController(this._authProvider);
+  SignupController(this._authProvider, this._profissionalProvider) {
+    _profissionalProvider.addListener(_onProfissionalProviderChanged);
+  }
+  
+  void _onProfissionalProviderChanged() {
+    notifyListeners();
+  }
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController especialidadeController = TextEditingController();
   final TextEditingController numRegistroController = TextEditingController();
+  
+  String? _selectedEspecialidade;
+  String? get selectedEspecialidade => _selectedEspecialidade;
+  List<String> get especialidades => _profissionalProvider.especialidades;
+  bool get isLoadingEspecialidades => _profissionalProvider.isLoadingEspecialidades;
+  String? get especialidadesError => _profissionalProvider.especialidadesError;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -24,7 +39,26 @@ class SignupController extends ChangeNotifier {
 
   void setIsProfissional(bool value) {
     _isProfissional = value;
+    if (value) {
+      fetchEspecialidades();
+    }
     notifyListeners();
+  }
+  
+  void setSelectedEspecialidade(String? especialidade) {
+    _selectedEspecialidade = especialidade;
+    notifyListeners();
+  }
+  
+  Future<void> fetchEspecialidades() async {
+    try {
+      await _profissionalProvider.fetchEspecialidades();
+    } catch (e) {
+      log('Erro ao buscar especialidades: $e');
+    }
+  }
+  
+  Future<void> init() async {
   }
 
   Future<String?> registerUser(BuildContext context) async {
@@ -36,11 +70,18 @@ class SignupController extends ChangeNotifier {
       return null;
     }
 
-    if (_isProfissional &&
-        (especialidadeController.text.isEmpty || numRegistroController.text.isEmpty)) { 
-      _errorMessage = 'Para profissional, preencha especialidade e número de registro.';
-      notifyListeners();
-      return null;
+    if (_isProfissional) {
+      if (numRegistroController.text.isEmpty) {
+        _errorMessage = 'Para profissional, preencha o número de registro.';
+        notifyListeners();
+        return null;
+      }
+      
+      if (_selectedEspecialidade == null) {
+        _errorMessage = 'Selecione uma especialidade.';
+        notifyListeners();
+        return null;
+      }
     }
 
     _isLoading = true;
@@ -54,7 +95,7 @@ class SignupController extends ChangeNotifier {
           emailController.text.trim(),
           passwordController.text.trim(),
           nameController.text.trim(),
-          especialidadeController.text.trim(),
+          _selectedEspecialidade ?? '',
           numRegistroController.text.trim(), 
         );
         if (_authProvider.isAuthenticated) {
@@ -85,7 +126,6 @@ class SignupController extends ChangeNotifier {
       } else {
         _errorMessage = 'Ocorreu um erro desconhecido durante o cadastro.';
       }
-      // TODO: Adicionar logging do erro para depuração
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -106,8 +146,8 @@ class SignupController extends ChangeNotifier {
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    especialidadeController.dispose();
-    numRegistroController.dispose(); 
+    numRegistroController.dispose();
+    _profissionalProvider.removeListener(_onProfissionalProviderChanged);
     super.dispose();
   }
 }

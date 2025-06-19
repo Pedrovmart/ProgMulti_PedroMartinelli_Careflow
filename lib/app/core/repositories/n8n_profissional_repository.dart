@@ -12,13 +12,13 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final N8nHttpClient _httpClient;
   final StorageService _storageService;
 
-  // Endpoints específicos para profissionais
   final String _endpointBase = '/profissionais';
   final String _endpointGetAll = '/profissionais';
   final String _endpointGetById = '/profissional';
   final String _endpointCreate = '/novoProfissional';
   final String _endpointUpdate = '/atualizaUser';
   final String _endpointDelete = '/excluirProfissional';
+  final String _endpointEspecialidades = '/especialidades';
 
   N8nProfissionalRepository(this._httpClient, {StorageService? storageService})
     : _storageService = storageService ?? StorageService();
@@ -251,6 +251,28 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
           .toList();
     } catch (e) {
       throw Exception('Erro ao buscar profissionais por empresa: $e');
+    }
+  }
+
+  /// Busca a lista de especialidades disponíveis
+  Future<List<String>> getEspecialidades() async {
+    try {
+      final response = await _httpClient.get(_endpointEspecialidades);
+      
+      if (response.data != null) {
+        final List<dynamic> data = response.data is List ? response.data : [];
+        // Extrai apenas os nomes das especialidades do JSON
+        return data
+            .whereType<Map<String, dynamic>>()
+            .map((json) => json['especialidade'].toString())
+            .toList();
+      } else {
+        log('Resposta vazia do endpoint de especialidades');
+        throw Exception('Falha ao carregar especialidades');
+      }
+    } catch (e) {
+      log('Exceção ao buscar especialidades: $e');
+      throw Exception('Erro ao conectar com o servidor');
     }
   }
 }

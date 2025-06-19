@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:careflow_app/app/core/providers/auth_provider.dart';
+import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/core/ui/app_text_styles.dart';
 import 'package:careflow_app/app/features/auth/signup/signup_controller.dart';
@@ -14,14 +15,66 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => SignupController(context.read<AuthProvider>()),
+      create: (context) => SignupController(
+        context.read<AuthProvider>(),
+        context.read<ProfissionalProvider>(),
+      )..init(),
       child: const _SignUpView(),
     );
   }
 }
 
-class _SignUpView extends StatelessWidget {
+class _SignUpView extends StatefulWidget {
   const _SignUpView();
+  
+  @override
+  State<_SignUpView> createState() => _SignUpViewState();
+}
+
+class _SignUpViewState extends State<_SignUpView> {
+  bool _isLoadingEspecialidades = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Usar addPostFrameCallback para evitar o erro de assertão '!_dirty'
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _carregarEspecialidades();
+    });
+  }
+  
+ 
+  Future<void> _carregarEspecialidades() async {
+    setState(() {
+      _isLoadingEspecialidades = true;
+    });
+    
+    try {
+      final controller = context.read<SignupController>();
+      await controller.fetchEspecialidades();
+    } catch (e) {
+      debugPrint('Erro ao carregar especialidades: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao carregar especialidades'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingEspecialidades = false;
+        });
+      }
+    }
+  }
+  
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   // Helper para criar os TextFields padronizados
   Widget _buildAuthTextField({
@@ -107,10 +160,70 @@ class _SignUpView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   if (controller.isProfissional) ...[
-                    _buildAuthTextField(
-                      controller: controller.especialidadeController,
-                      labelText: 'Especialidade',
-                      icon: Icons.medical_services_outlined,
+                    // Dropdown de especialidades
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.primary),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        children: [
+                          Icon(Icons.medical_services_outlined, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Consumer<SignupController>(
+                              builder: (context, controller, _) {
+                                return DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    hint: const Text('Selecione a especialidade'),
+                                    value: controller.selectedEspecialidade,
+                                    icon: _isLoadingEspecialidades
+                                        ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: Center(
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          )
+                                        : controller.especialidades.isEmpty
+                                            ? IconButton(
+                                                icon: const Icon(
+                                                  Icons.refresh,
+                                                  color: AppColors.primary,
+                                                ),
+                                                onPressed: _carregarEspecialidades,
+                                                tooltip: 'Carregar especialidades',
+                                              )
+                                            : null,
+                                    items: controller.especialidades.isEmpty
+                                        ? [
+                                            DropdownMenuItem<String>(
+                                              value: '',
+                                              enabled: false,
+                                              child: Text(
+                                                'Nenhuma especialidade encontrada',
+                                                style: TextStyle(
+                                                  color: AppColors.primary.withValues(alpha: 0.7),
+                                                ),
+                                              ),
+                                            ),
+                                          ]
+                                        : controller.especialidades.map((esp) {
+                                            return DropdownMenuItem<String>(
+                                              value: esp,
+                                              child: Text(esp),
+                                            );
+                                          }).toList(),
+                                    onChanged: controller.setSelectedEspecialidade,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _buildAuthTextField(

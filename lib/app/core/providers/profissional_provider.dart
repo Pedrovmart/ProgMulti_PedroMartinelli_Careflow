@@ -7,7 +7,6 @@ import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.d
 import 'package:careflow_app/app/core/http/n8n_http_client.dart';
 
 class ProfissionalProvider extends ChangeNotifier {
-  // Repositório n8n para operações CRUD
   late final N8nProfissionalRepository _n8nRepository;
   final N8nHttpClient _n8nClient;
 
@@ -16,54 +15,47 @@ class ProfissionalProvider extends ChangeNotifier {
   }
 
   List<Profissional> _profissionais = [];
+  List<String> _especialidades = [];
+  bool _isLoadingEspecialidades = false;
+  String? _especialidadesError;
 
   List<Profissional> get profissionais => _profissionais;
+  List<String> get especialidades => _especialidades;
+  bool get isLoadingEspecialidades => _isLoadingEspecialidades;
+  String? get especialidadesError => _especialidadesError;
 
   Future<void> fetchProfissionais() async {
     try {
-      // Busca os profissionais do n8n
       _profissionais = await _n8nRepository.getAll();
-
-      // Notifica os ouvintes sobre a mudança
       notifyListeners();
     } catch (e) {
-      // Lança uma exceção com a mensagem de erro
       throw Exception("Erro ao buscar profissionais: ${e.toString()}");
     }
   }
 
-  // O método addProfissional não é mais necessário aqui
-  // A criação de profissionais é feita pelo AuthRepository
-  // Este método pode ser usado para sincronização se necessário
+
   Future<void> syncProfissional(Profissional profissional) async {
     try {
-      // Verifica se o profissional já existe no n8n
       final profissionalExistente = await _n8nRepository.getById(
         profissional.id,
       );
 
       if (profissionalExistente == null) {
-        // Se não existir, cria um novo
         await _n8nRepository.create(profissional);
       } else {
-        // Se existir, atualiza
         await _n8nRepository.update(profissional.id, profissional);
       }
 
-      // Atualiza a lista local
       await fetchProfissionais();
     } catch (e) {
       debugPrint('Erro ao sincronizar profissional com n8n: $e');
-      // Não lança exceção para não interromper o fluxo principal
     }
   }
 
   Future<void> removeProfissional(String id) async {
     try {
-      // Remove do n8n
       await _n8nRepository.delete(id);
 
-      // Atualiza a lista local
       _profissionais = _profissionais.where((p) => p.id != id).toList();
       notifyListeners();
     } catch (e) {
@@ -73,10 +65,8 @@ class ProfissionalProvider extends ChangeNotifier {
 
   Future<void> updateProfissional(Profissional updatedProfissional) async {
     try {
-      // Atualiza no n8n
       await _n8nRepository.update(updatedProfissional.id, updatedProfissional);
 
-      // Atualiza a lista local
       _profissionais =
           _profissionais
               .map(
@@ -98,7 +88,6 @@ class ProfissionalProvider extends ChangeNotifier {
     }
   }
 
-  // Método para buscar profissionais por especialidade
   Future<List<Profissional>> getProfissionaisByEspecialidade(
     String especialidade,
   ) async {
@@ -111,26 +100,11 @@ class ProfissionalProvider extends ChangeNotifier {
     }
   }
 
-  // Método para buscar profissionais por empresa
-  Future<List<Profissional>> getProfissionaisByEmpresa(String empresaId) async {
-    try {
-      return await _n8nRepository.getByEmpresa(empresaId);
-    } catch (e) {
-      throw Exception(
-        "Erro ao buscar profissionais por empresa: ${e.toString()}",
-      );
-    }
-  }
 
   String? _currentProfileImage;
 
   String? get currentProfileImage => _currentProfileImage;
 
-  /// Faz upload de uma nova imagem de perfil para o profissional
-  ///
-  /// [profissionalId] - ID do profissional
-  /// [imageFile] - Arquivo de imagem a ser enviado
-  /// Retorna a URL da imagem após o upload
   Future<String?> uploadProfileImage(
     String profissionalId,
     File imageFile,
@@ -141,10 +115,9 @@ class ProfissionalProvider extends ChangeNotifier {
         imageFile,
       );
 
-      _currentProfileImage = imageUrl; // Atualiza a imagem atual
+      _currentProfileImage = imageUrl; 
       notifyListeners();
 
-      // Atualiza a lista local se o profissional estiver nela
       final index = _profissionais.indexWhere((p) => p.id == profissionalId);
       if (index != -1) {
         final profissional = _profissionais[index];
@@ -168,10 +141,6 @@ class ProfissionalProvider extends ChangeNotifier {
     }
   }
 
-  /// Obtém a URL da imagem de perfil do profissional
-  ///
-  /// [profissionalId] - ID do profissional
-  /// Retorna a URL da imagem ou null se não houver imagem
   Future<String?> getProfileImageUrl(String profissionalId) async {
     try {
       return await _n8nRepository.getProfileImageUrl(profissionalId);
@@ -186,11 +155,32 @@ class ProfissionalProvider extends ChangeNotifier {
   Future<void> update(String id, Profissional profissional) async {
     try {
       await _n8nRepository.update(id, profissional);
-      await getProfissionalById(id); // Recarregar dados após atualização
+      await getProfissionalById(id); 
       notifyListeners();
     } catch (e) {
       log('Erro ao atualizar profissional: $e');
       rethrow;
     }
   }
+  
+  Future<List<String>> fetchEspecialidades() async {
+    try {
+      _isLoadingEspecialidades = true;
+      _especialidadesError = null;
+      notifyListeners();
+      
+      _especialidades = await _n8nRepository.getEspecialidades();
+      
+      _isLoadingEspecialidades = false;
+      notifyListeners();
+      return _especialidades;
+    } catch (e) {
+      _isLoadingEspecialidades = false;
+      _especialidadesError = "Erro ao buscar especialidades: ${e.toString()}";
+      notifyListeners();
+      
+      throw Exception(_especialidadesError);
+    }
+  }
+
 }

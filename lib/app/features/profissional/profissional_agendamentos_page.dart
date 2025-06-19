@@ -40,11 +40,6 @@ class ProfissionalAgendamentosPage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Meus Agendamentos'),
-          centerTitle: true,
-          elevation: 0,
-        ),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: const _ProfissionalAgendamentosPageContent(),
       ),

@@ -223,25 +223,6 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     }
   }
 
-  @override
-  Future<void> atualizarConsultaParcial(
-    String consultaId,
-    Map<String, dynamic> fieldsToUpdate,
-  ) async {
-    try {
-      await _consultasProvider.atualizarConsultaParcial(
-        consultaId,
-        fieldsToUpdate,
-      );
-      await fetchConsultations(); // Recarrega as consultas para refletir a atualização
-      notifyListeners();
-    } catch (e) {
-      log(
-        'PacientesAgendamentosController - Erro ao atualizar consulta parcialmente: $e',
-      );
-      rethrow;
-    }
-  }
 
   @override
   Future<void> cancelAppointment(String consultaId) async {

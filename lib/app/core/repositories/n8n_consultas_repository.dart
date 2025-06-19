@@ -27,6 +27,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       final List<dynamic> data = response.data ?? []; 
       return data
           .whereType<Map<String, dynamic>>()
+          .where((item) => _isValidConsultaMap(item))
           .map((item) {
             log('N8nConsultasRepository.getAll - Raw item from API: $item');
             return ConsultaModel.fromMap(item);
@@ -49,6 +50,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
       return data
           .whereType<Map<String, dynamic>>()
+          .where((item) => _isValidConsultaMap(item))
           .map((item) {
             log('N8nConsultasRepository.getByPacienteId - Raw item from API: $item');
             return ConsultaModel.fromMap(item);
@@ -70,6 +72,8 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
       return data
           .whereType<Map<String, dynamic>>()
+          // Filtra mapas vazios ou que não contenham dados mínimos necessários
+          .where((item) => _isValidConsultaMap(item))
           .map((item) {
             log('N8nConsultasRepository.getByProfissionalId - Raw item from API: $item');
             return ConsultaModel.fromMap(item);
@@ -145,6 +149,28 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
   Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
 
+  /// Verifica se um mapa de consulta contém os dados mínimos necessários
+  /// para ser considerado válido
+  bool _isValidConsultaMap(Map<String, dynamic> map) {
+    // Verifica se o mapa não está vazio
+    if (map.isEmpty) {
+      log('Consulta inválida: mapa vazio');
+      return false;
+    }
+
+    // Verifica campos obrigatórios
+    // Uma consulta válida deve ter pelo menos um ID e um dos campos essenciais
+    final hasId = map['id'] != null || map['_id'] != null || map['idConsulta'] != null;
+    final hasEssentialData = map['idMedico'] != null || map['idPaciente'] != null;
+    
+    final isValid = hasId && hasEssentialData;
+    
+    if (!isValid) {
+      log('Consulta inválida: faltam campos obrigatórios. Map: $map');
+    }
+    
+    return isValid;
+  }
 
   // ESSA É A MANEIRA CORRETA PARA MIM FAZER 
   Future<List<ConsultaModel>> fetchConsultasAgendadas() => getAll();
