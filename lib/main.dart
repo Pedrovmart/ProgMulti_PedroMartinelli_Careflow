@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show kDebugMode, debugPrint;
 import 'app/app.dart';
 import 'app/core/dependency_injection.dart';
 import 'app/core/ui/app_theme.dart';
+import 'app/core/services/supabase_service.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -23,6 +24,8 @@ void main() {
       debugPrint('Variáveis de ambiente carregadas com sucesso');
       await Firebase.initializeApp();
       debugPrint('Firebase inicializado com sucesso');
+      await SupabaseService.initializeGlobally();
+      debugPrint('Supabase inicializado com sucesso');
       await DependencyInjection.init();
       debugPrint('Injeção de dependências inicializada');
       runApp(App(theme: AppTheme.themeData));

@@ -6,11 +6,13 @@ import 'package:careflow_app/app/core/repositories/n8n_paciente_repository.dart'
 import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
 import 'package:careflow_app/app/core/repositories/repository_manager.dart';
 import 'package:careflow_app/app/core/services/storage_service.dart';
+import 'package:careflow_app/app/core/services/supabase_service.dart';
 
 class DependencyInjection {
   static bool _initialized = false;
   static late final N8nHttpClient _httpClient;
   static late final RepositoryManager _repositoryManager;
+  static late final SupabaseService _supabaseService;
 
   static Future<void> init() async {
     if (_initialized) return;
@@ -18,6 +20,7 @@ class DependencyInjection {
     try {
       _httpClient = N8nHttpClient();
       _repositoryManager = RepositoryManager();
+      _supabaseService = SupabaseService();
 
       final storageService = StorageService();
 
@@ -59,6 +62,11 @@ class DependencyInjection {
   static N8nProfissionalRepository get profissionalRepository {
     if (!_initialized) throw Exception("DependencyInjection não inicializado.");
     return _repositoryManager.getProfissionalRepository();
+  }
+
+  static SupabaseService get supabaseService {
+    if (!_initialized) throw Exception("DependencyInjection não inicializado.");
+    return _supabaseService;
   }
 
   static void reset() {

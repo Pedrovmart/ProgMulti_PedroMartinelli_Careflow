@@ -1,8 +1,10 @@
 import 'dart:developer'; // Adicionado para log
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/supabase_service.dart';
 
 class AuthRepository {
+  final SupabaseService _supabaseService = SupabaseService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   // Autenticação do usuário
@@ -52,14 +54,19 @@ class AuthRepository {
     String numRegistro, 
   ) async {
     try {
+      await _supabaseService.initialize();
+      
       final UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
       await userCredential.user?.updateDisplayName(name);
+      
+      final uid = userCredential.user!.uid;
+      
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc('profissionais')
           .collection('profissionais')
-          .doc(userCredential.user!.uid)
+          .doc(uid)
           .set({
             'nome': name,
             'email': email,
@@ -68,8 +75,18 @@ class AuthRepository {
             'userType': 'profissional',
             'createdAt': FieldValue.serverTimestamp(),
           });
+      
+      await _supabaseService.insertProfissional(
+        nome: name,
+        email: email,
+        especialidade: especialidade,
+        numRegistro: numRegistro,
+        firebaseUid: uid,
+      );
+      
       return userCredential.user;
     } catch (e) {
+      log('Erro ao registrar profissional: ${e.toString()}');
       throw Exception("Falha ao registrar profissional: ${e.toString()}");
     }
   }
