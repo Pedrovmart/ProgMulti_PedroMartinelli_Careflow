@@ -5,8 +5,8 @@ import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:careflow_app/app/core/providers/profissional_provider.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/core/providers/consultas_provider.dart';
-import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart'; // Added import
-import 'package:careflow_app/app/core/dependency_injection.dart'; // Added import
+import 'package:careflow_app/app/core/repositories/n8n_profissional_repository.dart';
+import 'package:careflow_app/app/core/dependency_injection.dart';
 import 'package:provider/provider.dart';
 
 class App extends StatelessWidget {

@@ -100,7 +100,7 @@ class _ProfissionalMainPageState extends State<ProfissionalMainPage> {
     if (confirmed == true) {
       await authProvider.signOut();
       if (context.mounted) {
-        context.go(LoginPage.route); // Use LoginPage.route
+        context.go(LoginPage.route); 
       }
     }
   }

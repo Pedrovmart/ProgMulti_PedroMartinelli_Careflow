@@ -26,7 +26,6 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
   void initState() {
     super.initState();
     _loadPacienteData();
-    // Mover a inicialização do PerfilController para depois do carregamento dos dados
     _initPerfilController();
   }
 
@@ -139,10 +138,7 @@ class _PacienteMainPageState extends State<PacienteMainPage> {
           ),
           body: Stack(
             children: [
-              // O conteúdo principal agora preenche toda a Stack.
               widget.child,
-
-              // A NavBar é alinhada na parte inferior. A margem interna do próprio widget cuidará do espaçamento.
               Align(
                 alignment: Alignment.bottomCenter,
                 child: NavBarWidget(

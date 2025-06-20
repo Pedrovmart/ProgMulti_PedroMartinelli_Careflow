@@ -129,7 +129,6 @@ class ProfissionalHomeController extends ChangeNotifier {
         return false;
       }
       
-      // Se for hoje, verifica se a hora já passou
       if (dataConsulta.year == hoje.year && 
           dataConsulta.month == hoje.month && 
           dataConsulta.day == hoje.day) {
@@ -166,11 +165,10 @@ class ProfissionalHomeController extends ChangeNotifier {
     
     final proximosCompromissos = <Map<String, dynamic>>[];
     
-    // 'hoje' is already defined in the outer scope of _processarDados
     for (var consulta in consultasFuturas) {
       final horaInicio = consulta.hora;
       final horaFim = _calcularHoraFim(horaInicio);
-      final dataConsulta = _parseData(consulta.data); // Parse dataConsulta inside the loop
+      final dataConsulta = _parseData(consulta.data);
 
       final horario = (dataConsulta != null && dataConsulta.year == hoje.year && 
                      dataConsulta.month == hoje.month && dataConsulta.day == hoje.day)
@@ -180,7 +178,6 @@ class ProfissionalHomeController extends ChangeNotifier {
       String? profileUrlImage;
       if (consulta.idPaciente.isNotEmpty) {
         try {
-          // Use N8nPacienteRepository to get the profile image URL
           profileUrlImage = await _n8nPacienteRepository.getProfileImageUrl(consulta.idPaciente);
           log('Imagem de perfil para ${consulta.idPaciente}: $profileUrlImage');
         } catch (e) {
@@ -189,9 +186,9 @@ class ProfissionalHomeController extends ChangeNotifier {
       }
       
       _todasAsConsultasFuturas.add({
-        'nome': consulta.nome, // Use dot notation
+        'nome': consulta.nome,
         'horario': horario,
-        'id': consulta.id ?? 'temp-${consulta.idPaciente}-${consulta.data}-${consulta.hora}', // Use dot notation
+        'id': consulta.id ?? 'temp-${consulta.idPaciente}-${consulta.data}-${consulta.hora}',
         'profileUrlImage': profileUrlImage,
       });
     }

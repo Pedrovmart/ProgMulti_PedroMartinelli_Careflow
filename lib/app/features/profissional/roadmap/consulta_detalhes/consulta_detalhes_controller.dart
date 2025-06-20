@@ -84,41 +84,31 @@ class ConsultaDetalhesController extends ChangeNotifier {
     }
   }
 
-  /// Remove formatação Markdown para exibição em campos de texto simples
   String _removerFormatacaoMarkdown(String markdown) {
     if (markdown.isEmpty) return '';
     
-    // Remove cabeçalhos
     String texto = markdown.replaceAll(RegExp(r'^#+\s*', multiLine: true), '');
     
-    // Remove negrito e itálico
     texto = texto.replaceAll(RegExp(r'[*_]{1,3}(.*?)[*_]{1,3}'), r'$1');
     
-    // Remove links
     texto = texto.replaceAll(RegExp(r'\[(.*?)\]\(.*?\)'), r'$1');
     
-    // Remove listas
     texto = texto.replaceAll(RegExp(r'^[\s]*[-*+]\s', multiLine: true), '');
     
-    // Remove blocos de código
     texto = texto.replaceAll(RegExp(r'```[\s\S]*?```', multiLine: true), '');
     
-    // Remove citações
     texto = texto.replaceAll(RegExp(r'^>\s*', multiLine: true), '');
     
-    // Remove múltiplas quebras de linha
     texto = texto.replaceAll(RegExp(r'\n{3,}'), '\n\n');
     
     return texto.trim();
   }
 
-  /// Atualiza o conteúdo sem formatação
   void atualizarConteudoSemFormatacao() {
     _conteudoSemFormatacao = _removerFormatacaoMarkdown(_markdownContent ?? '');
     notifyListeners();
   }
 
-  /// Atualiza o diagnóstico do paciente
   Future<void> atualizarDiagnostico({
     required BuildContext context,
     required String idProfissional,
@@ -139,7 +129,6 @@ class ConsultaDetalhesController extends ChangeNotifier {
         diagnostico: novoDiagnostico,
       );
 
-      // Recarrega os detalhes da consulta após a atualização
       await carregarDetalhesConsulta(
         idProfissional: idProfissional,
         idPaciente: idPaciente,

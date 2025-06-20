@@ -8,25 +8,23 @@ class ProfissionalSearchCard extends StatelessWidget {
   final String nome;
   final String especialidade;
   final String numeroRegistro;
-  final String? profileUrlImage; // Added profileUrlImage
+  final String? profileUrlImage;
 
   const ProfissionalSearchCard({
     super.key,
     required this.nome,
     required this.especialidade,
     required this.numeroRegistro,
-    this.profileUrlImage, // Added profileUrlImage to constructor
+    this.profileUrlImage,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      // Elevation, margin, shape, and color will be inherited from AppTheme.cardTheme
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            // Placeholder for the professional's image
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Builder(
@@ -35,7 +33,7 @@ class ProfissionalSearchCard extends StatelessWidget {
                     return CircleAvatar(
                       radius: 30,
                       backgroundImage: NetworkImage(profileUrlImage!),
-                      backgroundColor: Colors.transparent, // Or a subtle placeholder color
+                      backgroundColor: Colors.transparent, 
                     );
                   } else {
                     final String initials = UiHelpers.getInitials(nome);
@@ -54,27 +52,26 @@ class ProfissionalSearchCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            // Professional's details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     nome,
-                    style: Theme.of(context).textTheme.titleMedium, // Uses AppTextStyles.titleMedium via AppTheme
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     especialidade,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.primaryDark.withOpacity(0.9),
+                          color: AppColors.primaryDark.withValues(alpha: 0.9),
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Registro: $numeroRegistro',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith( // Uses AppTextStyles.caption via AppTheme
-                          color: AppColors.primary.withOpacity(0.8),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.primary.withValues(alpha: 0.8),
                         ),
                   ),
                 ],

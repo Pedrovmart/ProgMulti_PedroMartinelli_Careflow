@@ -31,23 +31,22 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
           _buildHeader(context, profissional),
           _buildBody(context, profissional),
           const SliverToBoxAdapter(
-            child: SizedBox(height: 72.0), // Space for NavBarWidget
+            child: SizedBox(height: 72.0), 
           ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 56.0), // Adjust FAB position due to custom NavBar
+        padding: const EdgeInsets.only(bottom: 56.0), 
         child: FloatingActionButton.extended(
           onPressed: () {
-            // Navega para a página de agendamento com o profissional selecionado
             context.push(
               PacientesAgendamentosPage.route,
               extra: {'profissional': profissional},
             );
           },
           label: const Text('Agendar Consulta'),
-          icon: const Icon(Icons.calendar_month_rounded), // Consistent icon
+          icon: const Icon(Icons.calendar_month_rounded), 
           backgroundColor: AppColors.accent,
           foregroundColor: AppColors.primaryDark,
         ),
@@ -71,7 +70,7 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
               profissional.nome,
               textAlign: TextAlign.center,
               style: AppTextStyles.headlineSmall.copyWith(
-                color: theme.colorScheme.onBackground, // Cor do texto adaptada ao fundo
+                color: theme.colorScheme.onSurface, 
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -80,7 +79,7 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
               profissional.especialidade,
               textAlign: TextAlign.center,
               style: AppTextStyles.titleMedium.copyWith(
-                color: theme.colorScheme.onBackground.withOpacity(0.8), // Cor do texto adaptada
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.8), 
               ),
             ),
           ],
@@ -89,12 +88,10 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
     );
   }
 
-  // _buildProfileImageBackground não é mais necessário
-
   Widget _buildCircleAvatar(Profissional profissional) {
     return CircleAvatar(
-      radius: 64, // Tamanho do avatar ligeiramente aumentado
-      backgroundColor: AppColors.light.withOpacity(0.2), // Fundo sutil para o avatar
+      radius: 64, 
+      backgroundColor: AppColors.light.withValues(alpha: 0.2), 
       backgroundImage: (profissional.profileUrlImage != null &&
               profissional.profileUrlImage!.isNotEmpty)
           ? NetworkImage(profissional.profileUrlImage!)
@@ -104,13 +101,11 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
           ? Icon(
               Icons.person_rounded,
               size: 70,
-              color: AppColors.primary.withOpacity(0.8),
+              color: AppColors.primary.withValues(alpha: 0.8),
             )
           : null,
     );
   }
-
-  // _buildGradientOverlay não é mais necessário
 
   SliverToBoxAdapter _buildBody(BuildContext context, Profissional profissional) {
     return SliverToBoxAdapter(
@@ -122,7 +117,7 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
             _buildContactCard(context, profissional),
             const SizedBox(height: 24),
             _buildAboutCard(context, profissional),
-            const SizedBox(height: 80), // Space for FAB
+            const SizedBox(height: 80), 
           ],
         ),
       ),

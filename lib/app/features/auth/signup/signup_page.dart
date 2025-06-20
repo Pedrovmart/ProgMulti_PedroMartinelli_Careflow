@@ -37,7 +37,6 @@ class _SignUpViewState extends State<_SignUpView> {
   @override
   void initState() {
     super.initState();
-    // Usar addPostFrameCallback para evitar o erro de assertão '!_dirty'
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _carregarEspecialidades();
     });
@@ -76,7 +75,6 @@ class _SignUpViewState extends State<_SignUpView> {
     super.dispose();
   }
 
-  // Helper para criar os TextFields padronizados
   Widget _buildAuthTextField({
     required TextEditingController controller,
     required String labelText,
@@ -160,7 +158,6 @@ class _SignUpViewState extends State<_SignUpView> {
                   ),
                   const SizedBox(height: 16),
                   if (controller.isProfissional) ...[
-                    // Dropdown de especialidades
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.primary),
@@ -248,7 +245,6 @@ class _SignUpViewState extends State<_SignUpView> {
                         final navRoute = await controller.registerUser(context);
                         if (context.mounted) {
                           if (navRoute != null) {
-                            // Navega para a rota retornada em caso de sucesso
                             context.go(navRoute);
                           } else if (controller.errorMessage != null) {
                             ScaffoldMessenger.of(context).showSnackBar(

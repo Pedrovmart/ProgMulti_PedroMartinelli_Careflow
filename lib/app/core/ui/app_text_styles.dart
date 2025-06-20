@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart'; // Importar as cores definidas
+import 'app_colors.dart';
 
-// Definições de TextStyle baseadas no design da ProfissionalAgendamentosPage
-// As fontes 'Manrope' e 'Noto Sans' devem ser adicionadas ao pubspec.yaml e à pasta assets/
-// Por enquanto, usaremos as fontes padrão do sistema ou uma fallback comum.
-const String _fontFamilyPrimary = 'Manrope'; // Exemplo, se configurado
-const String _fontFamilySecondary = 'Noto Sans'; // Exemplo, se configurado
+const String _fontFamilyPrimary = 'Manrope';
+const String _fontFamilySecondary = 'Noto Sans';
 
 class AppTextStyles {
   static const TextStyle displayLarge = TextStyle(
-    // Exemplo: Título grande, como o valor nos cards de estatística
     fontFamily: _fontFamilyPrimary,
     fontSize: 30.0,
     fontWeight: FontWeight.bold,
@@ -20,19 +16,18 @@ class AppTextStyles {
   static const TextStyle headlineSmall = TextStyle(
     fontFamily: _fontFamilyPrimary,
     fontSize: 20.0,
-    fontWeight: FontWeight.w600, // semibold
+    fontWeight: FontWeight.w600,
     color: AppColors.primaryDark,
   );
   
   static const TextStyle titleLarge = TextStyle(
     fontFamily: _fontFamilyPrimary,
     fontSize: 22.0,
-    fontWeight: FontWeight.w600, // semibold
+    fontWeight: FontWeight.w600,
     color: AppColors.primaryDark,
   );
 
   static const TextStyle headlineLarge = TextStyle(
-    // Exemplo: 'Olá, Dr. Silva'
     fontFamily: _fontFamilyPrimary,
     fontSize: 20.0,
     fontWeight: FontWeight.bold,
@@ -40,18 +35,16 @@ class AppTextStyles {
   );
 
   static const TextStyle headlineMedium = TextStyle(
-    // Exemplo: Títulos de seção como 'Próximos compromissos'
     fontFamily: _fontFamilyPrimary,
     fontSize: 18.0,
-    fontWeight: FontWeight.w600, // semibold
+    fontWeight: FontWeight.w600,
     color: AppColors.primaryDark,
   );
 
   static const TextStyle titleMedium = TextStyle(
-    // Exemplo: Nome do paciente no item de agendamento 'Consulta com Maria Souza'
     fontFamily: _fontFamilyPrimary,
     fontSize: 16.0,
-    fontWeight: FontWeight.w500, // medium
+    fontWeight: FontWeight.w500,
     color: AppColors.primaryDark,
   );
 
@@ -63,7 +56,6 @@ class AppTextStyles {
   );
 
   static const TextStyle bodyMedium = TextStyle(
-    // Exemplo: Título do card de estatística 'Pacientes hoje', Hora do agendamento '10:00 - 10:30'
     fontFamily: _fontFamilySecondary,
     fontSize: 14.0,
     fontWeight: FontWeight.normal,
@@ -73,16 +65,15 @@ class AppTextStyles {
   static const TextStyle bodyMediumBold = TextStyle(
     fontFamily: _fontFamilySecondary,
     fontSize: 14.0,
-    fontWeight: FontWeight.w500, // medium (usado no HTML como font-medium para o título do card)
+    fontWeight: FontWeight.w500,
     color: AppColors.primary, 
   );
 
   static const TextStyle labelLarge = TextStyle(
-    // Exemplo: Texto dos botões de ação rápida 'Buscar paciente'
     fontFamily: _fontFamilyPrimary,
     fontSize: 14.0,
-    fontWeight: FontWeight.w600, // semibold
-    color: Colors.white, // Para contraste em botões com fundo primário
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
   );
 
   static const TextStyle caption = TextStyle(
@@ -92,17 +83,15 @@ class AppTextStyles {
     color: AppColors.primaryLight,
   );
 
-  // Adicione mais estilos conforme necessário
-
   static ButtonStyle get seeMoreTextButtonStyle {
     return TextButton.styleFrom(
-      foregroundColor: AppColors.primary, // Cor do texto
+      foregroundColor: AppColors.primary,
       textStyle: AppTextStyles.bodyMedium.copyWith(
         fontWeight: FontWeight.bold,
       ),
-      padding: EdgeInsets.zero, // Remove padding extra do TextButton
-      minimumSize: Size.zero, // Permite que o botão seja tão pequeno quanto o texto
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // Reduz a área de toque ao mínimo
+      padding: EdgeInsets.zero,
+      minimumSize: Size.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }

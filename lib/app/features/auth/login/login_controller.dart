@@ -54,7 +54,6 @@ class LoginController extends ChangeNotifier {
       } else {
         _errorMessage = 'Ocorreu um erro desconhecido ao tentar fazer login.';
       }
-      // TODO: Adicionar logging do erro para depuração
     } finally {
       _isLoading = false;
       notifyListeners();

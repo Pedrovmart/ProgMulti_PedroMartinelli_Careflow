@@ -144,7 +144,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       data['telefone'] = profissional.telefone;
     }
 
-    // Adicionar campo de imagem de perfil se existir
     if (profissional.profileUrlImage != null) {
       data['profileUrlImage'] = profissional.profileUrlImage;
     }
@@ -157,7 +156,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     File imageFile,
   ) async {
     try {
-      // Faz upload da imagem para o Firebase Storage
       final imageUrl = await _storageService.uploadFile(
         file: imageFile,
         folder: 'users_images',
@@ -165,7 +163,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
             'profissional_$profissionalId${path.extension(imageFile.path)}',
       );
 
-      // Atualiza o perfil do profissional com a nova URL da imagem
       await _httpClient.put(
         '/atualizaImagemUser?idUser=$profissionalId',
         data: {'profileImageUrl': imageUrl, 'userType': 'profissionais'},
@@ -178,30 +175,22 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     }
   }
 
-  /// Obtém a URL da imagem de perfil do profissional
-  ///
-  /// [profissionalId] - ID do profissional
-  /// Retorna a URL da imagem ou null se não houver imagem
   Future<String?> getProfileImageUrl(String profissionalId) async {
     try {
-      // Tenta obter do perfil do profissional
       final profissional = await getById(profissionalId);
       if (profissional?.profileUrlImage != null &&
           profissional!.profileUrlImage!.isNotEmpty) {
         return profissional.profileUrlImage;
       }
 
-      // Se não encontrar no perfil, tenta buscar diretamente do storage
       try {
         final ref = FirebaseStorage.instance
             .ref()
             .child('users_images')
             .child('profissional_$profissionalId');
 
-        // Lista todos os arquivos do profissional (pode ter extensões diferentes)
         final result = await ref.listAll();
 
-        // Retorna a primeira imagem encontrada
         if (result.items.isNotEmpty) {
           return await result.items.first.getDownloadURL();
         }
@@ -215,8 +204,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
       return null;
     }
   }
-
-  // Métodos específicos do domínio de profissionais
 
   Future<List<Profissional>> getByEspecialidade(String especialidade) async {
     try {
@@ -254,14 +241,12 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     }
   }
 
-  /// Busca a lista de especialidades disponíveis
   Future<List<String>> getEspecialidades() async {
     try {
       final response = await _httpClient.get(_endpointEspecialidades);
       
       if (response.data != null) {
         final List<dynamic> data = response.data is List ? response.data : [];
-        // Extrai apenas os nomes das especialidades do JSON
         return data
             .whereType<Map<String, dynamic>>()
             .map((json) => json['especialidade'].toString())

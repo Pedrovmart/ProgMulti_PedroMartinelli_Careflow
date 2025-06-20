@@ -23,7 +23,6 @@ class PerfilController extends ChangeNotifier {
   String _userType = '';
   bool _isDisposed = false;
 
-  // Getters
   UserModel? get user => _user;
   bool get isLoading => _isLoading;
   String? get profileImageUrl => _profileImageUrl;
@@ -31,7 +30,6 @@ class PerfilController extends ChangeNotifier {
   String get userType => _userType;
   bool get canEditProfileImage => _userType == 'paciente' || _userType == 'profissional';
 
-  /// Atualiza a URL da imagem de perfil e notifica os ouvintes
   void updateProfileImage(String imageUrl) {
     if (imageUrl.isNotEmpty && !_isDisposed) {
       _profileImageUrl = imageUrl;
@@ -134,7 +132,6 @@ class PerfilController extends ChangeNotifier {
         try {
           final response = await Dio().head(url);
           if (response.statusCode == 200) {
-            // Atualiza o usuário com a URL da imagem
             if (_user is Profissional) {
               final profissional = _user as Profissional;
               _user = Profissional(
@@ -201,7 +198,6 @@ class PerfilController extends ChangeNotifier {
         }
       } catch (e) {
         debugPrint('Erro ao fazer upload da imagem: $e');
-        // Tratar erro aqui
       }
     }
   }
@@ -219,7 +215,6 @@ class PerfilController extends ChangeNotifier {
         _profileImageUrl = url;
         _imageFile = null;
 
-        // Atualiza o usuário local com a nova URL da imagem
         if (_user is Paciente) {
           final paciente = _user as Paciente;
           _user = Paciente(
@@ -233,7 +228,6 @@ class PerfilController extends ChangeNotifier {
             profileUrlImage: url,
           );
 
-          // Força a atualização do paciente no provider
           await _pacienteProvider.getPacienteById(userId);
         }
 
@@ -262,7 +256,6 @@ class PerfilController extends ChangeNotifier {
         _profileImageUrl = url;
         _imageFile = null;
 
-        // Atualiza o usuário local com a nova URL da imagem
         if (_user is Profissional) {
           final profissional = _user as Profissional;
           _user = Profissional(
@@ -276,7 +269,6 @@ class PerfilController extends ChangeNotifier {
             profileUrlImage: url,
           );
 
-          // Força a atualização do profissional no provider
           await _profissionalProvider.getProfissionalById(userId);
         }
 
@@ -300,7 +292,6 @@ class PerfilController extends ChangeNotifier {
       final userId = _authProvider.currentUser?.uid;
       if (userId == null) throw Exception('Usuário não autenticado');
 
-      // Upload de imagem se necessário
       if (_imageFile != null) {
         if (_userType == 'paciente') {
           await _uploadImageForPaciente(userId);
@@ -309,7 +300,6 @@ class PerfilController extends ChangeNotifier {
         }
       }
 
-      // Atualizar dados do usuário
       if (_userType == 'paciente' && _user is Paciente) {
         final paciente = _user as Paciente;
 
@@ -319,9 +309,9 @@ class PerfilController extends ChangeNotifier {
           if (dateParts.length == 3) {
             try {
               newDate = DateTime(
-                int.parse(dateParts[2]), // ano
-                int.parse(dateParts[1]), // mês
-                int.parse(dateParts[0]), // dia
+                int.parse(dateParts[2]), 
+                int.parse(dateParts[1]), 
+                int.parse(dateParts[0]), 
               );
             } catch (e) {
               log('Erro ao converter data: $e');
@@ -356,7 +346,6 @@ class PerfilController extends ChangeNotifier {
         await _profissionalProvider.update(userId, updatedProfissional);
       }
 
-      // Recarregar dados do usuário
       await loadUserData();
       if (!_isDisposed) {
         notifyListeners();
@@ -369,7 +358,6 @@ class PerfilController extends ChangeNotifier {
     }
   }
 
-  // Retorna um mapa com as informações formatadas do usuário para exibição
   Map<String, String> getUserInfoMap() {
     if (_user == null) return {};
 

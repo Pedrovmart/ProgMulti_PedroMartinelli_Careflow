@@ -19,7 +19,6 @@ class ConsultaErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Ícone de erro
             Container(
               width: 100,
               height: 100,
@@ -34,7 +33,6 @@ class ConsultaErrorWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            // Mensagem de erro
             Text(
               'Ocorreu um erro',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(

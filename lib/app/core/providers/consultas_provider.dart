@@ -11,22 +11,17 @@ class ConsultasProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  // Construtor vazio - o repositório é obtido através do RepositoryManager
   ConsultasProvider();
 
   List<ConsultaModel> get consultas => _consultas;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
 
-
-  // Limpa os erros
   void clearError() {
     _error = null;
     notifyListeners();
   }
 
-  // Busca todas as consultas agendadas
   Future<void> fetchConsultasAgendadas() async {
     _isLoading = true;
     _error = null;
@@ -59,7 +54,6 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
   
-  /// Atualiza o diagnóstico de uma consulta
   Future<void> atualizarDiagnostico({
     required String idConsulta,
     required String diagnostico,
@@ -145,8 +139,6 @@ class ConsultasProvider extends ChangeNotifier {
 
     try {
       await _consultasRepository.updatePartialFields(consultaId, fieldsToUpdate);
-      // Após a atualização, é uma boa prática recarregar os dados para refletir as mudanças.
-      // Escolha o método de fetch mais apropriado aqui, por exemplo, fetchConsultasAgendadas ou um fetch específico se o ID do paciente/profissional estiver disponível.
       await fetchConsultasAgendadas(); 
     } catch (e) {
       _error = "Erro ao atualizar parcialmente a consulta: ${e.toString()}";

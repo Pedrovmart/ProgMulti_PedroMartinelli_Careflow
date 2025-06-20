@@ -20,23 +20,18 @@ class _FormWidgetState extends State<FormWidget> {
   @override
   void initState() {
     super.initState();
-    // Carrega profissionais quando o widget inicializa se a lista estiver vazia
     if (widget.controller.profissionais.isEmpty) {
       _carregarProfissionais();
     }
   }
-
-  // Método para carregar profissionais usando o controller
   Future<void> _carregarProfissionais() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Usa o método do controller para carregar os profissionais
       await widget.controller.fetchProfissionais();
     } catch (e) {
-      // Trata o erro silenciosamente
       debugPrint('Erro ao carregar profissionais: $e');
     } finally {
       if (mounted) {

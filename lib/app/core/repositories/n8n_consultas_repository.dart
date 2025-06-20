@@ -8,7 +8,6 @@ import 'dart:developer';
 class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   final N8nHttpClient _httpClient;
 
-  // Endpoints específicos
   final String _endpointConsultasPaciente = '/consultasPaciente';
   final String _endpointConsultasProfissional = '/consultasProfissional';
   final String _endpointNovaConsulta = '/novaConsulta';
@@ -72,7 +71,6 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
       return data
           .whereType<Map<String, dynamic>>()
-          // Filtra mapas vazios ou que não contenham dados mínimos necessários
           .where((item) => _isValidConsultaMap(item))
           .map((item) {
             log('N8nConsultasRepository.getByProfissionalId - Raw item from API: $item');
@@ -122,7 +120,6 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  /// Atualiza o diagnóstico de uma consulta
   Future<void> atualizarDiagnostico({
     required String idConsulta,
     required String diagnostico,
@@ -149,17 +146,12 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
 
   Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
 
-  /// Verifica se um mapa de consulta contém os dados mínimos necessários
-  /// para ser considerado válido
   bool _isValidConsultaMap(Map<String, dynamic> map) {
-    // Verifica se o mapa não está vazio
     if (map.isEmpty) {
       log('Consulta inválida: mapa vazio');
       return false;
     }
 
-    // Verifica campos obrigatórios
-    // Uma consulta válida deve ter pelo menos um ID e um dos campos essenciais
     final hasId = map['id'] != null || map['_id'] != null || map['idConsulta'] != null;
     final hasEssentialData = map['idMedico'] != null || map['idPaciente'] != null;
     

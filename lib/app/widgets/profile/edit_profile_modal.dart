@@ -30,14 +30,12 @@ class _EditProfileModalState extends State<EditProfileModal> {
     super.initState();
     _controllers = {};
 
-    // Inicializar controllers para campos editáveis
     for (final field in widget.editableFields) {
       _controllers[field] = TextEditingController(
         text: widget.initialData[field] ?? '',
       );
     }
 
-    // Inicializar controllers para campos somente leitura
     for (final field in widget.readOnlyFields) {
       _controllers[field] = TextEditingController(
         text: widget.initialData[field] ?? '',
@@ -63,20 +61,18 @@ class _EditProfileModalState extends State<EditProfileModal> {
     });
 
     try {
-      // Coletar dados atualizados
       final updatedData = <String, String>{};
       for (final entry in _controllers.entries) {
         updatedData[entry.key] = entry.value.text;
       }
 
-      // Adicionar campos não editáveis de volta
+
       for (final entry in widget.initialData.entries) {
         if (!updatedData.containsKey(entry.key)) {
           updatedData[entry.key] = entry.value;
         }
       }
 
-      // Chamar callback de salvamento
       await widget.onSave(updatedData);
 
       if (mounted) {
@@ -128,7 +124,6 @@ class _EditProfileModalState extends State<EditProfileModal> {
                 ),
                 const SizedBox(height: 16),
 
-                // Campos somente leitura
                 ...widget.readOnlyFields.map(
                   (field) => _buildTextField(
                     field,
@@ -137,7 +132,6 @@ class _EditProfileModalState extends State<EditProfileModal> {
                   ),
                 ),
 
-                // Campos editáveis
                 ...widget.editableFields.map(
                   (field) => _buildTextField(field, _controllers[field]!),
                 ),
@@ -176,7 +170,6 @@ class _EditProfileModalState extends State<EditProfileModal> {
     TextEditingController controller, {
     bool readOnly = false,
   }) {
-    // Tornar o campo de email sempre somente leitura
     final isEmailField = field.toLowerCase() == 'email';
     final isReadOnly = readOnly || isEmailField;
 

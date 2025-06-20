@@ -6,7 +6,6 @@ class SupabaseService {
   static bool _initialized = false;
   static late final SupabaseClient _client;
   
-  // Método estático para inicialização global
   static Future<void> initializeGlobally() async {
     if (_initialized) return;
     
@@ -33,7 +32,6 @@ class SupabaseService {
     }
   }
   
-  // Método de instância para garantir inicialização
   Future<void> initialize() async {
     if (!_initialized) {
       await initializeGlobally();

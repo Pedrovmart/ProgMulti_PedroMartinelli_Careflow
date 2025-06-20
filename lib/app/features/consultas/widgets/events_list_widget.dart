@@ -234,18 +234,18 @@ class _EventsListWidgetState extends State<EventsListWidget> {
               
               try {             
                 if (context.mounted) {
-                  Navigator.pop(context); // Fecha o diálogo primeiro
+                  Navigator.pop(context); 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Consulta atualizada com sucesso!'),
-                      backgroundColor: AppColors.success, // Usando a cor de sucesso do AppColors
+                      backgroundColor: AppColors.success, 
                     ),
                   );
                 }
               } catch (e) {
                 log('Erro ao atualizar consulta no _showEditDialog: $e');
                 if (context.mounted) {
-                  Navigator.pop(context); // Fecha o diálogo mesmo em caso de erro
+                  Navigator.pop(context); 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Erro ao atualizar consulta: ${e.toString().replaceFirst("Exception: ", "")}'),

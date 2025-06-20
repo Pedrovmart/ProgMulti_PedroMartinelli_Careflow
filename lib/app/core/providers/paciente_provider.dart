@@ -84,7 +84,6 @@ class PacienteProvider extends ChangeNotifier {
       _currentProfileImage = imageUrl;
       notifyListeners();
 
-      // Update local list if patient exists
       final index = _pacientes.indexWhere((p) => p.id == pacienteId);
       if (index != -1) {
         final paciente = _pacientes[index];
@@ -116,7 +115,7 @@ class PacienteProvider extends ChangeNotifier {
   Future<void> update(String id, Paciente paciente) async {
     try {
       await _pacienteRepository.update(id, paciente);
-      await getPacienteById(id); // Recarregar dados após atualização
+      await getPacienteById(id); 
       notifyListeners();
     } catch (e) {
       log('Erro ao atualizar paciente: $e');

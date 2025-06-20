@@ -98,14 +98,12 @@ class AppTheme {
         displayLarge: AppTextStyles.displayLarge,
         headlineLarge: AppTextStyles.headlineLarge,
         headlineMedium: AppTextStyles.headlineMedium,
-        titleLarge: AppTextStyles.titleMedium, // Material titleLarge mapeado para nosso titleMedium
+        titleLarge: AppTextStyles.titleMedium,
         titleMedium: AppTextStyles.titleMedium,
         bodyLarge: AppTextStyles.bodyLarge,
         bodyMedium: AppTextStyles.bodyMedium,
-        labelLarge: AppTextStyles.labelLarge, // Para botões
+        labelLarge: AppTextStyles.labelLarge,
       ),
-
-      // Outros temas de componentes
     );
   }
 }

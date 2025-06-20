@@ -1,4 +1,4 @@
-import 'dart:developer'; // Adicionado para log
+import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/supabase_service.dart';
@@ -7,7 +7,6 @@ class AuthRepository {
   final SupabaseService _supabaseService = SupabaseService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  // Autenticação do usuário
   Future<User?> loginWithEmailAndPassword(String email, String password) async {
     try {
       final UserCredential userCredential = await _firebaseAuth
@@ -18,7 +17,6 @@ class AuthRepository {
     }
   }
 
-  // Método de cadastro para Paciente
   Future<User?> registerPaciente(
     String email,
     String password,

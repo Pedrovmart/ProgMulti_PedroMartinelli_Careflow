@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/consultas_provider.dart';
 import '../../core/ui/app_text_styles.dart';
-import '../../core/repositories/n8n_paciente_repository.dart'; // Changed import
-import '../../core/http/n8n_http_client.dart'; // Added import
+import '../../core/repositories/n8n_paciente_repository.dart'; 
+import '../../core/http/n8n_http_client.dart'; 
 import 'controllers/profissional_home_controller.dart';
 import 'widgets/home_stats_cards.dart';
 import '../../widgets/shared/upcoming_appointments_list.dart';
@@ -40,13 +40,13 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
   void _initController() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final consultasProvider = Provider.of<ConsultasProvider>(context, listen: false);
-    final httpClient = N8nHttpClient(); // Instantiate N8nHttpClient
-    final n8nPacienteRepository = N8nPacienteRepository(httpClient); // Instantiate N8nPacienteRepository
+    final httpClient = N8nHttpClient();
+    final n8nPacienteRepository = N8nPacienteRepository(httpClient);
     
     _controller = ProfissionalHomeController(
       authProvider: authProvider,
       consultasProvider: consultasProvider,
-      n8nPacienteRepository: n8nPacienteRepository, // Pass N8nPacienteRepository
+      n8nPacienteRepository: n8nPacienteRepository,
     );
     
     _controller.addListener(_refreshUI);
@@ -107,7 +107,7 @@ class _ProfissionalHomePageState extends State<ProfissionalHomePage> {
       return AppointmentCardData(
         imageUrl: compromisso["profileUrlImage"] as String? ?? 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(nomePaciente)}&background=random&color=FFFFFF',
         title: 'Consulta com $nomePaciente',
-        subtitle1: null, // Profissional view might not have a subtitle1 like specialty
+        subtitle1: null, 
         subtitle2: compromisso["horario"] as String? ?? 'Horário indefinido',
         onTap: () {
           // TODO: Implement navigation to appointment details or patient profile

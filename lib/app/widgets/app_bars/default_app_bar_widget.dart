@@ -8,7 +8,7 @@ import '../../core/ui/app_colors.dart';
 import '../../core/ui/app_text_styles.dart';
 
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title; // Title is not directly used in the current design, but kept for potential future use
+  final String title; 
   final String? userImageUrl;
   final String? userName;
   final String? userRole;
@@ -55,7 +55,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20.0,
             offset: const Offset(0, 4),
           ),
@@ -80,10 +80,10 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                         height: 44,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.accent.withOpacity(0.7), width: 1.5),
+                          border: Border.all(color: AppColors.accent.withValues(alpha: 0.7), width: 1.5),
                         ),
                         child: CircleAvatar(
-                          backgroundColor: AppColors.light.withOpacity(0.1),
+                          backgroundColor: AppColors.light.withValues(alpha: 0.1),
                           backgroundImage: (currentImageUrl != null && currentImageUrl.isNotEmpty)
                               ? NetworkImage(currentImageUrl)
                               : null,
@@ -116,10 +116,10 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
-                                  vertical: 2, // Reduzido para corrigir pequeno overflow
+                                  vertical: 2, 
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.accent.withOpacity(0.2),
+                                  color: AppColors.accent.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(

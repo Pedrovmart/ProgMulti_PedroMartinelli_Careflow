@@ -6,10 +6,10 @@ class ProfileInfoWidget extends StatelessWidget {
   final VoidCallback onEditTap;
 
   const ProfileInfoWidget({
-    Key? key,
+    super.key,
     required this.userInfo,
     required this.onEditTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

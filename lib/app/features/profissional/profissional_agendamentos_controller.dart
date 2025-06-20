@@ -12,21 +12,18 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   final AuthProvider _authProvider;
   final ProfissionalProvider _profissionalProvider;
   
-  // Form field controllers
+
   final TextEditingController _queixaPacienteController = TextEditingController();
   String? _selectedProfissionalId;
   final List<Profissional> _profissionais = [];
   
-  // Calendar state
   @override
   DateTime selectedDay;
   @override
   TimeOfDay? selectedTime;
   
-  // Events map for the calendar
   final Map<String, List<ConsultaModel>> events = {};
   
-  // Text editing controllers
   @override
   final TextEditingController dateController = TextEditingController();
   @override
@@ -41,7 +38,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
     dateController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
   }
   
-  // Getters and setters
   @override
   TextEditingController get queixaPacienteController => _queixaPacienteController;
   
@@ -63,7 +59,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   @override
   DateTime get lastDay => DateTime.now().add(const Duration(days: 365));
   
-  // Initialization
   Future<void> init() async {
     selectedDay = DateTime.now().toLocal();
     dateController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
@@ -109,7 +104,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   Future<void> fetchProfissionais() async {
     try {
       _profissionais.clear();
-      // Fetch profissionais using the ProfissionalProvider
       await _profissionalProvider.fetchProfissionais();
       _profissionais.addAll(_profissionalProvider.profissionais);
       notifyListeners();
@@ -119,7 +113,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
     }
   }
   
-  // Calendar methods
   @override
   DateTime getValidFocusedDay() {
     if (selectedDay.isAfter(lastDay)) return lastDay;
@@ -139,7 +132,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
     notifyListeners();
   }
   
-  // Appointment operations
   @override
   Future<void> updateAppointment(ConsultaModel consulta) async {
     try {
@@ -181,7 +173,6 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
     // TODO: Implement actual consultation scheduling
   }
   
-  // Cleanup
   @override
   void dispose() {
     dateController.dispose();

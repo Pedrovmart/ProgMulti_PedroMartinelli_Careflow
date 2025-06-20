@@ -54,7 +54,6 @@ class ProfissionalRoadmapController extends ChangeNotifier {
   void _processarConsultasDoDia(List<ConsultaModel> consultas) {
     final hoje = DateTime.now();
     
-    // Filtra apenas as consultas de hoje TODO: NAO ESTA FUNCIONANDO CORRETAMENTE
     _consultasDoDia = consultas.where((consulta) {
       final dataConsulta = _parseData(consulta.data);
       if (dataConsulta == null) return false;

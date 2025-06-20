@@ -65,18 +65,15 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
   ProfissionalProvider get profissionalProvider => _profissionalProvider;
 
   Future<void> init() async {
-    // Garantir que a data selecionada esteja no fuso horário local
     selectedDay = DateTime.now().toLocal();
     dateController.text = DateFormat('dd/MM/yyyy').format(selectedDay);
 
     log('init - Data selecionada inicializada: ${selectedDay.toString()}');
     log('init - Data formatada: ${dateController.text}');
 
-    // Carregar consultas e profissionais
     await fetchConsultations();
     await fetchProfissionais();
 
-    // Forçar notificação para atualizar a UI
     notifyListeners();
   }
 
@@ -164,11 +161,9 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
           log(
             '_groupConsultationsByDate - Erro ao processar data: $dateStr - $e',
           );
-          // Se não conseguir converter, usa a data original
         }
       }
 
-      // Adicionar a consulta ao grupo correspondente
       if (groupedEvents[dateStr] == null) {
         groupedEvents[dateStr] = [];
       }
@@ -185,7 +180,6 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
 
   @override
   List<ConsultaModel> getEventsForDay(DateTime day) {
-    // Normaliza a data para garantir que estamos comparando apenas dia, mês e ano
     final normalizedDay = DateTime(day.year, day.month, day.day);
     final formattedDate = DateFormat('dd/MM/yyyy').format(normalizedDay);
 
@@ -194,7 +188,6 @@ class PacientesAgendamentosController extends BaseAgendamentosController {
     );
     log('getEventsForDay - Chaves disponíveis: ${events.keys.join(', ')}');
 
-    // Busca eventos para a data formatada
     final matchingEvents = events[formattedDate] ?? [];
 
     log(

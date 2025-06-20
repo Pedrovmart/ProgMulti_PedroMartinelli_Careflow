@@ -6,7 +6,6 @@ class N8nHttpClient {
   final Dio _dio;
   final String _baseUrl;
   
-  /// Public getter for the base URL
   String get baseUrl => _baseUrl;
   final String _username;
   final String _password;
