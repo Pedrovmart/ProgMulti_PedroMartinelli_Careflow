@@ -16,6 +16,7 @@ import 'package:careflow_app/app/features/perfil/perfil_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_agendamentos_page.dart';
 import 'package:careflow_app/app/features/profissional/roadmap/profissional_roadmap_page.dart';
 import 'package:careflow_app/app/features/profissional/profissional_search_page.dart';
+import 'package:careflow_app/app/features/paciente/historico/historico_paciente_page.dart';
 
 sealed class Routes {
   static const String loginName = 'login';
@@ -32,6 +33,7 @@ sealed class Routes {
   static const String profissionalConsultaDetalhesName =
       'profissionalConsultaDetalhes';
   static const String perfilProfissionalName = 'perfilProfissional';
+  static const String historicoPacienteName = 'historicoPaciente';
 
   static GoRouter createRouter({
     String? initialLocation,
@@ -87,6 +89,17 @@ sealed class Routes {
               path: '/paciente/perfil',
               name: perfilPacienteName,
               builder: (context, state) => const PerfilPage(),
+            ),
+            GoRoute(
+              path: HistoricoPacientePage.route,
+              name: historicoPacienteName,
+              builder: (context, state) {
+                final args = state.extra as Map<String, dynamic>? ?? {};
+                return HistoricoPacientePage(
+                  pacienteId: args['pacienteId'] ?? '',
+                  nomePaciente: args['nomePaciente'] ?? 'Paciente',
+                );
+              },
             ),
           ],
         ),

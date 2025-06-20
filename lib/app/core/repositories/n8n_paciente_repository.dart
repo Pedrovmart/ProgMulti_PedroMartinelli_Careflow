@@ -16,6 +16,8 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
   final String _endpointCreate = '/novoPaciente';
   final String _endpointUpdate = '/atualizaUser';
   final String _endpointDelete = '/excluirPaciente';
+  final String _endpointUpdateImage = '/atualizaImagemUser';
+  final String _endpointHistorico = '/historicoPaciente';
 
   N8nPacienteRepository(this._httpClient, {StorageService? storageService})
     : _storageService = storageService ?? StorageService();
@@ -159,7 +161,7 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
 
       try {
         await _httpClient.put(
-          '/atualizaImagemUser',
+          _endpointUpdateImage,
           queryParameters: {'idUser': pacienteId},
           data: {'profileImageUrl': imageUrl, 'userType': 'pacientes'},
         );
@@ -187,6 +189,32 @@ class N8nPacienteRepository implements BaseRepository<Paciente> {
     } catch (e) {
       log('Erro ao obter URL da imagem de perfil: $e');
       return null;
+    }
+  }
+
+  Future<List<dynamic>> getHistoricoPaciente(String pacienteId) async {
+    try {
+      final response = await _httpClient.get(
+        _endpointHistorico,
+        queryParameters: {'pacienteId': pacienteId},
+      );
+
+      if (response.data == null) {
+        return [];
+      }
+
+      if (response.data is Map<String, dynamic>) {
+        return [response.data];
+      }
+
+      if (response.data is List) {
+        return response.data;
+      }
+
+      return [];
+    } catch (e) {
+      log('Erro ao buscar histórico do paciente: $e');
+      throw Exception('Falha ao buscar histórico do paciente: $e');
     }
   }
 }

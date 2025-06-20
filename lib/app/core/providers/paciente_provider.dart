@@ -122,4 +122,14 @@ class PacienteProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<List<dynamic>> getHistoricoPaciente({required String pacienteId}) async {
+    try {
+      final historico = await _pacienteRepository.getHistoricoPaciente(pacienteId);
+      return historico;
+    } catch (e) {
+      log('Erro ao buscar histórico do paciente: $e');
+      throw Exception('Falha ao buscar histórico do paciente: $e');
+    }
+  }
 }

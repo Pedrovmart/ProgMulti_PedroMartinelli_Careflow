@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/routes/routes.dart';
+import 'package:careflow_app/app/core/providers/auth_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../models/consulta_model.dart';
 import '../../models/profissional_model.dart';
 import '../../core/providers/consultas_provider.dart';
@@ -104,7 +106,18 @@ class PacienteHomeController with ChangeNotifier {
   }
 
   void navigateToHistoricoMedico(BuildContext context) {
-    GoRouter.of(context).goNamed(Routes.perfilPacienteName);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.currentUser;
+    
+    if (user != null) {
+      GoRouter.of(context).goNamed(
+        Routes.historicoPacienteName,
+        extra: {
+          'pacienteId': user.uid,
+          'nomePaciente': user.displayName ?? 'Paciente',
+        },
+      );
+    }
   }
 
   void navigateToPerfil(BuildContext context) {
