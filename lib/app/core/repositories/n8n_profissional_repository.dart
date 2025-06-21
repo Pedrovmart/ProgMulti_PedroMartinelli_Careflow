@@ -15,9 +15,9 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final String _endpointGetAll = '/profissionais';
   final String _endpointGetById = '/profissional';
   final String _endpointCreate = '/novoProfissional';
-  final String _endpointUpdate = '/atualizaUser';
   final String _endpointDelete = '/excluirProfissional';
   final String _endpointEspecialidades = '/especialidades';
+  final String _endpointUpdate = '/atualizaUser';
 
   N8nProfissionalRepository(this._httpClient, {StorageService? storageService})
     : _storageService = storageService ?? StorageService();
@@ -145,6 +145,10 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
 
     if (profissional.profileUrlImage != null) {
       data['profileUrlImage'] = profissional.profileUrlImage;
+    }
+
+    if (profissional.sobre != null) {
+      data['sobre'] = profissional.sobre;
     }
 
     return data;

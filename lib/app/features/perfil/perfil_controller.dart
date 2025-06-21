@@ -143,6 +143,7 @@ class PerfilController extends ChangeNotifier {
                 dataNascimento: profissional.dataNascimento,
                 telefone: profissional.telefone,
                 profileUrlImage: url,
+                sobre: profissional.sobre,
               );
             }
             notifyListeners();
@@ -341,6 +342,7 @@ class PerfilController extends ChangeNotifier {
               updatedData['especialidade'] ?? profissional.especialidade,
           numeroRegistro: profissional.numeroRegistro,
           profileUrlImage: profissional.profileUrlImage,
+          sobre: updatedData['sobre'] ?? profissional.sobre,
         );
 
         await _profissionalProvider.update(userId, updatedProfissional);
@@ -380,6 +382,7 @@ class PerfilController extends ChangeNotifier {
         'Telefone': profissional.telefone ?? 'Não informado',
         'Especialidade': profissional.especialidade,
         'Número de Registro': profissional.numeroRegistro,
+        'Sobre': profissional.sobre ?? 'Não informado',
       };
     }
     return {};
@@ -419,8 +422,9 @@ class PerfilController extends ChangeNotifier {
         'telefone': profissional.telefone ?? '',
         'especialidade': profissional.especialidade,
         'numeroRegistro': profissional.numeroRegistro,
+        'sobre': profissional.sobre ?? '',
       };
-      editableFields = ['nome', 'telefone', 'especialidade'];
+      editableFields = ['nome', 'telefone', 'especialidade', 'sobre'];
       readOnlyFields = ['email', 'numeroRegistro'];
     }
 

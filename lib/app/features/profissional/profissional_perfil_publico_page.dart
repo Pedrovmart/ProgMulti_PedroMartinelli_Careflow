@@ -170,7 +170,7 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
             Text('Sobre', style: AppTextStyles.titleLarge),
             const SizedBox(height: 16),
             Text(
-              'Mais informações sobre o profissional estarão disponíveis em breve.',
+              profissional.sobre ?? 'Mais informações sobre o profissional estarão disponíveis em breve.',
               style: AppTextStyles.bodyLarge.copyWith(height: 1.5),
             ),
           ],
