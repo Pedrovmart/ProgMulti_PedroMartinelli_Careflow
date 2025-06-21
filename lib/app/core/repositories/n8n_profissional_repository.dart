@@ -12,7 +12,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
   final N8nHttpClient _httpClient;
   final StorageService _storageService;
 
-  final String _endpointBase = '/profissionais';
   final String _endpointGetAll = '/profissionais';
   final String _endpointGetById = '/profissional';
   final String _endpointCreate = '/novoProfissional';
@@ -202,42 +201,6 @@ class N8nProfissionalRepository implements BaseRepository<Profissional> {
     } catch (e) {
       log('Erro ao obter URL da imagem de perfil: $e');
       return null;
-    }
-  }
-
-  Future<List<Profissional>> getByEspecialidade(String especialidade) async {
-    try {
-      final response = await _httpClient.get(
-        _endpointBase,
-        queryParameters: {'especialidade': especialidade},
-      );
-
-      final List<dynamic> data = response.data is List ? response.data : [];
-
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map((item) => Profissional.fromJson(item))
-          .toList();
-    } catch (e) {
-      throw Exception('Erro ao buscar profissionais por especialidade: $e');
-    }
-  }
-
-  Future<List<Profissional>> getByEmpresa(String empresaId) async {
-    try {
-      final response = await _httpClient.get(
-        _endpointBase,
-        queryParameters: {'idEmpresa': empresaId},
-      );
-
-      final List<dynamic> data = response.data is List ? response.data : [];
-
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map((item) => Profissional.fromJson(item))
-          .toList();
-    } catch (e) {
-      throw Exception('Erro ao buscar profissionais por empresa: $e');
     }
   }
 

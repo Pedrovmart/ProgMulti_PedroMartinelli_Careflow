@@ -88,18 +88,6 @@ class ProfissionalProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<Profissional>> getProfissionaisByEspecialidade(
-    String especialidade,
-  ) async {
-    try {
-      return await _n8nRepository.getByEspecialidade(especialidade);
-    } catch (e) {
-      throw Exception(
-        "Erro ao buscar profissionais por especialidade: ${e.toString()}",
-      );
-    }
-  }
-
 
   String? _currentProfileImage;
 
