@@ -127,7 +127,6 @@ class _HistoricoContentWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: md.Markdown(
                   data: controller.markdownContent!,
-                  styleSheet: controller.markdownStyle,
                   padding: const EdgeInsets.all(8.0),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
