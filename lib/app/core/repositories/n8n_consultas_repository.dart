@@ -98,8 +98,14 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   }
 
   @override
-  Future<void> update(String id, ConsultaModel item) {
-    throw UnimplementedError('Este método não é utilizado por este repositório.');
+  Future<void> update(String id, ConsultaModel item) async {
+    try {
+      // Delega para o método updatePartialFields que usa o endpoint /atualizaConsulta
+      await updatePartialFields(id, item.toMap());
+    } catch (e) {
+      log('Erro ao atualizar consulta: $e');
+      throw Exception('Erro ao atualizar consulta: $e');
+    }
   }
 
   Future<void> updatePartialFields(String consultaId, Map<String, dynamic> fieldsToUpdate) async {

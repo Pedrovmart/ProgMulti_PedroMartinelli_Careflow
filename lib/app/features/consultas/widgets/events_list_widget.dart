@@ -232,7 +232,21 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                 return;
               }
               
-              try {             
+              try {
+                final consultaAtualizada = ConsultaModel(
+                  id: consulta.id,
+                  data: consulta.data,
+                  hora: timeController.text,
+                  queixaPaciente: queixaController.text,
+                  idPaciente: consulta.idPaciente,
+                  idMedico: consulta.idMedico,
+                  nome: consulta.nome,
+                  descricao: consulta.descricao,
+                  diagnostico: consulta.diagnostico,
+                );
+                
+                await widget.controller.atualizarConsulta(consultaAtualizada);
+                
                 if (context.mounted) {
                   Navigator.pop(context); 
                   ScaffoldMessenger.of(context).showSnackBar(
