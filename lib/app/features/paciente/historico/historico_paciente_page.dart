@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/core/providers/paciente_provider.dart';
 import 'package:careflow_app/app/features/paciente/historico/historico_paciente_controller.dart';
 import 'package:careflow_app/app/features/paciente/historico/widgets/content_widget.dart';
 import 'package:careflow_app/app/features/paciente/historico/widgets/empty_state_widget.dart';
 import 'package:careflow_app/app/features/paciente/historico/widgets/error_widget.dart';
 import 'package:careflow_app/app/features/paciente/historico/widgets/loading_widget.dart';
+import 'package:careflow_app/app/widgets/back_nav/back_nav_widget.dart';
+import 'package:careflow_app/app/features/paciente/paciente_home_page.dart';
 
 class HistoricoPacientePage extends StatelessWidget {
   final String pacienteId;
@@ -49,7 +52,26 @@ class _HistoricoPacienteView extends StatelessWidget {
     final controller = context.watch<HistoricoPacienteController>();
 
     return Scaffold(
-      body: _buildBody(controller, context),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 56.0),
+              child: _buildBody(controller, context),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BackNavWidget(
+                  label: 'Voltar',
+                  onPressed: () => context.pushReplacement(PacienteHomePage.route),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 

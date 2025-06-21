@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import '../../../core/providers/auth_provider.dart';
@@ -55,7 +53,7 @@ class ProfissionalHomeController extends ChangeNotifier {
       await _processarDados(consultas);
     } catch (e) {
       _errorMessage = "Erro ao buscar dados: ${e.toString()}";
-      log(_errorMessage!);
+      debugPrint(_errorMessage!);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -75,29 +73,14 @@ class ProfissionalHomeController extends ChangeNotifier {
   }
   
   Future<void> _processarDados(List<ConsultaModel> consultas) async {
-    log('Processando dados: ${consultas.length} consultas recebidas');
-    log('Data/hora atual local: ${DateTime.now().toLocal()}');
-    log('Data/hora atual UTC: ${DateTime.now().toUtc()}');
-    
     _proximosCompromissos.clear();
     _todasAsConsultasFuturas.clear();
     
-    log('Data de hoje (local): ${DateTime.now().toLocal()}');
-    log('Data de hoje (UTC): ${DateTime.now().toUtc()}');
-    
-    for (var i = 0; i < consultas.length; i++) {
-      var c = consultas[i];
-      log('Consulta $i: id=${c.id}, idPaciente=${c.idPaciente}, nome=${c.nome}, data=${c.data}, hora=${c.hora}');
-    }
-    
-
     final consultasValidas = consultas.where((c) => 
       c.idPaciente.isNotEmpty && 
       c.data.isNotEmpty && 
       c.hora.isNotEmpty
     ).toList();
-    
-    log('Consultas válidas: ${consultasValidas.length}');
     
     if (consultasValidas.isEmpty) {
       _pacientesHoje = '0';
@@ -119,15 +102,9 @@ class ProfissionalHomeController extends ChangeNotifier {
     final hoje = DateTime.now();
     final hojeInicioDia = DateTime(hoje.year, hoje.month, hoje.day);
     
-    log('Data/hora atual: $hoje');
-    log('Início do dia: $hojeInicioDia');
-    
     final consultasFuturas = consultasOrdenadas.where((consulta) {
       final dataConsulta = _parseData(consulta.data);
-      if (dataConsulta == null) {
-        log('Data inválida: ${consulta.data}');
-        return false;
-      }
+      if (dataConsulta == null) return false;
       
       if (dataConsulta.year == hoje.year && 
           dataConsulta.month == hoje.month && 
@@ -138,20 +115,14 @@ class ProfissionalHomeController extends ChangeNotifier {
             hoje.year, hoje.month, hoje.day,
             horaConsulta.hour, horaConsulta.minute
           );
-          log('Consulta hoje às ${horaConsulta.hour}:${horaConsulta.minute} - Agora: $hoje');
           return hojeComHora.isAfter(hoje.subtract(const Duration(seconds: 1)));
         }
       }
       
-      // TODO: REVER POIS NAO ESTA OK
-      // Se não for hoje, verifica se a data é futura
       final isFutura = dataConsulta.isAfter(hojeInicioDia) || 
                       dataConsulta.isAtSameMomentAs(hojeInicioDia);
-      log('Consulta em ${consulta.data} ${consulta.hora} - Futura: $isFutura');
       return isFutura;
     }).toList();
-    
-    log('Consultas futuras: ${consultasFuturas.length}');
     
     final consultasTotal = consultasFuturas.length.toString();
     
@@ -179,9 +150,8 @@ class ProfissionalHomeController extends ChangeNotifier {
       if (consulta.idPaciente.isNotEmpty) {
         try {
           profileUrlImage = await _n8nPacienteRepository.getProfileImageUrl(consulta.idPaciente);
-          log('Imagem de perfil para ${consulta.idPaciente}: $profileUrlImage');
         } catch (e) {
-          log('Erro ao buscar URL da imagem de perfil do paciente ${consulta.idPaciente}: $e');
+          debugPrint('Erro ao buscar URL da imagem de perfil: $e');
         }
       }
       
@@ -278,7 +248,6 @@ class ProfissionalHomeController extends ChangeNotifier {
       
       if (dataStr.contains('-')) {
         final date = DateTime.parse(dataStr).toLocal();
-        log('Data ISO convertida: $dataStr -> ${date.toString()}');
         return date;
       }
       
@@ -294,10 +263,9 @@ class ProfissionalHomeController extends ChangeNotifier {
       final anoAjustado = ano < 100 ? ano + 2000 : ano;
       
       final data = DateTime(anoAjustado, mes, dia);
-      log('Data parseada para $dataStr: ${data.toLocal()} (local) / $data (UTC)');
       return data;
     } catch (e) {
-      log('Erro ao fazer parse da data $dataStr: $e');
+      debugPrint('Erro ao fazer parse da data $dataStr: $e');
       return null;
     }
   }
@@ -321,7 +289,7 @@ class ProfissionalHomeController extends ChangeNotifier {
       
       return TimeOfDay(hour: hora, minute: minuto);
     } catch (e) {
-      log('Erro ao fazer parse da hora $horaStr: $e');
+      debugPrint('Erro ao fazer parse da hora $horaStr: $e');
       return null;
     }
   }

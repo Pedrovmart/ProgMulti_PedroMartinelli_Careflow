@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:careflow_app/app/models/profissional_model.dart';
 import 'package:careflow_app/app/core/ui/app_colors.dart';
 import 'package:careflow_app/app/features/consultas/pacientes_agendamentos_page.dart';
+import 'package:careflow_app/app/widgets/back_nav/back_nav_widget.dart';
 
 class ProfissionalPerfilPublicoPage extends StatelessWidget {
   const ProfissionalPerfilPublicoPage({super.key});
@@ -26,13 +27,18 @@ class ProfissionalPerfilPublicoPage extends StatelessWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: CustomScrollView(
-        slivers: [
-          _buildHeader(context, profissional),
-          _buildBody(context, profissional),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 72.0), 
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              _buildHeader(context, profissional),
+              _buildBody(context, profissional),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 72.0), 
+              ),
+            ],
           ),
+          const BackNavWidget(label: 'Voltar'),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
