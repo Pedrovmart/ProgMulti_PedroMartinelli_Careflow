@@ -123,6 +123,12 @@ class _SignUpViewState extends State<_SignUpView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Image.asset(
+                    'assets/Logos/duas_cores_e_titulosf.png',
+                    height: 200,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 5),
                   Text(
                     'Crie sua conta',
                     textAlign: TextAlign.center,

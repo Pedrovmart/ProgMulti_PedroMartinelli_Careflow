@@ -35,9 +35,7 @@ class ConsultaLoadingWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8.0),
                     child: Image.asset(
-                      'assets/loading_animation.gif',
-                      height: 120,
-                      width: 120,
+                      'assets/Logos/duas_cores_sem_fundo.png',
                       fit: BoxFit.contain,
                       frameBuilder: (
                         context,
@@ -54,7 +52,6 @@ class ConsultaLoadingWidget extends StatelessWidget {
                       },
                       cacheWidth: 240,
                       cacheHeight: 240,
-                      filterQuality: FilterQuality.low,
                     ),
                   ),
                   const SizedBox(height: 32),

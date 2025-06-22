@@ -43,8 +43,14 @@ class _LoginView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Image.asset(
+                    'assets/Logos/duas_cores_e_titulosf.png',
+                    height: 200,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 5),
                   Text(
-                    'Bem-vindo ao CareFlow',
+                    'Bem-vindo',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.headlineLarge.copyWith(fontSize: 24),
                   ),
