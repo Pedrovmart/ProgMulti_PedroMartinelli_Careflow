@@ -71,11 +71,14 @@ class ConsultaDetalhesController extends ChangeNotifier {
       );
 
       _markdownContent = _detalhesConsulta?['output'] as String?;
-      _conteudoSemFormatacao = _removerFormatacaoMarkdown(_markdownContent ?? '');
       
-      if (_markdownContent == null || _markdownContent!.isEmpty) {
+      if (_markdownContent != null && _markdownContent!.isNotEmpty) {
+        _markdownContent = _corrigirFormatacaoMarkdown(_markdownContent!);
+      } else {
         _markdownContent = mensagemSemConteudo;
       }
+      
+      _conteudoSemFormatacao = _removerFormatacaoMarkdown(_markdownContent ?? '');
     } catch (e) {
       _errorMessage = 'Erro ao carregar os detalhes da consulta: $e';
     } finally {
@@ -102,6 +105,14 @@ class ConsultaDetalhesController extends ChangeNotifier {
     texto = texto.replaceAll(RegExp(r'\n{3,}'), '\n\n');
     
     return texto.trim();
+  }
+
+  String _corrigirFormatacaoMarkdown(String markdown) {
+    if (markdown.isEmpty) return '';
+    
+    String texto = markdown.replaceAll(RegExp(r'(#{1,6})([^#\s])', multiLine: true), r'$1 $2');
+    
+    return texto;
   }
 
   void atualizarConteudoSemFormatacao() {
