@@ -277,24 +277,50 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   }
   
   void _showCancelDialog(BuildContext context, ConsultaModel consulta) {
+
+    // Armazenar o BuildContext global para uso após o diálogo ser fechado
+    final globalContext = context;
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
+
         title: const Text('Cancelar Consulta'),
         content: Text('Deseja realmente cancelar a consulta de ${consulta.data} às ${consulta.hora}?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+
+            onPressed: () => Navigator.pop(dialogContext),
+
             child: const Text('Não'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              if (consulta.id != null) {
-                widget.controller.cancelarConsulta(consulta.id!);
-              }
+
+            onPressed: () async {
+              // Fechar o diálogo de confirmação
+              Navigator.pop(dialogContext);
               
-              Navigator.pop(context);
+              if (consulta.id != null) {
+                log('Iniciando cancelamento da consulta ID: ${consulta.id}');
+                // Chamar o método de cancelamento e aguardar o resultado
+                final success = await widget.controller.cancelarConsulta(consulta.id!);
+                log('Resultado do cancelamento: $success');
+                
+                // Mostrar feedback sempre que a operação terminar
+                if (mounted) {
+                  log('Widget ainda está montado, exibindo feedback');
+                  ScaffoldMessenger.of(globalContext).showSnackBar(
+                    SnackBar(
+                      content: Text(success ? 'Consulta cancelada com sucesso!' : 'Não foi possível cancelar a consulta'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                } else {
+                  log('Widget não está mais montado, não é possível exibir feedback');
+                }
+              }
+
             },
             child: const Text('Sim, Cancelar', style: TextStyle(color: Colors.white)),
           ),

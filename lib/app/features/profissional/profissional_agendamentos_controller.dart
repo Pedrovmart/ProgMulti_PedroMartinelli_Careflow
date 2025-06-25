@@ -144,10 +144,19 @@ class ProfissionalAgendamentosController extends BaseAgendamentosController {
   }
   
   @override
-  Future<void> cancelAppointment(String consultaId) async {
+
+  Future<bool> cancelAppointment(String consultaId) async {
     try {
-      await _consultasProvider.cancelarConsulta(consultaId);
-      await fetchConsultations();
+      final success = await _consultasProvider.cancelarConsulta(consultaId);
+      if (success) {
+        await fetchConsultations();
+        notifyListeners();
+        return true;
+      } else {
+        debugPrint('Falha ao cancelar consulta: resposta da API indica falha');
+        return false;
+      }
+
     } catch (e) {
       debugPrint('Erro ao cancelar consulta: $e');
       rethrow;
