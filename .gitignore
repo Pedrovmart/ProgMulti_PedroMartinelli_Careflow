@@ -11,6 +11,8 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+.env
+
 
 # IntelliJ related
 *.iml
@@ -43,3 +45,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore Firebase configuration file
+android/app/google-services.json
+
+# Ignore Windsurf rules
+.windsurf
+
+.github/instructions/careflow_instructions.instructions.md
+
+# Ignore Flutter build artifacts
+linux
+macos
+windows
