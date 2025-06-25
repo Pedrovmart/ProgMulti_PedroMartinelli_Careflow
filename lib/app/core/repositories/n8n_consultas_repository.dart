@@ -143,7 +143,23 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
-  Future<void> cancelarConsulta(String consultaId) => delete(consultaId);
+  Future<bool> cancelarConsulta(String consultaId) async {
+    try {
+      final response = await _httpClient.delete('$_endpointDeleteConsulta?consultaId=$consultaId');
+      
+      if (response.data is List && response.data.isNotEmpty && 
+          response.data[0] is Map<String, dynamic> && 
+          response.data[0]['success'] == true) {
+        log('Consulta cancelada com sucesso: $consultaId');
+        return true;
+      } else {
+        log('Falha ao cancelar consulta. Resposta da API: ${response.data}');
+        return false;
+      }
+    } catch (e) {
+      throw Exception('Erro ao cancelar consulta: $e');
+    }
+  }
 
   bool _isValidConsultaMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
