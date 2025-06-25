@@ -149,12 +149,15 @@ class ConsultasProvider extends ChangeNotifier {
     }
   }
 
+
   Future<bool> cancelarConsulta(String consultaId) async {
+
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
+
       final success = await _consultasRepository.cancelarConsulta(consultaId);
       
       if (success) {
@@ -164,6 +167,7 @@ class ConsultasProvider extends ChangeNotifier {
         _error = "Não foi possível cancelar a consulta. Por favor, tente novamente.";
         return false;
       }
+
     } catch (e) {
       _error = "Erro ao cancelar consulta: ${e.toString()}";
       rethrow;

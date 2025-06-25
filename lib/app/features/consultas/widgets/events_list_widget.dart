@@ -277,21 +277,26 @@ class _EventsListWidgetState extends State<EventsListWidget> {
   }
   
   void _showCancelDialog(BuildContext context, ConsultaModel consulta) {
+
     // Armazenar o BuildContext global para uso após o diálogo ser fechado
     final globalContext = context;
     
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+
         title: const Text('Cancelar Consulta'),
         content: Text('Deseja realmente cancelar a consulta de ${consulta.data} às ${consulta.hora}?'),
         actions: [
           TextButton(
+
             onPressed: () => Navigator.pop(dialogContext),
+
             child: const Text('Não'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+
             onPressed: () async {
               // Fechar o diálogo de confirmação
               Navigator.pop(dialogContext);
@@ -315,6 +320,7 @@ class _EventsListWidgetState extends State<EventsListWidget> {
                   log('Widget não está mais montado, não é possível exibir feedback');
                 }
               }
+
             },
             child: const Text('Sim, Cancelar', style: TextStyle(color: Colors.white)),
           ),

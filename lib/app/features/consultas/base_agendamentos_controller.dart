@@ -42,6 +42,7 @@ abstract class BaseAgendamentosController extends ChangeNotifier {
   
   Future<bool> cancelarConsulta(String consultaId) => cancelAppointment(consultaId);
 
+
   Future<void> selectTime(BuildContext context);
   
   

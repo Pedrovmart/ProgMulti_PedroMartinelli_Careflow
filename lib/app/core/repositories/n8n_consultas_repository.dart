@@ -143,6 +143,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     }
   }
 
+
   Future<bool> cancelarConsulta(String consultaId) async {
     try {
       final response = await _httpClient.delete('$_endpointDeleteConsulta?consultaId=$consultaId');
@@ -160,6 +161,7 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
       throw Exception('Erro ao cancelar consulta: $e');
     }
   }
+
 
   bool _isValidConsultaMap(Map<String, dynamic> map) {
     if (map.isEmpty) {
