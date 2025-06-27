@@ -76,9 +76,7 @@ class ConsultaDetalhesController extends ChangeNotifier {
         _markdownContent = mensagemSemConteudo;
       }
 
-      _conteudoSemFormatacao = _removerFormatacaoMarkdown(
-        _markdownContent ?? '',
-      );
+
     } catch (e) {
       _errorMessage = 'Erro ao carregar os detalhes da consulta: $e';
     } finally {
@@ -142,12 +140,14 @@ class ConsultaDetalhesController extends ChangeNotifier {
         idConsulta: _idConsulta!,
         diagnostico: novoDiagnostico,
       );
-
-      await carregarDetalhesConsulta(
-        idProfissional: idProfissional,
-        idPaciente: idPaciente,
-        idConsulta: _idConsulta,
-      );
+      
+      if (_detalhesConsulta != null) {
+        _detalhesConsulta!['diagnostico'] = novoDiagnostico;
+        
+        if (_markdownContent != null && _markdownContent!.contains('Diagnóstico')) {
+          
+        }
+      }
     } catch (e) {
       _errorMessage = 'Erro ao atualizar o diagnóstico: $e';
       rethrow;

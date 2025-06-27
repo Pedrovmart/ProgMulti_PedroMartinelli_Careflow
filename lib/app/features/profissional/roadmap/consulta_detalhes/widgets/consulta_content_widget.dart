@@ -126,71 +126,34 @@ class ConsultaContentWidget extends StatelessWidget {
     required String idPaciente,
     required String idConsulta,
   }) async {
-    if (idConsulta.isEmpty) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Não foi possível identificar a consulta'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (controller.detalhesConsulta == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível carregar os detalhes da consulta'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
-
+    
     try {
-      bool? success = await showDialog<bool>(
+      final diagnosticoAtual = controller.detalhesConsulta?['diagnostico'] ?? '';
+      
+      await showAtualizarDiagnosticoDialog(
         context: context,
-        builder:
-            (dialogContext) => AtualizarDiagnosticoDialog(
-              diagnosticoInicial: '',
-              isLoading: controller.isLoading,
-              onConfirmar: (novoDiagnostico) async {
-                try {
-                  try {
-                    await controller.atualizarDiagnostico(
-                      context: dialogContext,
-                      idProfissional: idProfissional,
-                      idPaciente: idPaciente,
-                      novoDiagnostico: novoDiagnostico,
-                    );
+        diagnosticoInicial: diagnosticoAtual,
+        onConfirmar: (novoDiagnostico) async {
 
-                    controller.atualizarConteudoSemFormatacao();
+          await controller.atualizarDiagnostico(
+            context: context,
+            idProfissional: idProfissional,
+            idPaciente: idPaciente,
+            novoDiagnostico: novoDiagnostico,
+          );
 
-                    if (dialogContext.mounted) {
-                      ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(
-                          content: Text('Diagnóstico atualizado com sucesso!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
-
-                    if (dialogContext.mounted) {
-                      Navigator.of(dialogContext).pop(true);
-                    }
-                    return true;
-                  } catch (e) {
-                    rethrow;
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Erro ao atualizar diagnóstico: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                  return false;
-                }
-              },
-            ),
+          controller.atualizarConteudoSemFormatacao();
+        },
       );
-
-      if (success == true) {
-        return;
-      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

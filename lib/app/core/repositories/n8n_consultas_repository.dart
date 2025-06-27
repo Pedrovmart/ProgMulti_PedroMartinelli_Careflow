@@ -100,7 +100,6 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
   @override
   Future<void> update(String id, ConsultaModel item) async {
     try {
-      // Delega para o método updatePartialFields que usa o endpoint /atualizaConsulta
       await updatePartialFields(id, item.toMap());
     } catch (e) {
       log('Erro ao atualizar consulta: $e');
@@ -124,9 +123,9 @@ class N8nConsultasRepository implements BaseRepository<ConsultaModel> {
     required String diagnostico,
   }) async {
     try {
-      final url = '$_endpointAtualizarDiagnostico?idConsulta=$idConsulta';
       await _httpClient.put(
-        url,
+        _endpointAtualizarDiagnostico,
+        queryParameters: {'idConsulta': idConsulta},
         data: {'diagnostico': diagnostico},
       );
     } catch (e) {
